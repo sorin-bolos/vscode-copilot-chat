@@ -1,5 +1,4 @@
 // Core AI assistant logic exports
-// TODO: Implement core functionality
+export * from './instantiation';
+export * from './lifecycle';
 
-// Placeholder - will implement services later
-// export * from './services'

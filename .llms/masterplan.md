@@ -37,11 +37,11 @@ Browser Vue.js IDE
   ```
 
 ### 1.2 Remove VS Code Dependencies
-- [ ] Identify all VS Code API dependencies in source code
-- [ ] Create abstraction layer for VS Code-specific functionality
-- [ ] Replace VS Code event system with custom event emitter (or Vue's provide/inject + composables)
-- [ ] Replace VS Code disposable pattern with Vue lifecycle hooks (onBeforeUnmount, ref cleanup)
-- [ ] Remove dependency on VS Code extension host APIs
+- [x] Identify all VS Code API dependencies in source code
+- [x] Create abstraction layer for VS Code-specific functionality
+- [x] Replace VS Code event system with custom event emitter (or Vue's provide/inject + composables)
+- [x] Replace VS Code disposable pattern with Vue lifecycle hooks (onBeforeUnmount, ref cleanup)
+- [x] Remove dependency on VS Code extension host APIs
 
 ### 1.3 Core Service Architecture
 - [ ] Adapt dependency injection system for browser environment

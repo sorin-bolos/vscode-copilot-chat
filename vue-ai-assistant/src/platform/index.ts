@@ -1,7 +1,4 @@
 // Platform services exports
-// TODO: Implement platform abstraction layer
+export * from './platformAbstraction';
+export * from './storage';
 
-// Placeholders - will implement these services later
-// export * from './fileSystem'
-// export * from './storage'
-// export * from './communication'
