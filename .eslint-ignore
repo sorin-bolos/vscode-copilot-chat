@@ -11,6 +11,9 @@ test/scenarios/**
 .simulation/**
 .eslintplugin/**
 
+# ignore vue-ai-assistant project
+vue-ai-assistant/**
+
 # ignore vs
 src/util/vs/**
 
