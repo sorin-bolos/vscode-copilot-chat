@@ -44,11 +44,11 @@ Browser Vue.js IDE
 - [x] Remove dependency on VS Code extension host APIs
 
 ### 1.3 Core Service Architecture
-- [ ] Adapt dependency injection system for browser environment
-- [ ] Remove Node.js specific services and APIs
-- [ ] Create web-compatible service registration system
-- [ ] Implement browser-based lifecycle management
-- [ ] Set up error handling and logging for web environment
+- [x] Adapt dependency injection system for browser environment
+- [x] Remove Node.js specific services and APIs
+- [x] Create web-compatible service registration system
+- [x] Implement browser-based lifecycle management
+- [x] Set up error handling and logging for web environment
 
 ## Phase 2: Core Platform Services Migration
 *Estimated Time: 3-4 weeks*
