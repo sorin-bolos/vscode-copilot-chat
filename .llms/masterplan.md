@@ -65,64 +65,46 @@ Browser Vue.js IDE
   - [x] Handle connection management and reconnection
   - [x] Message queuing and delivery guarantees
 
-### 2.2 File System Abstraction
-- [ ] **Virtual File System**
-  - [ ] Create abstraction layer over your IDE's file system
-  - [ ] Implement file reading/writing operations
-  - [ ] Add file watching capabilities
-  - [ ] Support for different file encodings
-
-- [ ] **Monaco Editor Integration**
+### 2.2 Monaco Editor Integration
+- [ ] **Monaco Editor Service**
   - [ ] Create service to interact with Monaco editor
   - [ ] Implement text manipulation operations
   - [ ] Add selection and cursor management
   - [ ] Support for multiple editor instances
 
-### 2.3 Storage Services
-- [ ] **Browser Storage Service**
-  - [ ] Implement localStorage/sessionStorage wrapper
-  - [ ] Add IndexedDB support for large data
-  - [ ] Create conversation persistence
-  - [ ] Implement settings storage
-
-### 2.4 Search and Indexing
-- [ ] **Browser-Based Search**
-  - [ ] Adapt workspace search for web environment
-  - [ ] Implement client-side text search
-  - [ ] Create symbol search integration
-  - [ ] Add semantic search capabilities (if embedding service available)
+- [ ] **Single-File AI Assistant**
+  - [ ] Focus on current editor content only
+  - [ ] Direct editor content analysis
+  - [ ] In-place code editing and suggestions
+  - [ ] Context extraction from current file
 
 ## Phase 3: Chat System Core
 *Estimated Time: 4-5 weeks*
 
 ### 3.1 Chat Infrastructure
 - [ ] **Conversation Management**
-  - [ ] Port conversation store to browser storage
-  - [ ] Implement chat history persistence
-  - [ ] Add conversation export/import
-  - [ ] Create session management
+  - [ ] Create conversation state management (in-memory)
+  - [ ] Implement message handling and display
+  - [ ] Add conversation session management
+  - [ ] Create conversation export capabilities
 
 - [ ] **Message Processing Pipeline**
   - [ ] Adapt chat participant request handler
   - [ ] Implement intent detection system
-  - [ ] Create context resolution for web environment
+  - [ ] Create context resolution for Monaco editor
   - [ ] Add prompt construction logic
 
 ### 3.2 Chat Participants/Agents
 - [ ] **Default Chat Agent**
   - [ ] Port default conversational AI
-  - [ ] Adapt to work without VS Code context
+  - [ ] Adapt to work with Monaco editor context
   - [ ] Implement general coding assistance
-
-- [ ] **Workspace Agent**
-  - [ ] Create file-system aware agent
-  - [ ] Implement project-wide search and analysis
-  - [ ] Add code navigation capabilities
 
 - [ ] **Code Agent**
   - [ ] Implement code-specific assistance
   - [ ] Add syntax analysis and suggestions
   - [ ] Create refactoring assistance
+  - [ ] Focus on single-file transformations
 
 ### 3.3 Language Model Integration
 - [ ] **Backend API Integration**
@@ -174,8 +156,8 @@ Browser Vue.js IDE
 
 ### 4.3 Tool Integration UI
 - [ ] **Tool Results Display**
-  - [ ] Create components for file operations results
-  - [ ] Add search results visualization
+  - [ ] Create components for code analysis results
+  - [ ] Add syntax highlighting for code suggestions
   - [ ] Implement error/success notifications
   - [ ] Create progress indicators
 
@@ -187,20 +169,16 @@ Browser Vue.js IDE
   - [ ] Theme and appearance options
 
 ## Phase 5: Tool System Implementation
-*Estimated Time: 3-4 weeks*
+*Estimated Time: 2-3 weeks*
 
-### 5.1 Core Tools
-- [ ] **File Operations**
-  - [ ] `readFile`: Read file content from IDE
-  - [ ] `writeFile`: Write content to IDE files
-  - [ ] `createFile`: Create new files
-  - [ ] `deleteFile`: Delete files (with confirmation)
-
-- [ ] **Search Tools**
-  - [ ] `searchFiles`: Search for files by name/pattern
-  - [ ] `searchInFiles`: Search content within files
-  - [ ] `findSymbols`: Search for code symbols
-  - [ ] `findReferences`: Find symbol references
+### 5.1 Monaco Editor Tools
+- [ ] **Editor Integration**
+  - [ ] `getSelection`: Get current selection
+  - [ ] `replaceSelection`: Replace selected text
+  - [ ] `insertText`: Insert text at cursor
+  - [ ] `formatDocument`: Format code
+  - [ ] `getContent`: Get full editor content
+  - [ ] `setContent`: Set editor content
 
 ### 5.2 Code Analysis Tools
 - [ ] **Language Services Integration**
@@ -208,20 +186,14 @@ Browser Vue.js IDE
   - [ ] `getCompletions`: Get code completions
   - [ ] `getHover`: Get hover information
   - [ ] `getDefinition`: Go to definition
+  - [ ] `analyzeCode`: Analyze current code structure
 
-### 5.3 Monaco Editor Tools
-- [ ] **Editor Integration**
-  - [ ] `getSelection`: Get current selection
-  - [ ] `replaceSelection`: Replace selected text
-  - [ ] `insertText`: Insert text at cursor
-  - [ ] `formatDocument`: Format code
-
-### 5.4 Tool Registration System
+### 5.3 Tool Registration System
 - [ ] **Dynamic Tool System**
   - [ ] Create tool registry for extensibility
   - [ ] Implement tool validation
   - [ ] Add permission system for sensitive operations
-  - [ ] Create tool result caching
+  - [ ] Create tool result caching (in-memory)
 
 ## Phase 6: MCP Server Integration
 *Estimated Time: 2-3 weeks*
@@ -252,10 +224,10 @@ Browser Vue.js IDE
 
 ### 7.1 Context Intelligence
 - [ ] **Smart Context Collection**
-  - [ ] Implement file relationship detection
-  - [ ] Add import/dependency analysis
-  - [ ] Create workspace understanding
-  - [ ] Smart snippet extraction
+  - [ ] Implement code structure analysis
+  - [ ] Add import/dependency detection within file
+  - [ ] Create intelligent code snippet extraction
+  - [ ] Smart function/class understanding
 
 ### 7.2 Code Generation and Editing
 - [ ] **Inline Code Generation**
@@ -264,12 +236,12 @@ Browser Vue.js IDE
   - [ ] Create smart code modifications
   - [ ] Support for multiple languages
 
-### 7.3 Collaborative Features
-- [ ] **Multi-user Support**
-  - [ ] Share conversations between users
-  - [ ] Implement collaborative editing suggestions
-  - [ ] Add comment and review system
-  - [ ] Create workspace sharing
+### 7.3 User Experience Features
+- [ ] **Enhanced UX**
+  - [ ] Add undo/redo for AI suggestions
+  - [ ] Implement suggestion preview
+  - [ ] Create keyboard shortcuts
+  - [ ] Add accessibility support
 
 ## Phase 8: Performance and Optimization
 *Estimated Time: 2 weeks*
