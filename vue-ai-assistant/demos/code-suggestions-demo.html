@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Edit Suggestions Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 20px;
+        }
+
+        .demo-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            height: 80vh;
+        }
+
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .suggestions-panel {
+            background: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: #2d2d30;
+            padding: 15px;
+            border-bottom: 1px solid #3c3c3c;
+            font-weight: bold;
+            color: #cccccc;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #005a9e;
+        }
+
+        .btn.secondary {
+            background: #6c757d;
+        }
+
+        .btn.success {
+            background: #28a745;
+        }
+
+        .btn.danger {
+            background: #dc3545;
+        }
+
+        .editor-container {
+            flex: 1;
+            border: 2px solid #3c3c3c;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .editor-header {
+            background: #2d2d30;
+            padding: 10px 15px;
+            border-bottom: 1px solid #3c3c3c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-content {
+            height: 100%;
+            width: 100%;
+        }
+
+        .suggestion-item {
+            background: #2d2d30;
+            border: 1px solid #3c3c3c;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .suggestion-header {
+            padding: 12px 15px;
+            background: #343434;
+            border-bottom: 1px solid #3c3c3c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .suggestion-title {
+            font-weight: bold;
+            color: #4ec9b0;
+        }
+
+        .suggestion-category {
+            background: #007acc;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .suggestion-body {
+            padding: 15px;
+        }
+
+        .suggestion-description {
+            margin-bottom: 10px;
+            color: #cccccc;
+            font-size: 14px;
+        }
+
+        .suggestion-diff {
+            background: #0e0e0e;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+        }
+
+        .diff-line {
+            padding: 2px 10px;
+            border-left: 3px solid transparent;
+        }
+
+        .diff-removed {
+            background: #2d1a1a;
+            border-left-color: #dc3545;
+            color: #ff6b6b;
+        }
+
+        .diff-added {
+            background: #1a2d1a;
+            border-left-color: #28a745;
+            color: #6bcf7f;
+        }
+
+        .diff-context {
+            background: #1a1a1a;
+            color: #858585;
+        }
+
+        .suggestion-actions {
+            display: flex;
+            gap: 8px;
+            padding: 15px;
+            border-top: 1px solid #3c3c3c;
+            background: #252526;
+        }
+
+        .suggestion-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #858585;
+            margin-top: 10px;
+        }
+
+        .confidence-bar {
+            width: 60px;
+            height: 6px;
+            background: #3c3c3c;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #dc3545, #ffc107, #28a745);
+            transition: width 0.3s ease;
+        }
+
+        .event-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #0e0e0e;
+            border: 1px solid #3c3c3c;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+        }
+
+        .event-entry {
+            padding: 2px 0;
+        }
+
+        .event-timestamp {
+            color: #858585;
+        }
+
+        .event-type {
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+
+        .event-data {
+            color: #ce9178;
+        }
+
+        .status-badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .status-applied {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-rejected {
+            background: #dc3545;
+            color: white;
+        }
+
+        .inline-suggestion-demo {
+            margin-top: 20px;
+            padding: 15px;
+            background: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+        }
+
+        .diff-viewer-demo {
+            margin-top: 20px;
+            height: 300px;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        @media (max-width: 1200px) {
+            .demo-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+
+            .suggestions-panel {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Code Edit Suggestions Demo</h1>
+            <p>Interactive demonstration of AI-powered code suggestions with accept/reject workflow</p>
+        </div>
+
+        <div class="demo-layout">
+            <div class="editor-section">
+                <div class="demo-controls">
+                    <button class="btn" onclick="generateRefactorSuggestion()">🔄 Refactor Suggestion</button>
+                    <button class="btn" onclick="generateFixSuggestion()">🐛 Bug Fix Suggestion</button>
+                    <button class="btn" onclick="generateOptimizeSuggestion()">⚡ Optimize Suggestion</button>
+                    <button class="btn" onclick="generateTypingSuggestion()">📝 Add Types</button>
+                    <button class="btn secondary" onclick="showInlineSuggestion()">👻 Inline Suggestion</button>
+                    <button class="btn secondary" onclick="showDiffViewer()">📊 Diff Viewer</button>
+                    <button class="btn secondary" onclick="clearAllSuggestions()">🗑️ Clear All</button>
+                </div>
+
+                <div class="editor-container">
+                    <div class="editor-header">
+                        <div class="editor-title">Code Editor</div>
+                        <div class="editor-info">
+                            Language: <span id="languageInfo">javascript</span> |
+                            Pending Suggestions: <span id="pendingSuggestionsCount">0</span>
+                        </div>
+                    </div>
+                    <div id="editor" class="editor-content"></div>
+                </div>
+            </div>
+
+            <div class="suggestions-panel">
+                <div class="panel-header">
+                    <div>💡 Code Suggestions</div>
+                </div>
+                <div class="panel-content">
+                    <div id="suggestionsList">
+                        <div style="text-align: center; color: #858585; margin-top: 50px;">
+                            No suggestions yet.<br>
+                            Click a button above to generate suggestions!
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <div class="panel-header" style="margin: 0; border-radius: 4px;">📜 Event Log</div>
+                        <div id="eventLog" class="event-log" style="margin-top: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="inline-suggestion-demo">
+            <h3>🔮 Inline Suggestions Demo</h3>
+            <p>Position your cursor and trigger inline suggestions to see ghost text completions:</p>
+            <div id="inlineSuggestionStatus" style="color: #858585;">No active inline suggestions</div>
+        </div>
+
+        <div class="diff-viewer-demo" id="diffViewer" style="display: none;">
+            <div class="editor-header">
+                <div class="editor-title">📊 Side-by-Side Diff Viewer</div>
+                <button class="btn secondary" onclick="hideDiffViewer()" style="padding: 4px 8px;">✕ Close</button>
+            </div>
+            <div id="diffEditor" style="height: calc(100% - 45px);"></div>
+        </div>
+    </div>
+
+    <!-- Monaco Editor -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+    <script>
+        let monacoEditorService;
+        let primaryEditor;
+        let activeSuggestions = new Map();
+        let suggestionCounter = 0;
+
+        // Initialize Monaco Editor
+        require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+
+        require(['vs/editor/editor.main'], function () {
+            initializeDemo();
+        });
+
+        async function initializeDemo() {
+            try {
+                await loadMonacoEditorService();
+
+                // Create primary editor
+                primaryEditor = monacoEditorService.createEditor(
+                    document.getElementById('editor'),
+                    {
+                        value: getSampleCode(),
+                        language: 'javascript',
+                        theme: 'vs-dark',
+                        fontSize: 14,
+                        automaticLayout: true,
+                        minimap: { enabled: true }
+                    }
+                );
+
+                monacoEditorService.setActiveEditor(primaryEditor.id);
+                setupEventListeners();
+
+                logEvent('Demo initialized', 'Code suggestion system ready');
+
+            } catch (error) {
+                console.error('Failed to initialize demo:', error);
+                logEvent('ERROR', 'Failed to initialize: ' + error.message);
+            }
+        }
+
+        function setupEventListeners() {
+            // Suggestion events
+            monacoEditorService.onSuggestionCreated((event) => {
+                logEvent('Suggestion Created', JSON.stringify({
+                    id: event.suggestion.id.substring(0, 12) + '...',
+                    category: event.suggestion.category,
+                    confidence: event.suggestion.confidence
+                }));
+
+                addSuggestionToUI(event.suggestion);
+                updatePendingCount();
+            });
+
+            monacoEditorService.onSuggestionStatusChanged((event) => {
+                logEvent('Status Changed', JSON.stringify({
+                    id: event.suggestionId.substring(0, 12) + '...',
+                    status: event.newStatus
+                }));
+
+                updateSuggestionInUI(event.suggestionId, event.newStatus);
+                updatePendingCount();
+            });
+
+            monacoEditorService.onSuggestionApplied((event) => {
+                logEvent('Suggestion Applied', JSON.stringify({
+                    id: event.suggestionId.substring(0, 12) + '...',
+                    success: event.success,
+                    error: event.error
+                }));
+            });
+
+            // Content changes
+            monacoEditorService.onContentChanged((event) => {
+                // Auto-trigger inline suggestions on content change
+                setTimeout(() => {
+                    checkForInlineSuggestions();
+                }, 500);
+            });
+        }
+
+        function generateRefactorSuggestion() {
+            const suggestion = {
+                title: "Extract Function",
+                description: "Extract the validation logic into a separate function for better reusability and testing.",
+                edits: [{
+                    range: { startLineNumber: 8, startColumn: 5, endLineNumber: 12, endColumn: 6 },
+                    text: `    if (!validateUserInput(email, password)) {
+        return;
+    }`
+                }],
+                originalText: `    if (!email || email.length < 3) {
+        alert('Email too short');
+        return;
+    }
+    if (!password || password.length < 6) {
+        alert('Password too short');
+        return;
+    }`,
+                suggestedText: `    if (!validateUserInput(email, password)) {
+        return;
+    }`,
+                range: { startLineNumber: 8, startColumn: 5, endLineNumber: 15, endColumn: 6 },
+                confidence: 0.85,
+                category: 'refactor',
+                reasoning: "Extracting validation logic improves code maintainability and testability."
+            };
+
+            const suggestionId = monacoEditorService.createSuggestion(suggestion);
+            activeSuggestions.set(suggestionId, suggestion);
+        }
+
+        function generateFixSuggestion() {
+            const suggestion = {
+                title: "Fix Async/Await",
+                description: "Add proper error handling for the async operation to prevent unhandled promise rejections.",
+                edits: [{
+                    range: { startLineNumber: 18, startColumn: 1, endLineNumber: 20, endColumn: 2 },
+                    text: `async function loginUser(email, password) {
+    try {
+        const result = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (!result.ok) {
+            throw new Error('Login failed');
+        }
+
+        const data = await result.json();
+        console.log('Login successful:', data);
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Login failed: ' + error.message);
+    }
+}`
+                }],
+                originalText: `function loginUser(email, password) {
+    fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    }).then(response => response.json())
+      .then(data => console.log(data));
+}`,
+                suggestedText: `async function loginUser(email, password) {
+    try {
+        const result = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (!result.ok) {
+            throw new Error('Login failed');
+        }
+
+        const data = await result.json();
+        console.log('Login successful:', data);
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Login failed: ' + error.message);
+    }
+}`,
+                range: { startLineNumber: 18, startColumn: 1, endLineNumber: 25, endColumn: 2 },
+                confidence: 0.92,
+                category: 'fix',
+                reasoning: "Proper error handling prevents runtime crashes and provides better user feedback."
+            };
+
+            const suggestionId = monacoEditorService.createSuggestion(suggestion);
+            activeSuggestions.set(suggestionId, suggestion);
+        }
+
+        function generateOptimizeSuggestion() {
+            const suggestion = {
+                title: "Optimize Performance",
+                description: "Use event delegation instead of multiple event listeners for better performance with many elements.",
+                edits: [{
+                    range: { startLineNumber: 27, startColumn: 1, endLineNumber: 32, endColumn: 2 },
+                    text: `// Optimized: Use event delegation
+document.addEventListener('click', function(event) {
+    if (event.target.matches('.login-button')) {
+        const form = event.target.closest('form');
+        const email = form.querySelector('input[type="email"]').value;
+        const password = form.querySelector('input[type="password"]').value;
+        processLogin(email, password);
+    }
+});`
+                }],
+                originalText: `// Multiple event listeners (inefficient)
+document.querySelectorAll('.login-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const email = this.form.querySelector('input[type="email"]').value;
+        const password = this.form.querySelector('input[type="password"]').value;
+        processLogin(email, password);
+    });
+});`,
+                suggestedText: `// Optimized: Use event delegation
+document.addEventListener('click', function(event) {
+    if (event.target.matches('.login-button')) {
+        const form = event.target.closest('form');
+        const email = form.querySelector('input[type="email"]').value;
+        const password = form.querySelector('input[type="password"]').value;
+        processLogin(email, password);
+    }
+});`,
+                range: { startLineNumber: 27, startColumn: 1, endLineNumber: 34, endColumn: 4 },
+                confidence: 0.78,
+                category: 'optimize',
+                reasoning: "Event delegation reduces memory usage and improves performance with dynamic content."
+            };
+
+            const suggestionId = monacoEditorService.createSuggestion(suggestion);
+            activeSuggestions.set(suggestionId, suggestion);
+        }
+
+        function generateTypingSuggestion() {
+            const suggestion = {
+                title: "Add TypeScript Types",
+                description: "Add proper TypeScript type annotations for better type safety and IDE support.",
+                edits: [{
+                    range: { startLineNumber: 1, startColumn: 1, endLineNumber: 6, endColumn: 2 },
+                    text: `interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
+interface LoginResponse {
+    success: boolean;
+    token?: string;
+    user?: {
+        id: string;
+        email: string;
+        name: string;
+    };
+    error?: string;
+}
+
+function processLogin(email: string, password: string): void {
+    if (!validateUserInput(email, password)) {
+        return;
+    }
+
+    loginUser(email, password);
+}`
+                }],
+                originalText: `function processLogin(email, password) {
+    if (!validateUserInput(email, password)) {
+        return;
+    }
+
+    loginUser(email, password);
+}`,
+                suggestedText: `interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
+interface LoginResponse {
+    success: boolean;
+    token?: string;
+    user?: {
+        id: string;
+        email: string;
+        name: string;
+    };
+    error?: string;
+}
+
+function processLogin(email: string, password: string): void {
+    if (!validateUserInput(email, password)) {
+        return;
+    }
+
+    loginUser(email, password);
+}`,
+                range: { startLineNumber: 1, startColumn: 1, endLineNumber: 6, endColumn: 2 },
+                confidence: 0.88,
+                category: 'typing',
+                reasoning: "Type annotations improve code maintainability and catch errors at compile time."
+            };
+
+            const suggestionId = monacoEditorService.createSuggestion(suggestion);
+            activeSuggestions.set(suggestionId, suggestion);
+        }
+
+        function showInlineSuggestion() {
+            const position = monacoEditorService.getCursorPosition();
+            if (!position) return;
+
+            const inlineSuggestion = {
+                id: 'inline-' + (++suggestionCounter),
+                text: '// TODO: Add input validation here',
+                position: position,
+                confidence: 0.75,
+                category: 'generate',
+                ghostText: true,
+                showAfterDelay: 500
+            };
+
+            const suggestionId = monacoEditorService.showInlineSuggestion(inlineSuggestion);
+
+            document.getElementById('inlineSuggestionStatus').innerHTML =
+                `<span style="color: #4ec9b0;">Active:</span> ${inlineSuggestion.text}
+                 <button class="btn" style="margin-left: 10px; padding: 2px 8px;" onclick="acceptInlineSuggestion('${suggestionId}')">Accept</button>
+                 <button class="btn secondary" style="margin-left: 5px; padding: 2px 8px;" onclick="rejectInlineSuggestion('${suggestionId}')">Reject</button>`;
+
+            logEvent('Inline Suggestion', 'Shown at line ' + position.lineNumber);
+        }
+
+        function acceptInlineSuggestion(suggestionId) {
+            monacoEditorService.acceptInlineSuggestion(suggestionId);
+            document.getElementById('inlineSuggestionStatus').textContent = 'Inline suggestion accepted';
+            logEvent('Inline Accepted', suggestionId);
+        }
+
+        function rejectInlineSuggestion(suggestionId) {
+            monacoEditorService.hideInlineSuggestion(suggestionId);
+            document.getElementById('inlineSuggestionStatus').textContent = 'Inline suggestion rejected';
+            logEvent('Inline Rejected', suggestionId);
+        }
+
+        function showDiffViewer() {
+            const original = getSampleCode();
+            const modified = getSampleCodeOptimized();
+
+            const diffViewer = document.getElementById('diffViewer');
+            diffViewer.style.display = 'block';
+
+            const diffEditor = monacoEditorService.createDiffEditor(
+                document.getElementById('diffEditor'),
+                original,
+                modified,
+                {
+                    theme: 'vs-dark',
+                    renderSideBySide: true,
+                    readOnly: true
+                }
+            );
+
+            logEvent('Diff Viewer', 'Opened side-by-side comparison');
+        }
+
+        function hideDiffViewer() {
+            document.getElementById('diffViewer').style.display = 'none';
+            logEvent('Diff Viewer', 'Closed');
+        }
+
+        function clearAllSuggestions() {
+            monacoEditorService.clearSuggestions();
+            activeSuggestions.clear();
+            document.getElementById('suggestionsList').innerHTML =
+                '<div style="text-align: center; color: #858585; margin-top: 50px;">All suggestions cleared!</div>';
+            updatePendingCount();
+            logEvent('Suggestions Cleared', 'All suggestions removed');
+        }
+
+        function checkForInlineSuggestions() {
+            // Simulate checking for inline suggestions based on context
+            const content = monacoEditorService.getContent();
+            const position = monacoEditorService.getCursorPosition();
+
+            if (content.includes('TODO') && Math.random() < 0.3) {
+                // Randomly show inline suggestions for demonstration
+                showInlineSuggestion();
+            }
+        }
+
+        function addSuggestionToUI(suggestion) {
+            const suggestionsList = document.getElementById('suggestionsList');
+
+            if (suggestionsList.innerHTML.includes('No suggestions yet')) {
+                suggestionsList.innerHTML = '';
+            }
+
+            const suggestionElement = createSuggestionElement(suggestion);
+            suggestionsList.appendChild(suggestionElement);
+        }
+
+        function createSuggestionElement(suggestion) {
+            const element = document.createElement('div');
+            element.className = 'suggestion-item';
+            element.id = 'suggestion-' + suggestion.id;
+
+            element.innerHTML = `
+                <div class="suggestion-header">
+                    <div class="suggestion-title">${suggestion.title}</div>
+                    <div class="suggestion-category">${suggestion.category}</div>
+                </div>
+                <div class="suggestion-body">
+                    <div class="suggestion-description">${suggestion.description}</div>
+                    <div class="suggestion-diff">
+                        <div class="diff-line diff-removed">- ${suggestion.originalText.split('\\n')[0]}</div>
+                        <div class="diff-added">+ ${suggestion.suggestedText.split('\\n')[0]}</div>
+                        ${suggestion.originalText.split('\\n').length > 1 ? '<div class="diff-context">  ...</div>' : ''}
+                    </div>
+                    <div class="suggestion-meta">
+                        <div>Confidence:
+                            <div class="confidence-bar" style="display: inline-block; vertical-align: middle; margin-left: 5px;">
+                                <div class="confidence-fill" style="width: ${suggestion.confidence * 100}%"></div>
+                            </div>
+                            ${Math.round(suggestion.confidence * 100)}%
+                        </div>
+                        <div>Status: <span class="status-badge status-${suggestion.status || 'pending'}">${suggestion.status || 'pending'}</span></div>
+                    </div>
+                </div>
+                <div class="suggestion-actions">
+                    <button class="btn success" onclick="applySuggestion('${suggestion.id}')">✓ Accept</button>
+                    <button class="btn danger" onclick="rejectSuggestion('${suggestion.id}')">✗ Reject</button>
+                    <button class="btn secondary" onclick="previewSuggestion('${suggestion.id}')">👁 Preview</button>
+                </div>
+            `;
+
+            return element;
+        }
+
+        function updateSuggestionInUI(suggestionId, newStatus) {
+            const element = document.getElementById('suggestion-' + suggestionId);
+            if (element) {
+                const statusBadge = element.querySelector('.status-badge');
+                if (statusBadge) {
+                    statusBadge.className = `status-badge status-${newStatus}`;
+                    statusBadge.textContent = newStatus;
+                }
+
+                if (newStatus === 'applied' || newStatus === 'rejected') {
+                    const actions = element.querySelector('.suggestion-actions');
+                    if (actions) {
+                        actions.innerHTML = `<div style="color: #858585; font-style: italic;">${newStatus === 'applied' ? 'Applied successfully' : 'Rejected'}</div>`;
+                    }
+                }
+            }
+        }
+
+        function applySuggestion(suggestionId) {
+            monacoEditorService.applySuggestion(suggestionId);
+        }
+
+        function rejectSuggestion(suggestionId) {
+            monacoEditorService.rejectSuggestion(suggestionId);
+        }
+
+        function previewSuggestion(suggestionId) {
+            monacoEditorService.previewSuggestion(suggestionId);
+            logEvent('Preview Shown', suggestionId.substring(0, 12) + '...');
+        }
+
+        function updatePendingCount() {
+            const pending = monacoEditorService.getPendingSuggestions();
+            document.getElementById('pendingSuggestionsCount').textContent = pending.length;
+        }
+
+        function logEvent(type, data) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'event-entry';
+            logEntry.innerHTML =
+                `<span class="event-timestamp">[${timestamp}]</span> ` +
+                `<span class="event-type">${type}:</span> ` +
+                `<span class="event-data">${typeof data === 'string' ? data : JSON.stringify(data)}</span>`;
+
+            const eventLog = document.getElementById('eventLog');
+            eventLog.appendChild(logEntry);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        function getSampleCode() {
+            return `function processLogin(email, password) {
+    if (!validateUserInput(email, password)) {
+        return;
+    }
+
+    loginUser(email, password);
+}
+
+function validateUserInput(email, password) {
+    if (!email || email.length < 3) {
+        alert('Email too short');
+        return false;
+    }
+    if (!password || password.length < 6) {
+        alert('Password too short');
+        return false;
+    }
+    return true;
+}
+
+function loginUser(email, password) {
+    fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    }).then(response => response.json())
+      .then(data => console.log(data));
+}
+
+// Multiple event listeners (inefficient)
+document.querySelectorAll('.login-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const email = this.form.querySelector('input[type="email"]').value;
+        const password = this.form.querySelector('input[type="password"]').value;
+        processLogin(email, password);
+    });
+});`;
+        }
+
+        function getSampleCodeOptimized() {
+            return `interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
+interface LoginResponse {
+    success: boolean;
+    token?: string;
+    user?: UserInfo;
+    error?: string;
+}
+
+async function processLogin(email: string, password: string): Promise<void> {
+    if (!validateUserInput(email, password)) {
+        return;
+    }
+
+    await loginUser(email, password);
+}
+
+function validateUserInput(email: string, password: string): boolean {
+    if (!email || email.length < 3) {
+        showError('Email too short');
+        return false;
+    }
+    if (!password || password.length < 6) {
+        showError('Password too short');
+        return false;
+    }
+    return true;
+}
+
+async function loginUser(email: string, password: string): Promise<LoginResponse> {
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (!response.ok) {
+            throw new Error('Login failed');
+        }
+
+        const data: LoginResponse = await response.json();
+        console.log('Login successful:', data);
+        return data;
+    } catch (error) {
+        console.error('Login error:', error);
+        showError('Login failed: ' + error.message);
+        throw error;
+    }
+}
+
+// Optimized: Use event delegation
+document.addEventListener('click', function(event: Event) {
+    const target = event.target as HTMLElement;
+    if (target.matches('.login-button')) {
+        const form = target.closest('form') as HTMLFormElement;
+        const email = (form.querySelector('input[type="email"]') as HTMLInputElement).value;
+        const password = (form.querySelector('input[type="password"]') as HTMLInputElement).value;
+        processLogin(email, password);
+    }
+});
+
+function showError(message: string): void {
+    // Better error handling than alert()
+    const errorElement = document.getElementById('error-message');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+}`;
+        }
+
+        // Load simplified Monaco Editor Service for demo
+        async function loadMonacoEditorService() {
+            // Simplified implementation for demo purposes
+            monacoEditorService = {
+                _editors: new Map(),
+                _activeEditorId: null,
+                _suggestions: new Map(),
+                _inlineSuggestions: new Map(),
+                _decorations: new Map(),
+                _suggestionCounter: 0,
+                _eventListeners: {
+                    suggestionCreated: [],
+                    suggestionStatusChanged: [],
+                    suggestionApplied: [],
+                    contentChanged: []
+                },
+
+                createEditor(container, options) {
+                    const editorId = 'editor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    const monacoEditor = monaco.editor.create(container, options);
+
+                    const editor = {
+                        id: editorId,
+                        monacoInstance: monacoEditor,
+                        container: container,
+                        language: options.language || 'javascript',
+                        theme: options.theme || 'vs-dark',
+                        options: options,
+                        created: Date.now()
+                    };
+
+                    this._editors.set(editorId, editor);
+
+                    monacoEditor.onDidChangeModelContent(() => {
+                        const content = monacoEditor.getValue();
+                        this._fireEvent('contentChanged', { editorId, content });
+                    });
+
+                    return editor;
+                },
+
+                setActiveEditor(editorId) {
+                    this._activeEditorId = editorId;
+                },
+
+                getContent(editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    return editor ? editor.monacoInstance.getValue() : '';
+                },
+
+                getCursorPosition(editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    return editor ? editor.monacoInstance.getPosition() : null;
+                },
+
+                createSuggestion(suggestion, editorId) {
+                    const id = 'suggestion-' + (++this._suggestionCounter) + '-' + Date.now();
+                    const fullSuggestion = {
+                        ...suggestion,
+                        id,
+                        status: 'pending',
+                        timestamp: Date.now()
+                    };
+
+                    this._suggestions.set(id, fullSuggestion);
+
+                    this._fireEvent('suggestionCreated', {
+                        suggestion: fullSuggestion,
+                        editorId: editorId || this._activeEditorId
+                    });
+
+                    return id;
+                },
+
+                getSuggestion(suggestionId) {
+                    return this._suggestions.get(suggestionId);
+                },
+
+                getPendingSuggestions(editorId) {
+                    return Array.from(this._suggestions.values()).filter(s => s.status === 'pending');
+                },
+
+                async applySuggestion(suggestionId) {
+                    const suggestion = this._suggestions.get(suggestionId);
+                    if (!suggestion || suggestion.status !== 'pending') {
+                        return false;
+                    }
+
+                    try {
+                        const editor = this._editors.get(this._activeEditorId);
+                        if (editor && suggestion.edits.length > 0) {
+                            const edit = suggestion.edits[0];
+                            editor.monacoInstance.executeEdits('ai-assistant', [{
+                                range: edit.range,
+                                text: edit.text
+                            }]);
+                        }
+
+                        const oldStatus = suggestion.status;
+                        suggestion.status = 'applied';
+                        this._suggestions.set(suggestionId, suggestion);
+
+                        this._fireEvent('suggestionStatusChanged', {
+                            suggestionId,
+                            oldStatus,
+                            newStatus: 'applied',
+                            editorId: this._activeEditorId
+                        });
+
+                        this._fireEvent('suggestionApplied', {
+                            suggestionId,
+                            editorId: this._activeEditorId,
+                            success: true
+                        });
+
+                        return true;
+                    } catch (error) {
+                        this._fireEvent('suggestionApplied', {
+                            suggestionId,
+                            editorId: this._activeEditorId,
+                            success: false,
+                            error: error.message
+                        });
+                        return false;
+                    }
+                },
+
+                rejectSuggestion(suggestionId) {
+                    const suggestion = this._suggestions.get(suggestionId);
+                    if (!suggestion || suggestion.status !== 'pending') {
+                        return;
+                    }
+
+                    const oldStatus = suggestion.status;
+                    suggestion.status = 'rejected';
+                    this._suggestions.set(suggestionId, suggestion);
+
+                    this._fireEvent('suggestionStatusChanged', {
+                        suggestionId,
+                        oldStatus,
+                        newStatus: 'rejected',
+                        editorId: this._activeEditorId
+                    });
+                },
+
+                clearSuggestions() {
+                    this._suggestions.clear();
+                },
+
+                showInlineSuggestion(suggestion, editorId) {
+                    this._inlineSuggestions.set(suggestion.id, suggestion);
+                    return suggestion.id;
+                },
+
+                hideInlineSuggestion(suggestionId) {
+                    this._inlineSuggestions.delete(suggestionId);
+                },
+
+                async acceptInlineSuggestion(suggestionId) {
+                    const suggestion = this._inlineSuggestions.get(suggestionId);
+                    if (!suggestion) return false;
+
+                    const editor = this._editors.get(this._activeEditorId);
+                    if (editor) {
+                        editor.monacoInstance.executeEdits('ai-assistant', [{
+                            range: { ...suggestion.position, ...suggestion.position },
+                            text: suggestion.text
+                        }]);
+                    }
+
+                    this.hideInlineSuggestion(suggestionId);
+                    return true;
+                },
+
+                createDiffEditor(container, original, modified, options) {
+                    const diffEditor = monaco.editor.createDiffEditor(container, {
+                        theme: options?.theme === 'light' ? 'vs' : 'vs-dark',
+                        readOnly: options?.readOnly ?? false,
+                        renderSideBySide: options?.renderSideBySide ?? true
+                    });
+
+                    const originalModel = monaco.editor.createModel(original, 'javascript');
+                    const modifiedModel = monaco.editor.createModel(modified, 'javascript');
+
+                    diffEditor.setModel({
+                        original: originalModel,
+                        modified: modifiedModel
+                    });
+
+                    return {
+                        id: 'diff-' + Date.now(),
+                        monacoInstance: diffEditor,
+                        container,
+                        language: 'javascript',
+                        theme: options?.theme || 'vs-dark',
+                        options: options || {},
+                        created: Date.now()
+                    };
+                },
+
+                previewSuggestion(suggestionId, editorId) {
+                    // Simplified preview implementation
+                    console.log('Previewing suggestion:', suggestionId);
+                },
+
+                // Event system
+                onSuggestionCreated(listener) {
+                    this._eventListeners.suggestionCreated.push(listener);
+                    return () => {
+                        const index = this._eventListeners.suggestionCreated.indexOf(listener);
+                        if (index >= 0) this._eventListeners.suggestionCreated.splice(index, 1);
+                    };
+                },
+
+                onSuggestionStatusChanged(listener) {
+                    this._eventListeners.suggestionStatusChanged.push(listener);
+                    return () => {
+                        const index = this._eventListeners.suggestionStatusChanged.indexOf(listener);
+                        if (index >= 0) this._eventListeners.suggestionStatusChanged.splice(index, 1);
+                    };
+                },
+
+                onSuggestionApplied(listener) {
+                    this._eventListeners.suggestionApplied.push(listener);
+                    return () => {
+                        const index = this._eventListeners.suggestionApplied.indexOf(listener);
+                        if (index >= 0) this._eventListeners.suggestionApplied.splice(index, 1);
+                    };
+                },
+
+                onContentChanged(listener) {
+                    this._eventListeners.contentChanged.push(listener);
+                    return () => {
+                        const index = this._eventListeners.contentChanged.indexOf(listener);
+                        if (index >= 0) this._eventListeners.contentChanged.splice(index, 1);
+                    };
+                },
+
+                _fireEvent(eventType, data) {
+                    this._eventListeners[eventType].forEach(listener => {
+                        try {
+                            listener(data);
+                        } catch (error) {
+                            console.error('Error in event listener:', error);
+                        }
+                    });
+                }
+            };
+        }
+    </script>
+</body>
+</html>

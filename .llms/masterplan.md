@@ -66,17 +66,24 @@ Browser Vue.js IDE
   - [x] Message queuing and delivery guarantees
 
 ### 2.2 Monaco Editor Integration
-- [ ] **Monaco Editor Service**
-  - [ ] Create service to interact with Monaco editor
-  - [ ] Implement text manipulation operations
-  - [ ] Add selection and cursor management
-  - [ ] Support for multiple editor instances
+- [x] **Monaco Editor Service**
+  - [x] Create service to interact with Monaco editor
+  - [x] Implement text manipulation operations
+  - [x] Add selection and cursor management
+  - [x] Support for multiple editor instances
 
-- [ ] **Single-File AI Assistant**
-  - [ ] Focus on current editor content only
-  - [ ] Direct editor content analysis
-  - [ ] In-place code editing and suggestions
-  - [ ] Context extraction from current file
+- [x] **Code Edit Suggestions System**
+  - [x] Create highlighted diffs with accept/reject workflow
+  - [x] Implement inline suggestions (ghost text)
+  - [x] Add side-by-side diff viewer
+  - [x] Support suggestion providers and management
+  - [x] Event-driven suggestion lifecycle
+
+- [x] **Single-File AI Assistant**
+  - [x] Focus on current editor content only
+  - [x] Direct editor content analysis
+  - [x] In-place code editing and suggestions
+  - [x] Context extraction from current file
 
 ## Phase 3: Chat System Core
 *Estimated Time: 4-5 weeks*

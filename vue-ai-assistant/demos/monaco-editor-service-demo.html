@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monaco Editor Service Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 20px;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #005a9e;
+        }
+
+        .editor-container {
+            border: 2px solid #3c3c3c;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .editor-header {
+            background: #2d2d30;
+            padding: 10px 15px;
+            border-bottom: 1px solid #3c3c3c;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .editor-title {
+            font-weight: bold;
+            color: #cccccc;
+        }
+
+        .editor-info {
+            font-size: 12px;
+            color: #858585;
+        }
+
+        .editor-content {
+            height: 400px;
+            width: 100%;
+        }
+
+        .info-panel {
+            background: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .info-section {
+            margin-bottom: 15px;
+        }
+
+        .info-title {
+            font-weight: bold;
+            color: #007acc;
+            margin-bottom: 8px;
+        }
+
+        .info-content {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            background: #1e1e1e;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #3c3c3c;
+            white-space: pre-wrap;
+        }
+
+        .event-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #0e0e0e;
+            border: 1px solid #3c3c3c;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .event-entry {
+            padding: 2px 0;
+            font-size: 11px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .event-timestamp {
+            color: #858585;
+        }
+
+        .event-type {
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+
+        .event-data {
+            color: #ce9178;
+        }
+
+        .multi-editor-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .multi-editor-demo {
+                grid-template-columns: 1fr;
+            }
+
+            .demo-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Monaco Editor Service Demo</h1>
+            <p>Testing comprehensive Monaco editor abstraction with AI integration capabilities</p>
+        </div>
+
+        <div class="demo-controls">
+            <button class="btn" onclick="createJavaScriptEditor()">Create JavaScript Editor</button>
+            <button class="btn" onclick="createTypeScriptEditor()">Create TypeScript Editor</button>
+            <button class="btn" onclick="createPythonEditor()">Create Python Editor</button>
+            <button class="btn" onclick="testTextOperations()">Test Text Operations</button>
+            <button class="btn" onclick="testSelectionOperations()">Test Selection Operations</button>
+            <button class="btn" onclick="formatCode()">Format Code</button>
+            <button class="btn" onclick="saveEditorState()">Save State</button>
+            <button class="btn" onclick="restoreEditorState()">Restore State</button>
+            <button class="btn" onclick="clearEventLog()">Clear Events</button>
+        </div>
+
+        <div class="editor-container">
+            <div class="editor-header">
+                <div class="editor-title">Primary Editor</div>
+                <div class="editor-info">Language: <span id="languageInfo">javascript</span> | Lines: <span id="linesInfo">0</span></div>
+            </div>
+            <div id="editor" class="editor-content"></div>
+        </div>
+
+        <div class="multi-editor-demo">
+            <div class="editor-container">
+                <div class="editor-header">
+                    <div class="editor-title">Secondary Editor</div>
+                    <div class="editor-info">Multi-editor support demo</div>
+                </div>
+                <div id="secondaryEditor" class="editor-content"></div>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-section">
+                    <div class="info-title">Editor State</div>
+                    <div id="editorState" class="info-content">Loading...</div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-title">Selection Info</div>
+                    <div id="selectionInfo" class="info-content">No selection</div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-title">Cursor Position</div>
+                    <div id="cursorInfo" class="info-content">Line 1, Column 1</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <div class="info-title">Event Log</div>
+            <div id="eventLog" class="event-log"></div>
+        </div>
+    </div>
+
+    <!-- Monaco Editor -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+    <script>
+        let monacoEditorService;
+        let primaryEditor;
+        let secondaryEditor;
+        let savedState;
+
+        // Initialize Monaco Editor
+        require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+
+        require(['vs/editor/editor.main'], function () {
+            initializeDemo();
+        });
+
+        async function initializeDemo() {
+            try {
+                // Load the Monaco Editor Service (would normally be imported)
+                // For demo purposes, we'll create a simplified version
+                await loadMonacoEditorService();
+
+                // Create primary editor with JavaScript content
+                primaryEditor = monacoEditorService.createEditor(
+                    document.getElementById('editor'),
+                    {
+                        value: getDefaultJavaScriptCode(),
+                        language: 'javascript',
+                        theme: 'vs-dark',
+                        fontSize: 14,
+                        minimap: { enabled: true },
+                        automaticLayout: true
+                    }
+                );
+
+                // Create secondary editor with TypeScript content
+                secondaryEditor = monacoEditorService.createEditor(
+                    document.getElementById('secondaryEditor'),
+                    {
+                        value: getDefaultTypeScriptCode(),
+                        language: 'typescript',
+                        theme: 'vs-dark',
+                        fontSize: 12,
+                        minimap: { enabled: false },
+                        automaticLayout: true
+                    }
+                );
+
+                monacoEditorService.setActiveEditor(primaryEditor.id);
+
+                // Set up event listeners
+                setupEventListeners();
+
+                // Update UI
+                updateEditorInfo();
+                logEvent('Demo initialized', 'Primary and secondary editors created');
+
+            } catch (error) {
+                console.error('Failed to initialize demo:', error);
+                document.getElementById('eventLog').innerHTML =
+                    '<div class="event-entry"><span class="event-type">ERROR:</span> Failed to initialize demo: ' + error.message + '</div>';
+            }
+        }
+
+        function setupEventListeners() {
+            // Content change events
+            monacoEditorService.onContentChanged((event) => {
+                logEvent('Content Changed', JSON.stringify({
+                    editorId: event.editorId.substring(0, 8) + '...',
+                    contentLength: event.content.length
+                }, null, 2));
+                updateEditorInfo();
+            });
+
+            // Selection change events
+            monacoEditorService.onSelectionChanged((event) => {
+                logEvent('Selection Changed', JSON.stringify({
+                    editorId: event.editorId.substring(0, 8) + '...',
+                    selection: event.selection
+                }, null, 2));
+                updateSelectionInfo(event.selection);
+            });
+
+            // Cursor position change events
+            monacoEditorService.onCursorPositionChanged((event) => {
+                logEvent('Cursor Position Changed', JSON.stringify({
+                    editorId: event.editorId.substring(0, 8) + '...',
+                    position: event.position
+                }, null, 2));
+                updateCursorInfo(event.position);
+            });
+
+            // Editor lifecycle events
+            monacoEditorService.onEditorCreated((editor) => {
+                logEvent('Editor Created', JSON.stringify({
+                    id: editor.id.substring(0, 8) + '...',
+                    language: editor.language
+                }, null, 2));
+            });
+
+            monacoEditorService.onEditorDestroyed((editorId) => {
+                logEvent('Editor Destroyed', editorId.substring(0, 8) + '...');
+            });
+        }
+
+        function createJavaScriptEditor() {
+            const content = getDefaultJavaScriptCode();
+            monacoEditorService.setContent(content);
+            monacoEditorService.setLanguage('javascript');
+            logEvent('Language Changed', 'Switched to JavaScript');
+        }
+
+        function createTypeScriptEditor() {
+            const content = getDefaultTypeScriptCode();
+            monacoEditorService.setContent(content);
+            monacoEditorService.setLanguage('typescript');
+            logEvent('Language Changed', 'Switched to TypeScript');
+        }
+
+        function createPythonEditor() {
+            const content = getDefaultPythonCode();
+            monacoEditorService.setContent(content);
+            monacoEditorService.setLanguage('python');
+            logEvent('Language Changed', 'Switched to Python');
+        }
+
+        function testTextOperations() {
+            const operations = [
+                () => {
+                    monacoEditorService.insertText('\\n// AI-generated comment', { lineNumber: 1, column: 1 });
+                    return 'Inserted comment at beginning';
+                },
+                () => {
+                    monacoEditorService.setCursorPosition({ lineNumber: 3, column: 10 });
+                    return 'Set cursor to line 3, column 10';
+                },
+                () => {
+                    const selection = { startLineNumber: 5, startColumn: 1, endLineNumber: 6, endColumn: 1, isEmpty: false };
+                    monacoEditorService.setSelection(selection);
+                    return 'Selected lines 5-6';
+                },
+                () => {
+                    monacoEditorService.replaceSelection('// AI-enhanced code\\n');
+                    return 'Replaced selection with AI comment';
+                }
+            ];
+
+            operations.forEach((op, index) => {
+                setTimeout(() => {
+                    const result = op();
+                    logEvent('Text Operation', result);
+                }, index * 1000);
+            });
+        }
+
+        function testSelectionOperations() {
+            const text = monacoEditorService.getContent();
+            const lines = text.split('\\n');
+
+            if (lines.length > 3) {
+                const selection = {
+                    startLineNumber: 2,
+                    startColumn: 1,
+                    endLineNumber: 4,
+                    endColumn: lines[3].length + 1,
+                    isEmpty: false
+                };
+
+                monacoEditorService.setSelection(selection);
+                const selectedText = monacoEditorService.getSelectedText();
+
+                logEvent('Selection Test', JSON.stringify({
+                    selectedLines: '2-4',
+                    selectedText: selectedText.substring(0, 50) + (selectedText.length > 50 ? '...' : '')
+                }, null, 2));
+            }
+        }
+
+        async function formatCode() {
+            try {
+                await monacoEditorService.formatDocument();
+                logEvent('Code Formatted', 'Document formatting completed');
+            } catch (error) {
+                logEvent('Format Error', error.message);
+            }
+        }
+
+        function saveEditorState() {
+            savedState = monacoEditorService.saveEditorState();
+            logEvent('State Saved', JSON.stringify({
+                contentLength: savedState.content.length,
+                language: savedState.language,
+                isDirty: savedState.isDirty
+            }, null, 2));
+        }
+
+        function restoreEditorState() {
+            if (savedState) {
+                monacoEditorService.restoreEditorState(savedState);
+                logEvent('State Restored', 'Editor state restored from saved state');
+            } else {
+                logEvent('Restore Error', 'No saved state available');
+            }
+        }
+
+        function clearEventLog() {
+            document.getElementById('eventLog').innerHTML = '';
+            logEvent('Log Cleared', 'Event log cleared');
+        }
+
+        function updateEditorInfo() {
+            const content = monacoEditorService.getContent();
+            const language = monacoEditorService.getLanguage();
+            const lines = content.split('\\n').length;
+
+            document.getElementById('languageInfo').textContent = language || 'unknown';
+            document.getElementById('linesInfo').textContent = lines;
+
+            const state = monacoEditorService.getEditorState();
+            if (state) {
+                document.getElementById('editorState').textContent = JSON.stringify({
+                    language: state.language,
+                    isDirty: state.isDirty,
+                    lastModified: new Date(state.lastModified).toLocaleTimeString(),
+                    contentLength: state.content.length
+                }, null, 2);
+            }
+        }
+
+        function updateSelectionInfo(selection) {
+            if (selection && !selection.isEmpty) {
+                document.getElementById('selectionInfo').textContent = JSON.stringify({
+                    start: selection.startLineNumber + ':' + selection.startColumn,
+                    end: selection.endLineNumber + ':' + selection.endColumn,
+                    lines: selection.endLineNumber - selection.startLineNumber + 1
+                }, null, 2);
+            } else {
+                document.getElementById('selectionInfo').textContent = 'No selection';
+            }
+        }
+
+        function updateCursorInfo(position) {
+            if (position) {
+                document.getElementById('cursorInfo').textContent =
+                    'Line ' + position.lineNumber + ', Column ' + position.column;
+            }
+        }
+
+        function logEvent(type, data) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'event-entry';
+            logEntry.innerHTML =
+                '<span class="event-timestamp">[' + timestamp + ']</span> ' +
+                '<span class="event-type">' + type + ':</span> ' +
+                '<span class="event-data">' + (typeof data === 'string' ? data : JSON.stringify(data)) + '</span>';
+
+            const eventLog = document.getElementById('eventLog');
+            eventLog.appendChild(logEntry);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        function getDefaultJavaScriptCode() {
+            return `// JavaScript AI Assistant Demo
+function analyzeCode(code) {
+    const lines = code.split('\\n');
+    const functions = [];
+
+    lines.forEach((line, index) => {
+        if (line.includes('function')) {
+            functions.push({
+                name: extractFunctionName(line),
+                line: index + 1
+            });
+        }
+    });
+
+    return {
+        totalLines: lines.length,
+        functions: functions,
+        complexity: calculateComplexity(lines)
+    };
+}
+
+function extractFunctionName(line) {
+    const match = line.match(/function\\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/);
+    return match ? match[1] : 'anonymous';
+}
+
+function calculateComplexity(lines) {
+    let complexity = 1;
+    lines.forEach(line => {
+        if (line.includes('if') || line.includes('for') || line.includes('while')) {
+            complexity++;
+        }
+    });
+    return complexity;
+}
+
+// AI-powered code suggestions
+const aiSuggestions = [
+    'Consider using async/await for better readability',
+    'Add error handling for robust code',
+    'Extract constants for magic numbers',
+    'Use descriptive variable names'
+];
+
+console.log('AI Assistant ready for code analysis!');`;
+        }
+
+        function getDefaultTypeScriptCode() {
+            return `// TypeScript AI Assistant Demo
+interface CodeAnalysis {
+    totalLines: number;
+    functions: FunctionInfo[];
+    complexity: number;
+    suggestions: string[];
+}
+
+interface FunctionInfo {
+    name: string;
+    line: number;
+    parameters?: string[];
+    returnType?: string;
+}
+
+class AICodeAnalyzer {
+    private analysisCache: Map<string, CodeAnalysis> = new Map();
+
+    public analyzeCode(code: string): CodeAnalysis {
+        const cacheKey = this.generateCacheKey(code);
+
+        if (this.analysisCache.has(cacheKey)) {
+            return this.analysisCache.get(cacheKey)!;
+        }
+
+        const analysis = this.performAnalysis(code);
+        this.analysisCache.set(cacheKey, analysis);
+
+        return analysis;
+    }
+
+    private performAnalysis(code: string): CodeAnalysis {
+        const lines = code.split('\\n');
+        const functions = this.extractFunctions(lines);
+
+        return {
+            totalLines: lines.length,
+            functions,
+            complexity: this.calculateComplexity(lines),
+            suggestions: this.generateSuggestions(lines)
+        };
+    }
+
+    private extractFunctions(lines: string[]): FunctionInfo[] {
+        const functions: FunctionInfo[] = [];
+
+        lines.forEach((line, index) => {
+            const functionMatch = line.match(/(?:function|const\\s+\\w+\\s*=|\\w+\\s*\\()/);
+            if (functionMatch) {
+                functions.push({
+                    name: this.extractFunctionName(line),
+                    line: index + 1
+                });
+            }
+        });
+
+        return functions;
+    }
+
+    private extractFunctionName(line: string): string {
+        const patterns = [
+            /function\\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/,
+            /const\\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\\s*=/,
+            /([a-zA-Z_$][a-zA-Z0-9_$]*)\\s*\\(/
+        ];
+
+        for (const pattern of patterns) {
+            const match = line.match(pattern);
+            if (match) return match[1];
+        }
+
+        return 'anonymous';
+    }
+
+    private calculateComplexity(lines: string[]): number {
+        let complexity = 1;
+        const complexityKeywords = ['if', 'else', 'for', 'while', 'switch', 'catch'];
+
+        lines.forEach(line => {
+            complexityKeywords.forEach(keyword => {
+                if (line.includes(keyword)) complexity++;
+            });
+        });
+
+        return complexity;
+    }
+
+    private generateSuggestions(lines: string[]): string[] {
+        const suggestions: string[] = [];
+
+        if (lines.some(line => line.includes('any'))) {
+            suggestions.push('Consider using specific types instead of any');
+        }
+
+        if (lines.some(line => line.length > 120)) {
+            suggestions.push('Break down long lines for better readability');
+        }
+
+        return suggestions;
+    }
+
+    private generateCacheKey(code: string): string {
+        return btoa(code).substring(0, 32);
+    }
+}
+
+const analyzer = new AICodeAnalyzer();
+console.log('TypeScript AI Analyzer ready!');`;
+        }
+
+        function getDefaultPythonCode() {
+            return `# Python AI Assistant Demo
+import re
+from typing import List, Dict, Optional, Tuple
+from dataclasses import dataclass
+
+@dataclass
+class FunctionInfo:
+    name: str
+    line: int
+    parameters: List[str] = None
+    return_type: Optional[str] = None
+
+@dataclass
+class CodeAnalysis:
+    total_lines: int
+    functions: List[FunctionInfo]
+    complexity: int
+    suggestions: List[str]
+
+class AICodeAnalyzer:
+    def __init__(self):
+        self.analysis_cache: Dict[str, CodeAnalysis] = {}
+
+    def analyze_code(self, code: str) -> CodeAnalysis:
+        """Analyze Python code and provide AI-powered insights."""
+        cache_key = self._generate_cache_key(code)
+
+        if cache_key in self.analysis_cache:
+            return self.analysis_cache[cache_key]
+
+        analysis = self._perform_analysis(code)
+        self.analysis_cache[cache_key] = analysis
+
+        return analysis
+
+    def _perform_analysis(self, code: str) -> CodeAnalysis:
+        """Perform comprehensive code analysis."""
+        lines = code.split('\\n')
+        functions = self._extract_functions(lines)
+
+        return CodeAnalysis(
+            total_lines=len(lines),
+            functions=functions,
+            complexity=self._calculate_complexity(lines),
+            suggestions=self._generate_suggestions(lines)
+        )
+
+    def _extract_functions(self, lines: List[str]) -> List[FunctionInfo]:
+        """Extract function definitions from code."""
+        functions = []
+
+        for i, line in enumerate(lines):
+            if re.match(r'^\\s*def\\s+', line):
+                func_name = self._extract_function_name(line)
+                functions.append(FunctionInfo(
+                    name=func_name,
+                    line=i + 1
+                ))
+
+        return functions
+
+    def _extract_function_name(self, line: str) -> str:
+        """Extract function name from definition line."""
+        match = re.search(r'def\\s+([a-zA-Z_][a-zA-Z0-9_]*)', line)
+        return match.group(1) if match else 'anonymous'
+
+    def _calculate_complexity(self, lines: List[str]) -> int:
+        """Calculate cyclomatic complexity."""
+        complexity = 1
+        complexity_keywords = ['if', 'elif', 'for', 'while', 'except', 'and', 'or']
+
+        for line in lines:
+            for keyword in complexity_keywords:
+                if keyword in line:
+                    complexity += 1
+
+        return complexity
+
+    def _generate_suggestions(self, lines: List[str]) -> List[str]:
+        """Generate AI-powered code improvement suggestions."""
+        suggestions = []
+
+        # Check for missing docstrings
+        if any('def ' in line for line in lines):
+            if not any('"""' in line or "'''" in line for line in lines):
+                suggestions.append('Consider adding docstrings to functions')
+
+        # Check for long lines
+        if any(len(line) > 120 for line in lines):
+            suggestions.append('Break down long lines for better readability')
+
+        # Check for type hints
+        if any('def ' in line for line in lines):
+            if not any('->' in line for line in lines):
+                suggestions.append('Consider adding type hints for better code clarity')
+
+        return suggestions
+
+    def _generate_cache_key(self, code: str) -> str:
+        """Generate cache key for code."""
+        import hashlib
+        return hashlib.md5(code.encode()).hexdigest()[:16]
+
+def main():
+    """Main function to demonstrate AI code analysis."""
+    analyzer = AICodeAnalyzer()
+
+    sample_code = '''
+def fibonacci(n: int) -> int:
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+'''
+
+    analysis = analyzer.analyze_code(sample_code)
+    print(f"Analysis: {analysis}")
+
+if __name__ == "__main__":
+    main()
+    print("Python AI Analyzer ready!")`;
+        }
+
+        // Simplified Monaco Editor Service for demo
+        async function loadMonacoEditorService() {
+            // This would normally be imported from the actual service
+            // For demo purposes, we create a simplified implementation
+            monacoEditorService = {
+                _editors: new Map(),
+                _activeEditorId: null,
+                _eventListeners: {
+                    contentChanged: [],
+                    selectionChanged: [],
+                    cursorPositionChanged: [],
+                    editorCreated: [],
+                    editorDestroyed: []
+                },
+
+                createEditor(container, options) {
+                    const editorId = 'editor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    const monacoEditor = monaco.editor.create(container, options);
+
+                    const editor = {
+                        id: editorId,
+                        monacoInstance: monacoEditor,
+                        container: container,
+                        language: options.language || 'javascript',
+                        theme: options.theme || 'vs-dark',
+                        options: options,
+                        created: Date.now()
+                    };
+
+                    this._editors.set(editorId, editor);
+
+                    // Set up event listeners
+                    monacoEditor.onDidChangeModelContent(() => {
+                        const content = monacoEditor.getValue();
+                        this._fireEvent('contentChanged', { editorId, content });
+                    });
+
+                    monacoEditor.onDidChangeCursorSelection((e) => {
+                        const selection = {
+                            startLineNumber: e.selection.startLineNumber,
+                            startColumn: e.selection.startColumn,
+                            endLineNumber: e.selection.endLineNumber,
+                            endColumn: e.selection.endColumn,
+                            isEmpty: e.selection.isEmpty()
+                        };
+                        this._fireEvent('selectionChanged', { editorId, selection });
+                    });
+
+                    monacoEditor.onDidChangeCursorPosition((e) => {
+                        const position = {
+                            lineNumber: e.position.lineNumber,
+                            column: e.position.column
+                        };
+                        this._fireEvent('cursorPositionChanged', { editorId, position });
+                    });
+
+                    this._fireEvent('editorCreated', editor);
+                    return editor;
+                },
+
+                setActiveEditor(editorId) {
+                    this._activeEditorId = editorId;
+                },
+
+                getContent(editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    return editor ? editor.monacoInstance.getValue() : '';
+                },
+
+                setContent(content, editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    if (editor) {
+                        editor.monacoInstance.setValue(content);
+                    }
+                },
+
+                getLanguage(editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    return editor ? editor.language : null;
+                },
+
+                setLanguage(language, editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    if (editor) {
+                        const model = editor.monacoInstance.getModel();
+                        monaco.editor.setModelLanguage(model, language);
+                        editor.language = language;
+                    }
+                },
+
+                setCursorPosition(position, editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    if (editor) {
+                        editor.monacoInstance.setPosition(position);
+                    }
+                },
+
+                setSelection(selection, editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    if (editor) {
+                        editor.monacoInstance.setSelection(selection);
+                    }
+                },
+
+                getSelectedText(editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    return editor ? editor.monacoInstance.getModel().getValueInRange(editor.monacoInstance.getSelection()) : '';
+                },
+
+                replaceSelection(text, editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    if (editor) {
+                        const selection = editor.monacoInstance.getSelection();
+                        editor.monacoInstance.executeEdits('ai-assistant', [{
+                            range: selection,
+                            text: text
+                        }]);
+                    }
+                },
+
+                insertText(text, position, editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    if (editor) {
+                        const pos = position || editor.monacoInstance.getPosition();
+                        editor.monacoInstance.executeEdits('ai-assistant', [{
+                            range: { ...pos, ...pos },
+                            text: text
+                        }]);
+                    }
+                },
+
+                async formatDocument(editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    if (editor) {
+                        await editor.monacoInstance.getAction('editor.action.formatDocument').run();
+                    }
+                },
+
+                getEditorState(editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    if (editor) {
+                        return {
+                            content: editor.monacoInstance.getValue(),
+                            language: editor.language,
+                            isDirty: true,
+                            lastModified: Date.now()
+                        };
+                    }
+                    return null;
+                },
+
+                saveEditorState(editorId) {
+                    return this.getEditorState(editorId);
+                },
+
+                restoreEditorState(state, editorId) {
+                    const id = editorId || this._activeEditorId;
+                    const editor = this._editors.get(id);
+                    if (editor && state) {
+                        editor.monacoInstance.setValue(state.content);
+                        this.setLanguage(state.language, id);
+                    }
+                },
+
+                // Event system
+                onContentChanged(listener) {
+                    this._eventListeners.contentChanged.push(listener);
+                    return () => {
+                        const index = this._eventListeners.contentChanged.indexOf(listener);
+                        if (index >= 0) this._eventListeners.contentChanged.splice(index, 1);
+                    };
+                },
+
+                onSelectionChanged(listener) {
+                    this._eventListeners.selectionChanged.push(listener);
+                    return () => {
+                        const index = this._eventListeners.selectionChanged.indexOf(listener);
+                        if (index >= 0) this._eventListeners.selectionChanged.splice(index, 1);
+                    };
+                },
+
+                onCursorPositionChanged(listener) {
+                    this._eventListeners.cursorPositionChanged.push(listener);
+                    return () => {
+                        const index = this._eventListeners.cursorPositionChanged.indexOf(listener);
+                        if (index >= 0) this._eventListeners.cursorPositionChanged.splice(index, 1);
+                    };
+                },
+
+                onEditorCreated(listener) {
+                    this._eventListeners.editorCreated.push(listener);
+                    return () => {
+                        const index = this._eventListeners.editorCreated.indexOf(listener);
+                        if (index >= 0) this._eventListeners.editorCreated.splice(index, 1);
+                    };
+                },
+
+                onEditorDestroyed(listener) {
+                    this._eventListeners.editorDestroyed.push(listener);
+                    return () => {
+                        const index = this._eventListeners.editorDestroyed.indexOf(listener);
+                        if (index >= 0) this._eventListeners.editorDestroyed.splice(index, 1);
+                    };
+                },
+
+                _fireEvent(eventType, data) {
+                    this._eventListeners[eventType].forEach(listener => {
+                        try {
+                            listener(data);
+                        } catch (error) {
+                            console.error('Error in event listener:', error);
+                        }
+                    });
+                }
+            };
+        }
+    </script>
+</body>
+</html>

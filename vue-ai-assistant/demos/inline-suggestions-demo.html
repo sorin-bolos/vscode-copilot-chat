@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inline Suggestions Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 20px;
+        }
+
+        .demo-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            height: 85vh;
+        }
+
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .controls-panel {
+            background: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: #2d2d30;
+            padding: 15px;
+            border-bottom: 1px solid #3c3c3c;
+            font-weight: bold;
+            color: #cccccc;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #005a9e;
+        }
+
+        .btn.secondary {
+            background: #6c757d;
+        }
+
+        .btn.success {
+            background: #28a745;
+        }
+
+        .btn.warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .editor-container {
+            flex: 1;
+            border: 2px solid #3c3c3c;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .editor-header {
+            background: #2d2d30;
+            padding: 10px 15px;
+            border-bottom: 1px solid #3c3c3c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-content {
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-title {
+            font-weight: bold;
+            color: #4ec9b0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #3c3c3c;
+            padding-bottom: 5px;
+        }
+
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-buttons .btn {
+            width: 100%;
+            text-align: left;
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .status-display {
+            background: #0e0e0e;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 15px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+        }
+
+        .status-item {
+            margin-bottom: 8px;
+            padding: 4px 0;
+        }
+
+        .status-label {
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+
+        .status-value {
+            color: #ce9178;
+        }
+
+        .suggestion-preview {
+            background: #2d2d30;
+            border: 1px solid #3c3c3c;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+
+        .suggestion-text {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            color: #d7ba7d;
+            background: #1a1a1a;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #007acc;
+        }
+
+        .suggestion-meta {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #858585;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .keyboard-shortcuts {
+            background: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 15px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+
+        .shortcut-key {
+            background: #3c3c3c;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #cccccc;
+        }
+
+        .inline-overlay {
+            position: absolute;
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid #28a745;
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: #28a745;
+            font-size: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+
+        .inline-overlay.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ghost-text-demo {
+            position: relative;
+            background: #1a1a1a;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .ghost-text {
+            color: #666;
+            opacity: 0.6;
+            font-style: italic;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.3; }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 20px;
+            background: #007acc;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .lightbulb-icon {
+            position: absolute;
+            left: -25px;
+            top: 2px;
+            width: 16px;
+            height: 16px;
+            background: #ffc107;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .lightbulb-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #252526;
+            border: 1px solid #007acc;
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: #d4d4d4;
+            font-size: 12px;
+            max-width: 250px;
+            z-index: 1001;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 10px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid #007acc;
+        }
+
+        .event-log {
+            max-height: 150px;
+            overflow-y: auto;
+            background: #0e0e0e;
+            border: 1px solid #3c3c3c;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+        }
+
+        .event-entry {
+            padding: 2px 0;
+            color: #858585;
+        }
+
+        .event-type {
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+
+        /* Inline Diff Styles */
+        .diff-deletion {
+            background-color: rgba(248, 81, 73, 0.3);
+            color: #f85149;
+            text-decoration: line-through;
+            border-radius: 2px;
+            padding: 1px 2px;
+        }
+
+        .diff-addition {
+            background-color: rgba(63, 185, 80, 0.3);
+            color: #3fb950;
+            border-radius: 2px;
+            padding: 1px 2px;
+        }
+
+        .diff-highlight-deletion {
+            background-color: rgba(248, 81, 73, 0.15) !important;
+            border: 1px solid rgba(248, 81, 73, 0.5) !important;
+        }
+
+        .diff-highlight-addition {
+            background-color: rgba(63, 185, 80, 0.15) !important;
+            border: 1px solid rgba(63, 185, 80, 0.5) !important;
+        }
+
+        .inline-diff-widget {
+            position: absolute;
+            background: #2d2d30;
+            border: 1px solid #007acc;
+            border-radius: 6px;
+            padding: 12px;
+            color: #d4d4d4;
+            font-size: 12px;
+            max-width: 400px;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .diff-preview {
+            background: #1a1a1a;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 8px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .diff-line {
+            padding: 2px 4px;
+            margin: 1px 0;
+        }
+
+        .diff-line.removed {
+            background-color: rgba(248, 81, 73, 0.2);
+            color: #f85149;
+        }
+
+        .diff-line.added {
+            background-color: rgba(63, 185, 80, 0.2);
+            color: #3fb950;
+        }
+
+        .diff-line.context {
+            color: #d4d4d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👁️ Inline Suggestions Demo</h1>
+            <p>Experience how users see AI suggestions directly in the Monaco editor</p>
+        </div>
+
+        <div class="demo-layout">
+            <div class="editor-section">
+                <div class="demo-controls">
+                    <button class="btn" onclick="triggerGhostText()">👻 Ghost Text</button>
+                    <button class="btn" onclick="triggerTooltip()">💬 Tooltip</button>
+                    <button class="btn" onclick="triggerLightbulb()">💡 Lightbulb</button>
+                    <button class="btn" onclick="triggerPopup()">📦 Popup</button>
+                    <button class="btn success" onclick="triggerInlineDiff()">🔄 Inline Diff</button>
+                    <button class="btn secondary" onclick="triggerDecoration()">🎨 Highlight</button>
+                    <button class="btn secondary" onclick="triggerWidget()">🔧 Widget</button>
+                    <button class="btn warning" onclick="clearAll()">🗑️ Clear All</button>
+                </div>
+
+                <div class="editor-container">
+                    <div class="editor-header">
+                        <div class="editor-title">Code Editor with Inline Suggestions</div>
+                        <div class="editor-info">
+                            Active Suggestions: <span id="activeSuggestionsCount">0</span>
+                        </div>
+                    </div>
+                    <div id="editor" class="editor-content"></div>
+
+                    <!-- Inline overlay for demonstrations -->
+                    <div id="inlineOverlay" class="inline-overlay">
+                        <div id="overlayContent"></div>
+                    </div>
+                </div>
+
+                <!-- Ghost Text Demo -->
+                <div class="ghost-text-demo">
+                    <div><strong>Ghost Text Example:</strong></div>
+                    <div style="margin-top: 10px;">
+                        function calculateTotal(items) {<br>
+                        &nbsp;&nbsp;return items<span class="cursor"></span><span class="ghost-text">.reduce((sum, item) => sum + item.price, 0);</span><br>
+                        }
+                    </div>
+                    <div style="font-size: 11px; color: #858585; margin-top: 8px;">
+                        Press <kbd style="background: #3c3c3c; padding: 1px 4px; border-radius: 2px;">Tab</kbd> to accept,
+                        <kbd style="background: #3c3c3c; padding: 1px 4px; border-radius: 2px;">Esc</kbd> to dismiss
+                    </div>
+                </div>
+
+                <!-- Inline Diff Demo -->
+                <div class="inline-diff-demo" style="background: #1a1a1a; border: 1px solid #3c3c3c; border-radius: 4px; padding: 15px; margin: 10px 0; font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; line-height: 1.5;">
+                    <div><strong>Inline Diff Example (like VS Code):</strong></div>
+                    <div style="margin-top: 10px;">
+                        suggestion.previewDecorations.forEach(<span class="diff-deletion">decorationId =&gt;</span> {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="diff-addition">(decorationId: string) =&gt;</span> {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.clearHighlight(decorationId);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                        });
+                    </div>
+                    <div style="font-size: 11px; color: #858585; margin-top: 8px;">
+                        <span style="color: #f85149;">Red background</span> = deleted text,
+                        <span style="color: #3fb950;">Green background</span> = added text
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="panel-header">
+                    🎛️ Inline Suggestion Controls
+                </div>
+                <div class="panel-content">
+
+                    <div class="control-group">
+                        <div class="control-title">Display Modes</div>
+                        <div class="control-buttons">
+                            <button class="btn" onclick="setDisplayMode('ghost-text')">👻 Ghost Text Mode</button>
+                            <button class="btn" onclick="setDisplayMode('tooltip')">💬 Tooltip Mode</button>
+                            <button class="btn" onclick="setDisplayMode('popup')">📦 Popup Mode</button>
+                            <button class="btn" onclick="setDisplayMode('decoration')">🎨 Decoration Mode</button>
+                            <button class="btn" onclick="setDisplayMode('lightbulb')">💡 Lightbulb Mode</button>
+                            <button class="btn success" onclick="setDisplayMode('inline-diff')">🔄 Inline Diff Mode</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-title">Trigger Suggestions</div>
+                        <div class="control-buttons">
+                            <button class="btn" onclick="triggerFunctionCompletion()">🔧 Function Completion</button>
+                            <button class="btn" onclick="triggerImportSuggestion()">📦 Import Suggestion</button>
+                            <button class="btn" onclick="triggerErrorFix()">🐛 Error Fix</button>
+                            <button class="btn" onclick="triggerRefactor()">🔄 Refactor Hint</button>
+                            <button class="btn" onclick="triggerTypeHint()">📝 Type Annotation</button>
+                            <button class="btn success" onclick="triggerParameterTyping()">⚡ Parameter Typing</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-title">Styling Options</div>
+                        <div class="control-buttons">
+                            <button class="btn secondary" onclick="setGhostOpacity(0.3)">Ghost: Subtle</button>
+                            <button class="btn secondary" onclick="setGhostOpacity(0.6)">Ghost: Normal</button>
+                            <button class="btn secondary" onclick="setGhostOpacity(0.9)">Ghost: Bold</button>
+                            <button class="btn secondary" onclick="toggleAnimation()">Toggle Animation</button>
+                        </div>
+                    </div>
+
+                    <div class="status-display">
+                        <div class="status-item">
+                            <span class="status-label">Current Mode:</span>
+                            <span class="status-value" id="currentMode">ghost-text</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Ghost Opacity:</span>
+                            <span class="status-value" id="ghostOpacity">0.6</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Animation:</span>
+                            <span class="status-value" id="animationStatus">enabled</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Cursor Position:</span>
+                            <span class="status-value" id="cursorPosition">1:1</span>
+                        </div>
+                    </div>
+
+                    <div class="keyboard-shortcuts">
+                        <div style="font-weight: bold; margin-bottom: 8px; color: #4ec9b0;">Keyboard Shortcuts:</div>
+                        <div class="shortcut-item">
+                            <span>Accept Suggestion</span>
+                            <span class="shortcut-key">Tab</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Reject Suggestion</span>
+                            <span class="shortcut-key">Esc</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Next Suggestion</span>
+                            <span class="shortcut-key">Ctrl+→</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Previous Suggestion</span>
+                            <span class="shortcut-key">Ctrl+←</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Show Details</span>
+                            <span class="shortcut-key">Ctrl+Space</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <div class="control-title">Activity Log</div>
+                        <div id="eventLog" class="event-log"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tooltip container -->
+        <div id="tooltip" class="tooltip">
+            <div id="tooltipContent"></div>
+        </div>
+    </div>
+
+    <!-- Monaco Editor -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+    <script>
+        let monacoEditor;
+        let currentDisplayMode = 'ghost-text';
+        let ghostOpacity = 0.6;
+        let animationEnabled = true;
+        let activeSuggestions = [];
+        let suggestionCounter = 0;
+
+        // Initialize Monaco Editor
+        require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+
+        require(['vs/editor/editor.main'], function () {
+            initializeDemo();
+        });
+
+        function initializeDemo() {
+            monacoEditor = monaco.editor.create(document.getElementById('editor'), {
+                value: getSampleCode(),
+                language: 'javascript',
+                theme: 'vs-dark',
+                fontSize: 14,
+                lineHeight: 22,
+                automaticLayout: true,
+                minimap: { enabled: false },
+                lineNumbers: 'on',
+                wordWrap: 'on',
+                scrollBeyondLastLine: false
+            });
+
+            setupEditorEvents();
+            logEvent('Demo initialized', 'Inline suggestions ready');
+        }
+
+        function setupEditorEvents() {
+            // Track cursor position
+            monacoEditor.onDidChangeCursorPosition((e) => {
+                updateCursorPosition(e.position);
+            });
+
+            // Track content changes for auto-suggestions
+            monacoEditor.onDidChangeModelContent((e) => {
+                setTimeout(() => {
+                    checkForAutoSuggestions();
+                }, 300);
+            });
+
+            // Keyboard shortcuts
+            monacoEditor.addCommand(monaco.KeyCode.Tab, () => {
+                acceptCurrentSuggestion();
+            });
+
+            monacoEditor.addCommand(monaco.KeyCode.Escape, () => {
+                clearCurrentSuggestion();
+            });
+        }
+
+        function triggerGhostText() {
+            const position = monacoEditor.getPosition();
+            showInlineSuggestion({
+                id: 'ghost-' + (++suggestionCounter),
+                text: '.reduce((sum, item) => sum + item.price, 0)',
+                position: position,
+                displayMode: 'ghost-text',
+                confidence: 0.85,
+                category: 'generate',
+                styling: {
+                    ghostTextOpacity: ghostOpacity,
+                    ghostTextColor: '#666',
+                    fontStyle: 'italic'
+                }
+            });
+        }
+
+        function triggerTooltip() {
+            const position = monacoEditor.getPosition();
+            const pixelPosition = monacoEditor.getScrolledVisiblePosition(position);
+
+            if (pixelPosition) {
+                showTooltip(
+                    pixelPosition.left + 20,
+                    pixelPosition.top - 40,
+                    'Suggestion: Add error handling for this async operation',
+                    'This will help prevent unhandled promise rejections'
+                );
+            }
+
+            logEvent('Tooltip shown', 'Error handling suggestion');
+        }
+
+        function triggerLightbulb() {
+            const position = monacoEditor.getPosition();
+            showInlineSuggestion({
+                id: 'lightbulb-' + (++suggestionCounter),
+                text: 'Extract this logic into a separate function',
+                position: position,
+                displayMode: 'lightbulb',
+                confidence: 0.75,
+                category: 'refactor'
+            });
+        }
+
+        function triggerPopup() {
+            const position = monacoEditor.getPosition();
+            showInlineSuggestion({
+                id: 'popup-' + (++suggestionCounter),
+                text: 'async/await pattern',
+                position: position,
+                displayMode: 'popup',
+                confidence: 0.90,
+                category: 'fix',
+                widget: {
+                    showAcceptReject: true,
+                    showConfidence: true,
+                    position: 'above'
+                }
+            });
+        }
+
+        function triggerDecoration() {
+            const selection = monacoEditor.getSelection();
+            const range = selection || {
+                startLineNumber: monacoEditor.getPosition().lineNumber,
+                startColumn: 1,
+                endLineNumber: monacoEditor.getPosition().lineNumber,
+                endColumn: 100
+            };
+
+            const decorations = monacoEditor.deltaDecorations([], [{
+                range: range,
+                options: {
+                    className: 'suggestion-highlight',
+                    hoverMessage: { value: '💡 **Suggestion:** This function could be optimized using memoization' },
+                    glyphMarginClassName: 'suggestion-glyph'
+                }
+            }]);
+
+            // Store decoration for cleanup
+            setTimeout(() => {
+                monacoEditor.deltaDecorations(decorations, []);
+            }, 5000);
+
+            logEvent('Decoration shown', 'Optimization suggestion highlighted');
+        }
+
+        function triggerWidget() {
+            const position = monacoEditor.getPosition();
+            showInlineWidget(position, {
+                title: 'AI Suggestion',
+                content: 'Add TypeScript interface for better type safety',
+                actions: ['Accept', 'Reject', 'More Info'],
+                confidence: 0.88
+            });
+        }
+
+        function triggerInlineDiff() {
+            const position = monacoEditor.getPosition();
+            const selection = monacoEditor.getSelection();
+
+            // Find a line with function parameters to demonstrate the diff
+            const content = monacoEditor.getValue();
+            const lines = content.split('\n');
+            let targetLine = position.lineNumber;
+
+            // Look for a line with function parameters or similar
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes('forEach') || lines[i].includes('function') || lines[i].includes('=>')) {
+                    targetLine = i + 1;
+                    break;
+                }
+            }
+
+            showInlineDiffSuggestion({
+                id: 'diff-' + (++suggestionCounter),
+                originalText: 'decorationId =>',
+                suggestedText: '(decorationId: string) =>',
+                position: { lineNumber: targetLine, column: 1 },
+                range: {
+                    startLineNumber: targetLine,
+                    startColumn: 1,
+                    endLineNumber: targetLine,
+                    endColumn: lines[targetLine - 1]?.length || 1
+                },
+                confidence: 0.92,
+                category: 'typing'
+            });
+        }
+
+        function showInlineDiffSuggestion(suggestion) {
+            const model = monacoEditor.getModel();
+
+            // Create decorations for deletion and addition
+            const deletionDecoration = monacoEditor.deltaDecorations([], [{
+                range: suggestion.range,
+                options: {
+                    className: 'diff-highlight-deletion',
+                    hoverMessage: { value: `**Original:** ${suggestion.originalText}\n\n**Suggested:** ${suggestion.suggestedText}\n\nPress Tab to accept, Esc to reject` }
+                }
+            }]);
+
+            // Show the inline diff widget
+            const position = monacoEditor.getScrolledVisiblePosition({
+                lineNumber: suggestion.range.startLineNumber,
+                column: suggestion.range.startColumn
+            });
+
+            if (position) {
+                const diffWidget = document.createElement('div');
+                diffWidget.className = 'inline-diff-widget';
+                diffWidget.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 8px; color: #4ec9b0;">⚡ Type Enhancement Suggestion</div>
+                    <div class="diff-preview">
+                        <div class="diff-line removed">- ${suggestion.originalText}</div>
+                        <div class="diff-line added">+ ${suggestion.suggestedText}</div>
+                    </div>
+                    <div style="font-size: 11px; color: #858585; margin: 8px 0;">
+                        Confidence: ${Math.round(suggestion.confidence * 100)}% | Category: ${suggestion.category}
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="btn success" style="padding: 4px 8px; font-size: 11px;" onclick="acceptDiffSuggestion('${suggestion.id}', '${suggestion.suggestedText}', ${JSON.stringify(suggestion.range).replace(/"/g, '&quot;')})">
+                            ✅ Accept Change
+                        </button>
+                        <button class="btn secondary" style="padding: 4px 8px; font-size: 11px;" onclick="rejectDiffSuggestion('${suggestion.id}')">
+                            ❌ Reject
+                        </button>
+                        <button class="btn" style="padding: 4px 8px; font-size: 11px;" onclick="showDiffDetails('${suggestion.id}')">
+                            🔍 Details
+                        </button>
+                    </div>
+                `;
+
+                diffWidget.style.left = (position.left + 20) + 'px';
+                diffWidget.style.top = (position.top - 120) + 'px';
+
+                document.getElementById('editor').appendChild(diffWidget);
+
+                // Store for cleanup
+                diffWidget.decorationIds = deletionDecoration;
+                diffWidget.suggestionId = suggestion.id;
+
+                // Auto-remove after 15 seconds
+                setTimeout(() => {
+                    if (diffWidget.parentNode) {
+                        monacoEditor.deltaDecorations(deletionDecoration, []);
+                        diffWidget.parentNode.removeChild(diffWidget);
+                    }
+                }, 15000);
+
+                logEvent('Inline diff shown', `${suggestion.originalText} → ${suggestion.suggestedText}`);
+            }
+        }
+
+        function acceptDiffSuggestion(suggestionId, newText, range) {
+            // Apply the text change
+            const edit = {
+                range: range,
+                text: newText
+            };
+
+            monacoEditor.executeEdits('inline-diff-accept', [edit]);
+
+            // Clean up widgets and decorations
+            cleanupDiffWidgets();
+
+            logEvent('Diff suggestion accepted', `Applied: ${newText}`);
+        }
+
+        function rejectDiffSuggestion(suggestionId) {
+            cleanupDiffWidgets();
+            logEvent('Diff suggestion rejected', suggestionId);
+        }
+
+        function showDiffDetails(suggestionId) {
+            showTooltip(
+                event.target.getBoundingClientRect().left,
+                event.target.getBoundingClientRect().top - 60,
+                '📋 Suggestion Details',
+                'This suggestion adds TypeScript type annotations to improve type safety and provide better IntelliSense support.'
+            );
+        }
+
+        function cleanupDiffWidgets() {
+            // Remove all diff widgets
+            const widgets = document.querySelectorAll('.inline-diff-widget');
+            widgets.forEach(widget => {
+                if (widget.decorationIds) {
+                    monacoEditor.deltaDecorations(widget.decorationIds, []);
+                }
+                if (widget.parentNode) {
+                    widget.parentNode.removeChild(widget);
+                }
+            });
+        }
+
+        function triggerParameterTyping() {
+            const position = monacoEditor.getPosition();
+
+            // Create a realistic parameter typing suggestion
+            showInlineDiffSuggestion({
+                id: 'param-typing-' + (++suggestionCounter),
+                originalText: 'user =>',
+                suggestedText: '(user: User) =>',
+                position: position,
+                range: {
+                    startLineNumber: position.lineNumber,
+                    startColumn: position.column,
+                    endLineNumber: position.lineNumber,
+                    endColumn: position.column + 10
+                },
+                confidence: 0.95,
+                category: 'typing'
+            });
+        }
+
+        function clearAll() {
+            // Clear all decorations
+            monacoEditor.deltaDecorations(monacoEditor.getModel().getAllDecorations().map(d => d.id), []);
+
+            // Clear overlays
+            document.getElementById('inlineOverlay').classList.remove('show');
+            document.getElementById('tooltip').classList.remove('show');
+
+            // Clear diff widgets
+            cleanupDiffWidgets();
+
+            // Clear other widgets
+            const widgets = document.querySelectorAll('.inline-widget, .lightbulb-icon');
+            widgets.forEach(widget => {
+                if (widget.parentNode) {
+                    widget.parentNode.removeChild(widget);
+                }
+            });
+
+            // Clear suggestions
+            activeSuggestions = [];
+            updateActiveSuggestionsCount();
+
+            logEvent('All cleared', 'Removed all inline suggestions');
+        }
+
+        function setDisplayMode(mode) {
+            currentDisplayMode = mode;
+            document.getElementById('currentMode').textContent = mode;
+            logEvent('Display mode changed', mode);
+        }
+
+        function setGhostOpacity(opacity) {
+            ghostOpacity = opacity;
+            document.getElementById('ghostOpacity').textContent = opacity;
+            logEvent('Ghost opacity changed', opacity);
+        }
+
+        function toggleAnimation() {
+            animationEnabled = !animationEnabled;
+            document.getElementById('animationStatus').textContent = animationEnabled ? 'enabled' : 'disabled';
+            logEvent('Animation toggled', animationEnabled ? 'enabled' : 'disabled');
+        }
+
+        function triggerFunctionCompletion() {
+            const position = monacoEditor.getPosition();
+            showInlineSuggestion({
+                id: 'completion-' + (++suggestionCounter),
+                text: 'function validateEmail(email) {\\n  return email.includes("@") && email.includes(".");\\n}',
+                position: position,
+                displayMode: currentDisplayMode,
+                confidence: 0.92,
+                category: 'generate',
+                styling: {
+                    ghostTextOpacity: ghostOpacity,
+                    animation: animationEnabled ? { fadeIn: true, fadeInDuration: 500 } : undefined
+                }
+            });
+        }
+
+        function triggerImportSuggestion() {
+            const position = { lineNumber: 1, column: 1 };
+            monacoEditor.setPosition(position);
+            showInlineSuggestion({
+                id: 'import-' + (++suggestionCounter),
+                text: 'import { validateEmail } from "./utils/validation";',
+                position: position,
+                displayMode: currentDisplayMode,
+                confidence: 0.88,
+                category: 'import'
+            });
+        }
+
+        function triggerErrorFix() {
+            const position = monacoEditor.getPosition();
+            showInlineSuggestion({
+                id: 'fix-' + (++suggestionCounter),
+                text: 'try {\\n  // existing code\\n} catch (error) {\\n  console.error("Error:", error);\\n}',
+                position: position,
+                displayMode: currentDisplayMode,
+                confidence: 0.85,
+                category: 'fix'
+            });
+        }
+
+        function triggerRefactor() {
+            const position = monacoEditor.getPosition();
+            showInlineSuggestion({
+                id: 'refactor-' + (++suggestionCounter),
+                text: '// Consider extracting this into a separate utility function',
+                position: position,
+                displayMode: currentDisplayMode,
+                confidence: 0.70,
+                category: 'refactor'
+            });
+        }
+
+        function triggerTypeHint() {
+            const position = monacoEditor.getPosition();
+            showInlineSuggestion({
+                id: 'type-' + (++suggestionCounter),
+                text: ': string',
+                position: position,
+                displayMode: currentDisplayMode,
+                confidence: 0.95,
+                category: 'typing'
+            });
+        }
+
+        function showInlineSuggestion(suggestion) {
+            activeSuggestions.push(suggestion);
+            updateActiveSuggestionsCount();
+
+            switch (suggestion.displayMode) {
+                case 'ghost-text':
+                    showGhostText(suggestion);
+                    break;
+                case 'tooltip':
+                    showSuggestionTooltip(suggestion);
+                    break;
+                case 'popup':
+                    showSuggestionPopup(suggestion);
+                    break;
+                case 'decoration':
+                    showSuggestionDecoration(suggestion);
+                    break;
+                case 'lightbulb':
+                    showLightbulbSuggestion(suggestion);
+                    break;
+                case 'widget':
+                    showInlineWidget(suggestion.position, {
+                        title: 'AI Suggestion',
+                        content: suggestion.text,
+                        confidence: suggestion.confidence
+                    });
+                    break;
+                default:
+                    showGhostText(suggestion);
+            }
+
+            logEvent('Inline suggestion shown', JSON.stringify({
+                id: suggestion.id.substring(0, 12) + '...',
+                mode: suggestion.displayMode,
+                confidence: suggestion.confidence
+            }));
+        }
+
+        function showGhostText(suggestion) {
+            const model = monacoEditor.getModel();
+            const position = suggestion.position;
+
+            // Create a decoration for ghost text
+            const decorations = monacoEditor.deltaDecorations([], [{
+                range: {
+                    startLineNumber: position.lineNumber,
+                    startColumn: position.column,
+                    endLineNumber: position.lineNumber,
+                    endColumn: position.column
+                },
+                options: {
+                    after: {
+                        content: suggestion.text,
+                        inlineClassName: 'ghost-text-inline'
+                    },
+                    className: 'ghost-text-line'
+                }
+            }]);
+
+            // Add CSS for ghost text if not exists
+            if (!document.getElementById('ghost-text-styles')) {
+                const style = document.createElement('style');
+                style.id = 'ghost-text-styles';
+                style.textContent = `
+                    .ghost-text-inline {
+                        opacity: ${suggestion.styling?.ghostTextOpacity || 0.6} !important;
+                        color: ${suggestion.styling?.ghostTextColor || '#666'} !important;
+                        font-style: ${suggestion.styling?.fontStyle || 'italic'} !important;
+                    }
+                    .ghost-text-line {
+                        position: relative;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                monacoEditor.deltaDecorations(decorations, []);
+            }, 10000);
+        }
+
+        function showSuggestionTooltip(suggestion) {
+            const position = monacoEditor.getScrolledVisiblePosition(suggestion.position);
+            if (position) {
+                showTooltip(
+                    position.left + 20,
+                    position.top - 40,
+                    `💡 ${suggestion.text}`,
+                    `Confidence: ${Math.round(suggestion.confidence * 100)}% | Category: ${suggestion.category}`
+                );
+            }
+        }
+
+        function showSuggestionPopup(suggestion) {
+            const overlay = document.getElementById('inlineOverlay');
+            const content = document.getElementById('overlayContent');
+
+            content.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 8px;">AI Suggestion</div>
+                <div style="margin-bottom: 8px;">${suggestion.text}</div>
+                <div style="font-size: 11px; color: #858585; margin-bottom: 10px;">
+                    Confidence: ${Math.round(suggestion.confidence * 100)}%
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" style="padding: 4px 8px; font-size: 11px;" onclick="acceptSuggestion('${suggestion.id}')">Accept</button>
+                    <button class="btn secondary" style="padding: 4px 8px; font-size: 11px;" onclick="rejectSuggestion('${suggestion.id}')">Reject</button>
+                </div>
+            `;
+
+            // Position the overlay
+            const position = monacoEditor.getScrolledVisiblePosition(suggestion.position);
+            if (position) {
+                overlay.style.left = (position.left + 20) + 'px';
+                overlay.style.top = (position.top - 60) + 'px';
+                overlay.classList.add('show');
+
+                // Auto-hide after 8 seconds
+                setTimeout(() => {
+                    overlay.classList.remove('show');
+                }, 8000);
+            }
+        }
+
+        function showLightbulbSuggestion(suggestion) {
+            const position = monacoEditor.getScrolledVisiblePosition(suggestion.position);
+            if (position) {
+                const lightbulb = document.createElement('div');
+                lightbulb.className = 'lightbulb-icon';
+                lightbulb.innerHTML = '💡';
+                lightbulb.style.left = (position.left - 25) + 'px';
+                lightbulb.style.top = position.top + 'px';
+                lightbulb.style.position = 'absolute';
+                lightbulb.style.zIndex = '1000';
+
+                lightbulb.onclick = () => {
+                    showTooltip(
+                        position.left + 20,
+                        position.top - 40,
+                        suggestion.text,
+                        `Click to apply this ${suggestion.category} suggestion`
+                    );
+                };
+
+                document.getElementById('editor').appendChild(lightbulb);
+
+                // Remove after 10 seconds
+                setTimeout(() => {
+                    if (lightbulb.parentNode) {
+                        lightbulb.parentNode.removeChild(lightbulb);
+                    }
+                }, 10000);
+            }
+        }
+
+        function showInlineWidget(position, options) {
+            const widget = document.createElement('div');
+            widget.className = 'inline-widget';
+            widget.style.cssText = `
+                position: absolute;
+                background: #2d2d30;
+                border: 1px solid #007acc;
+                border-radius: 6px;
+                padding: 10px;
+                color: #d4d4d4;
+                font-size: 12px;
+                max-width: 300px;
+                z-index: 1001;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            `;
+
+            widget.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 8px; color: #4ec9b0;">${options.title}</div>
+                <div style="margin-bottom: 8px;">${options.content}</div>
+                ${options.confidence ? `<div style="font-size: 11px; color: #858585; margin-bottom: 10px;">Confidence: ${Math.round(options.confidence * 100)}%</div>` : ''}
+                <div style="display: flex; gap: 6px;">
+                    ${(options.actions || ['Accept', 'Reject']).map(action =>
+                        `<button class="btn" style="padding: 4px 8px; font-size: 11px;" onclick="handleWidgetAction('${action}')">${action}</button>`
+                    ).join('')}
+                </div>
+            `;
+
+            const pixelPosition = monacoEditor.getScrolledVisiblePosition(position);
+            if (pixelPosition) {
+                widget.style.left = (pixelPosition.left + 20) + 'px';
+                widget.style.top = (pixelPosition.top - 80) + 'px';
+
+                document.getElementById('editor').appendChild(widget);
+
+                // Auto-remove after 12 seconds
+                setTimeout(() => {
+                    if (widget.parentNode) {
+                        widget.parentNode.removeChild(widget);
+                    }
+                }, 12000);
+            }
+        }
+
+        function showTooltip(x, y, title, description) {
+            const tooltip = document.getElementById('tooltip');
+            const content = document.getElementById('tooltipContent');
+
+            content.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 4px;">${title}</div>
+                ${description ? `<div style="font-size: 11px; color: #cccccc;">${description}</div>` : ''}
+            `;
+
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+            tooltip.classList.add('show');
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                tooltip.classList.remove('show');
+            }, 5000);
+        }
+
+        function acceptSuggestion(suggestionId) {
+            logEvent('Suggestion accepted', suggestionId);
+            clearAll();
+        }
+
+        function rejectSuggestion(suggestionId) {
+            logEvent('Suggestion rejected', suggestionId);
+            clearAll();
+        }
+
+        function handleWidgetAction(action) {
+            logEvent('Widget action', action);
+            clearAll();
+        }
+
+        function acceptCurrentSuggestion() {
+            if (activeSuggestions.length > 0) {
+                const suggestion = activeSuggestions[activeSuggestions.length - 1];
+                logEvent('Current suggestion accepted', suggestion.id);
+                clearAll();
+            }
+        }
+
+        function clearCurrentSuggestion() {
+            if (activeSuggestions.length > 0) {
+                const suggestion = activeSuggestions[activeSuggestions.length - 1];
+                logEvent('Current suggestion dismissed', suggestion.id);
+                clearAll();
+            }
+        }
+
+        function checkForAutoSuggestions() {
+            // Simulate auto-suggestion triggers based on content
+            const content = monacoEditor.getValue();
+            const position = monacoEditor.getPosition();
+
+            if (content.includes('function') && Math.random() < 0.2) {
+                triggerGhostText();
+            }
+        }
+
+        function updateCursorPosition(position) {
+            document.getElementById('cursorPosition').textContent = `${position.lineNumber}:${position.column}`;
+        }
+
+        function updateActiveSuggestionsCount() {
+            document.getElementById('activeSuggestionsCount').textContent = activeSuggestions.length;
+        }
+
+        function logEvent(type, data) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'event-entry';
+            logEntry.innerHTML =
+                `<span style="color: #858585;">[${timestamp}]</span> ` +
+                `<span class="event-type">${type}:</span> ` +
+                `<span style="color: #ce9178;">${typeof data === 'string' ? data : JSON.stringify(data)}</span>`;
+
+            const eventLog = document.getElementById('eventLog');
+            eventLog.appendChild(logEntry);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        function getSampleCode() {
+            return `// Sample JavaScript code for inline suggestion demo
+// Try clicking "🔄 Inline Diff" to see change suggestions!
+
+function processUserData(users) {
+    const validUsers = users.filter(user => user.email);
+
+    return validUsers.map(user => {
+        // Position cursor here and try suggestions!
+        return {
+            id: user.id,
+            name: user.name,
+            email: user.email
+        };
+    });
+}
+
+// This function could benefit from type annotations
+async function fetchUserData() {
+    const response = await fetch('/api/users');
+    // Try triggering suggestions here
+    return response.json();
+}
+
+// Example with forEach that can show parameter typing suggestions
+data.forEach(item => {
+    console.log(item.name);
+});
+
+// Position cursor at end of lines and trigger suggestions
+const userData =
+`;
+        }
+    </script>
+</body>
+</html>
