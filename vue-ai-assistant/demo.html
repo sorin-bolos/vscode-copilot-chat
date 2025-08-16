@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vue AI Assistant Demo</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="./dist/style.css">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -60,6 +61,47 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
+        .status-success {
+            color: #28a745;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.info {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .toast.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .toast.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -67,30 +109,35 @@
         <div class="demo-container">
             <div class="demo-header">
                 <h1>Vue AI Assistant Demo</h1>
-                <p>A standalone Vue.js component replacing VS Code Copilot Chat functionality</p>
+                <p>A standalone Vue.js component with full AI assistant functionality</p>
             </div>
 
             <div class="platform-status">
                 <h3>Platform Status</h3>
                 <div class="status-item">
+                    <span class="status-label">Component Status:</span>
+                    <span class="status-value status-success">✅ Loaded Successfully</span>
+                </div>
+                <div class="status-item">
                     <span class="status-label">Platform Implementation:</span>
-                    <span class="status-value">Browser Abstraction Layer</span>
+                    <span class="status-value">{{ platformAbstraction.constructor.name }}</span>
                 </div>
                 <div class="status-item">
                     <span class="status-label">Storage Backend:</span>
-                    <span class="status-value">localStorage + IndexedDB</span>
+                    <span class="status-value">{{ storageService.constructor.name }}</span>
                 </div>
                 <div class="status-item">
-                    <span class="status-label">Event System:</span>
-                    <span class="status-value">Custom EventEmitter</span>
+                    <span class="status-label">Core Services:</span>
+                    <span class="status-value status-success">✅ Dependency Injection, Lifecycle, Configuration, Error Handling</span>
                 </div>
                 <div class="status-item">
-                    <span class="status-label">Dependency Injection:</span>
-                    <span class="status-value">Vue provide/inject + Custom DI</span>
+                    <span class="status-label">Active Editor:</span>
+                    <span class="status-value">{{ activeEditorFile }}</span>
                 </div>
             </div>
 
             <div class="assistant-wrapper">
+                <!-- This will now load the actual Vue component -->
                 <vue-copilot-assistant
                     :platform-abstraction="platformAbstraction"
                     :storage-service="storageService"
@@ -102,8 +149,8 @@
     </div>
 
     <script type="module">
-        // Import the built library (in a real app, you'd use npm install)
-        // For this demo, we'll create mock implementations
+        // Import the actual built component
+        import VueCopilotAssistant from './dist/vue-copilot-assistant.es.js';
 
         // Mock EventEmitter implementation
         class EventEmitter {
@@ -144,11 +191,20 @@
             }
         }
 
-        // Mock platform abstraction
+        // Enhanced platform abstraction with better editor simulation
         class MockPlatformAbstraction {
             constructor() {
                 this.onDidChangeActiveEditor = new EventEmitter();
                 this.currentEditor = new MockEditor();
+                this.toastContainer = null;
+                this.initializeToastContainer();
+            }
+
+            initializeToastContainer() {
+                // Create toast container for notifications
+                this.toastContainer = document.createElement('div');
+                this.toastContainer.id = 'toast-container';
+                document.body.appendChild(this.toastContainer);
             }
 
             getActiveEditor() {
@@ -156,59 +212,92 @@
             }
 
             async readFile(path) {
-                // Simulate file reading
-                return `// Mock file content for: ${path}\nconsole.log('Hello from ${path}');`;
+                // Simulate file reading with more realistic content
+                const mockContents = {
+                    'demo.js': 'function greet(name) {\n    return `Hello, ${name}!`;\n}\n\ngreet("World");',
+                    'utils.ts': 'export function formatDate(date: Date): string {\n    return date.toISOString();\n}',
+                    'index.html': '<!DOCTYPE html>\n<html>\n<head><title>Demo</title></head>\n<body></body>\n</html>'
+                };
+
+                await new Promise(resolve => setTimeout(resolve, 100)); // Simulate async operation
+                return mockContents[path] || `// Mock file content for: ${path}\n\n// This file would contain real content in a production environment`;
             }
 
             async writeFile(path, content) {
-                console.log(`Mock write to ${path}:`, content);
+                console.log(`📝 Mock write to ${path}:`, content);
+                this.showMessage(`File saved: ${path}`, 'info');
+                // In a real implementation, this would save to the actual file system
             }
 
             async showDocument(path) {
-                console.log(`Mock show document: ${path}`);
+                console.log(`📖 Mock show document: ${path}`);
+                this.showMessage(`Opening file: ${path}`, 'info');
             }
 
-            showMessage(message, type) {
-                const className = type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'info';
+            showMessage(message, type = 'info') {
                 console.log(`[${type.toUpperCase()}] ${message}`);
 
-                // Create a simple toast notification
+                // Create a toast notification
                 const toast = document.createElement('div');
                 toast.textContent = message;
-                toast.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 12px 20px;
-                    background: ${type === 'error' ? '#f8d7da' : type === 'warning' ? '#fff3cd' : '#d4edda'};
-                    color: ${type === 'error' ? '#721c24' : type === 'warning' ? '#856404' : '#155724'};
-                    border-radius: 6px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                    z-index: 1000;
-                    animation: slideIn 0.3s ease-out;
-                `;
-                document.body.appendChild(toast);
+                toast.className = `toast ${type}`;
+
+                this.toastContainer.appendChild(toast);
+
+                // Remove after 3 seconds
                 setTimeout(() => {
-                    toast.remove();
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
                 }, 3000);
             }
         }
 
-        // Mock editor
+        // Enhanced mock editor with more realistic behavior
         class MockEditor {
             constructor() {
                 this.onDidChangeTextDocument = new EventEmitter();
-                this.text = '// Sample code file\nfunction example() {\n    console.log("Hello World");\n}\n\nexample();';
+                this.onDidChangeSelection = new EventEmitter();
+
+                // Sample code that looks more realistic
+                this.text = `// Sample TypeScript file
+interface User {
+    id: number;
+    name: string;
+    email: string;
+}
+
+function createUser(data: Partial<User>): User {
+    return {
+        id: Math.random(),
+        name: data.name || 'Anonymous',
+        email: data.email || 'user@example.com'
+    };
+}
+
+const user = createUser({
+    name: 'John Doe',
+    email: 'john@example.com'
+});
+
+console.log('Created user:', user);`;
+
                 this.selection = { start: 0, end: 0 };
                 this.cursor = 0;
+                this.fileName = 'demo.ts';
+
+                // Simulate periodic selection changes
+                this.simulateUserInteraction();
             }
 
             get uri() {
-                return 'demo-file.js';
+                return this.fileName;
             }
 
             get languageId() {
-                return 'javascript';
+                return this.fileName.endsWith('.ts') ? 'typescript' :
+                       this.fileName.endsWith('.js') ? 'javascript' :
+                       this.fileName.endsWith('.py') ? 'python' : 'plaintext';
             }
 
             getText(range) {
@@ -227,25 +316,69 @@
             }
 
             async replaceText(range, text) {
-                console.log('Mock replace text:', { range, text });
+                console.log('🔄 Mock replace text:', { range, text });
+
+                // Update the internal text (simplified)
+                if (range && range.start !== undefined && range.end !== undefined) {
+                    this.text = this.text.substring(0, range.start) + text + this.text.substring(range.end);
+                } else {
+                    this.text = text;
+                }
+
                 this.onDidChangeTextDocument.fire({ range, text });
             }
 
             async insertText(position, text) {
-                console.log('Mock insert text:', { position, text });
+                console.log('📝 Mock insert text:', { position, text });
+
+                this.text = this.text.substring(0, position) + text + this.text.substring(position);
                 this.onDidChangeTextDocument.fire({ position, text });
+            }
+
+            async setSelection(range) {
+                this.selection = range;
+                this.onDidChangeSelection.fire(range);
+            }
+
+            async setCursorPosition(position) {
+                this.cursor = position;
+                this.selection = { start: position, end: position };
+                this.onDidChangeSelection.fire(this.selection);
+            }
+
+            simulateUserInteraction() {
+                // Simulate user selecting different parts of the code every few seconds
+                setInterval(() => {
+                    const lines = this.text.split('\n');
+                    const randomLine = Math.floor(Math.random() * lines.length);
+                    const lineStart = lines.slice(0, randomLine).join('\n').length + (randomLine > 0 ? 1 : 0);
+                    const lineEnd = lineStart + lines[randomLine].length;
+
+                    this.selection = { start: lineStart, end: lineEnd };
+                    this.onDidChangeSelection.fire(this.selection);
+                }, 5000);
             }
         }
 
-        // Mock storage service
-        class MockStorageService {
+        // Browser-compatible storage service
+        class BrowserStorageService {
             get(key, defaultValue) {
-                const value = localStorage.getItem(key);
-                return value ? JSON.parse(value) : defaultValue;
+                try {
+                    const value = localStorage.getItem(key);
+                    return value ? JSON.parse(value) : defaultValue;
+                } catch (error) {
+                    console.warn('Failed to parse stored value:', error);
+                    return defaultValue;
+                }
             }
 
             async set(key, value) {
-                localStorage.setItem(key, JSON.stringify(value));
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } catch (error) {
+                    console.error('Failed to store value:', error);
+                    throw error;
+                }
             }
 
             async remove(key) {
@@ -254,45 +387,7 @@
         }
 
         // Vue app setup
-        const { createApp, ref } = Vue;
-
-        // Mock Vue component (since we can't import the actual built component in this simple demo)
-        const VueCopilotAssistant = {
-            props: ['platformAbstraction', 'storageService'],
-            emits: ['codeChange', 'toolResult'],
-            template: `
-                <div style="padding: 20px; background: white;">
-                    <h3>Vue AI Assistant Component</h3>
-                    <p><strong>Status:</strong> Successfully loaded with browser abstractions</p>
-                    <p><strong>Platform:</strong> {{ platformAbstraction.constructor.name }}</p>
-                    <p><strong>Storage:</strong> {{ storageService.constructor.name }}</p>
-
-                    <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 6px;">
-                        <h4>✅ Phase 1.2 Complete: VS Code Dependencies Removed</h4>
-                        <ul style="margin: 10px 0;">
-                            <li>✅ Browser EventEmitter replacing VS Code events</li>
-                            <li>✅ Platform abstraction layer for editor/file operations</li>
-                            <li>✅ Custom dependency injection system</li>
-                            <li>✅ Lifecycle management for browser environment</li>
-                            <li>✅ Storage services (localStorage/IndexedDB)</li>
-                            <li>✅ Vue composables for reactive state management</li>
-                        </ul>
-                    </div>
-
-                    <div style="margin: 20px 0; padding: 15px; background: #e7f3ff; border-radius: 6px;">
-                        <h4>🎯 Ready for Phase 2: Core Components</h4>
-                        <p>The abstraction layer is complete and the Vue component is ready to implement:</p>
-                        <ul style="margin: 10px 0;">
-                            <li>Chat interface with message history</li>
-                            <li>Code editor integration via Monaco</li>
-                            <li>AI API communication layer</li>
-                            <li>Tool execution system</li>
-                            <li>Configuration management</li>
-                        </ul>
-                    </div>
-                </div>
-            `
-        };
+        const { createApp, ref, onMounted } = Vue;
 
         const app = createApp({
             components: {
@@ -300,19 +395,29 @@
             },
             setup() {
                 const platformAbstraction = new MockPlatformAbstraction();
-                const storageService = new MockStorageService();
+                const storageService = new BrowserStorageService();
+                const activeEditorFile = ref('demo.ts');
+
+                // Update active editor file when it changes
+                onMounted(() => {
+                    platformAbstraction.onDidChangeActiveEditor.on((editor) => {
+                        activeEditorFile.value = editor ? editor.uri : 'No file';
+                    });
+                });
 
                 function onCodeChange(change) {
-                    console.log('Code change event:', change);
+                    console.log('🔄 Code change event:', change);
+                    platformAbstraction.showMessage('Code applied successfully!', 'info');
                 }
 
                 function onToolResult(result) {
-                    console.log('Tool result event:', result);
+                    console.log('🔧 Tool result event:', result);
                 }
 
                 return {
                     platformAbstraction,
                     storageService,
+                    activeEditorFile,
                     onCodeChange,
                     onToolResult
                 };
@@ -320,22 +425,6 @@
         });
 
         app.mount('#app');
-
-        // Add slide-in animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
