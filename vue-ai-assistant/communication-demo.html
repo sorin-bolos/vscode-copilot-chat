@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Layer Demo</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .demo-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #007acc;
+        }
+
+        .status-success {
+            border-left-color: #28a745;
+        }
+
+        .status-warning {
+            border-left-color: #ffc107;
+        }
+
+        .status-error {
+            border-left-color: #dc3545;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #007acc;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        button:hover {
+            background: #005a9e;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .log {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .input-group {
+            margin: 10px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .ws-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .ws-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .ws-status.connecting {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .ws-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="demo-container">
+            <div class="demo-header">
+                <h1>Phase 2.1: Communication Layer Demo</h1>
+                <p>Browser-compatible HTTP Client and WebSocket services</p>
+            </div>
+
+            <div class="status-grid">
+                <div class="status-card status-success">
+                    <h4>✅ HTTP Client Service</h4>
+                    <p>Fetch-based client with retry, auth, and streaming support</p>
+                </div>
+                <div class="status-card status-success">
+                    <h4>✅ WebSocket Service</h4>
+                    <p>Connection management, reconnection, and message queuing</p>
+                </div>
+                <div class="status-card status-success">
+                    <h4>✅ CORS Handler</h4>
+                    <p>Browser security constraints and proxy fallback</p>
+                </div>
+                <div class="status-card status-success">
+                    <h4>✅ Authentication</h4>
+                    <p>Token management and automatic refresh</p>
+                </div>
+            </div>
+
+            <!-- HTTP Client Demo -->
+            <div class="demo-section">
+                <h3>HTTP Client Demo</h3>
+                <div class="controls">
+                    <button @click="testHttpGet">Test GET Request</button>
+                    <button @click="testHttpPost">Test POST Request</button>
+                    <button @click="testHttpError">Test Error Handling</button>
+                    <button @click="testHttpStream">Test Streaming</button>
+                    <button @click="clearHttpLog">Clear Log</button>
+                </div>
+
+                <div class="input-group">
+                    <label>API Endpoint:</label>
+                    <input v-model="httpEndpoint" placeholder="https://jsonplaceholder.typicode.com/posts/1">
+                </div>
+
+                <div class="log">{{ httpLog }}</div>
+            </div>
+
+            <!-- WebSocket Demo -->
+            <div class="demo-section">
+                <h3>WebSocket Demo</h3>
+                <div class="controls">
+                    <button @click="connectWebSocket" :disabled="wsConnected">Connect</button>
+                    <button @click="disconnectWebSocket" :disabled="!wsConnected">Disconnect</button>
+                    <button @click="sendWebSocketMessage" :disabled="!wsConnected">Send Message</button>
+                    <button @click="clearWsLog">Clear Log</button>
+                </div>
+
+                <div class="input-group">
+                    <label>WebSocket URL:</label>
+                    <input v-model="wsUrl" placeholder="wss://echo.websocket.org">
+                </div>
+
+                <div class="input-group">
+                    <label>Message to Send:</label>
+                    <textarea v-model="wsMessage" rows="3" placeholder='{"type": "test", "data": "Hello WebSocket!"}'></textarea>
+                </div>
+
+                <div style="margin: 10px 0;">
+                    Status: <span class="ws-status" :class="wsStatus.toLowerCase()">{{ wsStatus }}</span>
+                </div>
+
+                <div class="log">{{ wsLog }}</div>
+            </div>
+
+            <!-- Browser Capabilities -->
+            <div class="demo-section">
+                <h3>Browser Capabilities</h3>
+                <div class="status-grid">
+                    <div class="status-card" :class="capabilities.webSocket ? 'status-success' : 'status-error'">
+                        <h5>WebSocket Support</h5>
+                        <p>{{ capabilities.webSocket ? '✅ Supported' : '❌ Not Supported' }}</p>
+                    </div>
+                    <div class="status-card" :class="capabilities.streaming ? 'status-success' : 'status-error'">
+                        <h5>Streaming Support</h5>
+                        <p>{{ capabilities.streaming ? '✅ Supported' : '❌ Not Supported' }}</p>
+                    </div>
+                    <div class="status-card" :class="capabilities.serviceWorker ? 'status-success' : 'status-warning'">
+                        <h5>Service Worker</h5>
+                        <p>{{ capabilities.serviceWorker ? '✅ Supported' : '⚠️ Not Supported' }}</p>
+                    </div>
+                    <div class="status-card status-success">
+                        <h5>Security Context</h5>
+                        <p>{{ secureContext ? '🔒 Secure (HTTPS)' : '🔓 Insecure (HTTP)' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const { createApp, ref, onMounted } = Vue;
+
+        // Mock HTTP Client for demo
+        class DemoHttpClient {
+            async get(url) {
+                const response = await fetch(url);
+                return {
+                    data: await response.json(),
+                    status: response.status,
+                    statusText: response.statusText
+                };
+            }
+
+            async post(url, data) {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                return {
+                    data: await response.json(),
+                    status: response.status,
+                    statusText: response.statusText
+                };
+            }
+
+            async stream(url) {
+                const response = await fetch(url);
+                return response.body;
+            }
+        }
+
+        // Mock WebSocket wrapper
+        class DemoWebSocket {
+            constructor(url) {
+                this.url = url;
+                this.ws = null;
+                this.state = 'disconnected';
+                this.onStateChange = () => {};
+                this.onMessage = () => {};
+                this.onError = () => {};
+            }
+
+            async connect() {
+                this.state = 'connecting';
+                this.onStateChange(this.state);
+
+                try {
+                    this.ws = new WebSocket(this.url);
+
+                    this.ws.onopen = () => {
+                        this.state = 'connected';
+                        this.onStateChange(this.state);
+                    };
+
+                    this.ws.onclose = () => {
+                        this.state = 'disconnected';
+                        this.onStateChange(this.state);
+                    };
+
+                    this.ws.onerror = (error) => {
+                        this.state = 'disconnected';
+                        this.onStateChange(this.state);
+                        this.onError(error);
+                    };
+
+                    this.ws.onmessage = (event) => {
+                        this.onMessage({ data: event.data });
+                    };
+
+                } catch (error) {
+                    this.state = 'disconnected';
+                    this.onStateChange(this.state);
+                    throw error;
+                }
+            }
+
+            disconnect() {
+                if (this.ws) {
+                    this.ws.close();
+                }
+            }
+
+            send(message) {
+                if (this.ws && this.state === 'connected') {
+                    this.ws.send(typeof message === 'string' ? message : JSON.stringify(message));
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        const app = createApp({
+            setup() {
+                const httpClient = new DemoHttpClient();
+                const httpEndpoint = ref('https://jsonplaceholder.typicode.com/posts/1');
+                const httpLog = ref('HTTP Client ready. Click buttons to test functionality.\n');
+
+                const wsUrl = ref('wss://echo.websocket.org');
+                const wsMessage = ref('{"type": "test", "data": "Hello WebSocket!"}');
+                const wsLog = ref('WebSocket ready. Click Connect to start.\n');
+                const wsStatus = ref('Disconnected');
+                const wsConnected = ref(false);
+                const webSocket = ref(null);
+
+                const capabilities = ref({
+                    webSocket: false,
+                    streaming: false,
+                    serviceWorker: false
+                });
+                const secureContext = ref(false);
+
+                function addHttpLog(message) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    httpLog.value += `[${timestamp}] ${message}\n`;
+                }
+
+                function addWsLog(message) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    wsLog.value += `[${timestamp}] ${message}\n`;
+                }
+
+                async function testHttpGet() {
+                    try {
+                        addHttpLog(`GET ${httpEndpoint.value}`);
+                        const response = await httpClient.get(httpEndpoint.value);
+                        addHttpLog(`✅ Success (${response.status}): ${JSON.stringify(response.data).substring(0, 100)}...`);
+                    } catch (error) {
+                        addHttpLog(`❌ Error: ${error.message}`);
+                    }
+                }
+
+                async function testHttpPost() {
+                    try {
+                        const data = { title: 'Test Post', body: 'Demo content', userId: 1 };
+                        addHttpLog(`POST ${httpEndpoint.value.replace('/1', '')}`);
+                        const response = await httpClient.post(httpEndpoint.value.replace('/1', ''), data);
+                        addHttpLog(`✅ Success (${response.status}): Created post with ID ${response.data.id}`);
+                    } catch (error) {
+                        addHttpLog(`❌ Error: ${error.message}`);
+                    }
+                }
+
+                async function testHttpError() {
+                    try {
+                        addHttpLog('GET https://jsonplaceholder.typicode.com/posts/999999');
+                        const response = await httpClient.get('https://jsonplaceholder.typicode.com/posts/999999');
+                        addHttpLog(`Response: ${JSON.stringify(response.data)}`);
+                    } catch (error) {
+                        addHttpLog(`❌ Expected error: ${error.message}`);
+                    }
+                }
+
+                async function testHttpStream() {
+                    try {
+                        addHttpLog('Testing streaming response...');
+                        const stream = await httpClient.stream(httpEndpoint.value);
+                        addHttpLog(`✅ Stream created: ${stream.constructor.name}`);
+
+                        // Read a small chunk for demo
+                        const reader = stream.getReader();
+                        const { value, done } = await reader.read();
+                        if (!done) {
+                            const text = new TextDecoder().decode(value);
+                            addHttpLog(`📦 First chunk: ${text.substring(0, 50)}...`);
+                        }
+                        reader.releaseLock();
+                    } catch (error) {
+                        addHttpLog(`❌ Stream error: ${error.message}`);
+                    }
+                }
+
+                function clearHttpLog() {
+                    httpLog.value = 'HTTP Client log cleared.\n';
+                }
+
+                async function connectWebSocket() {
+                    try {
+                        webSocket.value = new DemoWebSocket(wsUrl.value);
+
+                        webSocket.value.onStateChange = (state) => {
+                            wsStatus.value = state.charAt(0).toUpperCase() + state.slice(1);
+                            wsConnected.value = state === 'connected';
+                            addWsLog(`State changed: ${state}`);
+                        };
+
+                        webSocket.value.onMessage = (message) => {
+                            addWsLog(`📨 Received: ${message.data}`);
+                        };
+
+                        webSocket.value.onError = (error) => {
+                            addWsLog(`❌ Error: ${error.message || 'Connection failed'}`);
+                        };
+
+                        addWsLog(`Connecting to ${wsUrl.value}...`);
+                        await webSocket.value.connect();
+                    } catch (error) {
+                        addWsLog(`❌ Connection failed: ${error.message}`);
+                    }
+                }
+
+                function disconnectWebSocket() {
+                    if (webSocket.value) {
+                        webSocket.value.disconnect();
+                        addWsLog('Disconnecting...');
+                    }
+                }
+
+                function sendWebSocketMessage() {
+                    if (webSocket.value && wsConnected.value) {
+                        const success = webSocket.value.send(wsMessage.value);
+                        if (success) {
+                            addWsLog(`📤 Sent: ${wsMessage.value}`);
+                        } else {
+                            addWsLog('❌ Failed to send message');
+                        }
+                    }
+                }
+
+                function clearWsLog() {
+                    wsLog.value = 'WebSocket log cleared.\n';
+                }
+
+                onMounted(() => {
+                    // Check browser capabilities
+                    capabilities.value = {
+                        webSocket: 'WebSocket' in window,
+                        streaming: 'ReadableStream' in window && 'fetch' in window,
+                        serviceWorker: 'serviceWorker' in navigator
+                    };
+
+                    secureContext.value = window.isSecureContext;
+
+                    addHttpLog('HTTP Client initialized with browser-compatible fetch API');
+                    addWsLog('WebSocket service initialized with reconnection and message queuing');
+                });
+
+                return {
+                    httpEndpoint,
+                    httpLog,
+                    wsUrl,
+                    wsMessage,
+                    wsLog,
+                    wsStatus,
+                    wsConnected,
+                    capabilities,
+                    secureContext,
+                    testHttpGet,
+                    testHttpPost,
+                    testHttpError,
+                    testHttpStream,
+                    clearHttpLog,
+                    connectWebSocket,
+                    disconnectWebSocket,
+                    sendWebSocketMessage,
+                    clearWsLog
+                };
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>

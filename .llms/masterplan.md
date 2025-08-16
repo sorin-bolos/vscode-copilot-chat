@@ -54,16 +54,16 @@ Browser Vue.js IDE
 *Estimated Time: 3-4 weeks*
 
 ### 2.1 Communication Layer
-- [ ] **HTTP Client Service**
-  - [ ] Replace VS Code networking with fetch/axios
-  - [ ] Implement request/response handling
-  - [ ] Add authentication token management
-  - [ ] Handle CORS and browser security constraints
+- [x] **HTTP Client Service**
+  - [x] Replace VS Code networking with fetch/axios
+  - [x] Implement request/response handling
+  - [x] Add authentication token management
+  - [x] Handle CORS and browser security constraints
 
-- [ ] **WebSocket Service** (for real-time features)
-  - [ ] Implement WebSocket client for live collaboration
-  - [ ] Handle connection management and reconnection
-  - [ ] Message queuing and delivery guarantees
+- [x] **WebSocket Service** (for real-time features)
+  - [x] Implement WebSocket client for live collaboration
+  - [x] Handle connection management and reconnection
+  - [x] Message queuing and delivery guarantees
 
 ### 2.2 File System Abstraction
 - [ ] **Virtual File System**
