@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual File System Demo</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .demo-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #0066cc;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #0066cc;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #0052a3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .file-tree {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background: #f9f9f9;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .file-entry {
+            padding: 4px 8px;
+            margin: 2px 0;
+            cursor: pointer;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+        }
+
+        .file-entry:hover {
+            background: #e6f3ff;
+        }
+
+        .file-entry.selected {
+            background: #0066cc;
+            color: white;
+        }
+
+        .file-icon {
+            margin-right: 8px;
+            width: 16px;
+        }
+
+        .editor-pane {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background: white;
+            min-height: 200px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow: auto;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .log {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background: #f9f9f9;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="demo-container">
+            <div class="demo-header">
+                <h1>🗂️ Virtual File System Demo</h1>
+                <p>Interactive demonstration of the browser-compatible VFS abstraction layer</p>
+            </div>
+
+            <!-- Status Overview -->
+            <div class="status-grid">
+                <div class="status-card">
+                    <h3>📊 VFS Status</h3>
+                    <p><strong>Provider:</strong> Memory</p>
+                    <p><strong>Files:</strong> {{ fileCount }}</p>
+                    <p><strong>Directories:</strong> {{ directoryCount }}</p>
+                </div>
+                <div class="status-card">
+                    <h3>👁️ File Watcher</h3>
+                    <p><strong>Status:</strong> {{ watcherStatus }}</p>
+                    <p><strong>Events:</strong> {{ watcherEventCount }}</p>
+                </div>
+                <div class="status-card">
+                    <h3>📝 Editor</h3>
+                    <p><strong>File:</strong> {{ selectedFile || 'None' }}</p>
+                    <p><strong>Language:</strong> {{ currentLanguage }}</p>
+                </div>
+                <div class="status-card">
+                    <h3>🔧 Operations</h3>
+                    <p><strong>Total:</strong> {{ operationCount }}</p>
+                    <p><strong>Last:</strong> {{ lastOperation }}</p>
+                </div>
+            </div>
+
+            <div class="demo-grid">
+                <!-- File Explorer -->
+                <div class="demo-section">
+                    <h3>📁 File Explorer</h3>
+                    <div class="controls">
+                        <button @click="createSampleProject" :disabled="loading">Create Sample Project</button>
+                        <button @click="refreshFileTree">Refresh</button>
+                        <button @click="clearFileSystem" :disabled="loading">Clear All</button>
+                    </div>
+                    <div class="file-tree">
+                        <div v-if="fileTree.length === 0" style="color: #666; font-style: italic;">
+                            No files. Click "Create Sample Project" to get started.
+                        </div>
+                        <div v-for="entry in fileTree" :key="entry.uri"
+                             class="file-entry"
+                             :class="{ selected: selectedFile === entry.uri }"
+                             @click="selectFile(entry)">
+                            <span class="file-icon">{{ getFileIcon(entry.type, entry.name) }}</span>
+                            {{ entry.name || '/' }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Editor -->
+                <div class="demo-section">
+                    <h3>✏️ File Editor</h3>
+                    <div class="controls">
+                        <button @click="saveFile" :disabled="!selectedFile || loading">Save File</button>
+                        <button @click="closeFile" :disabled="!selectedFile">Close</button>
+                        <button @click="copySelected" :disabled="!selectedFile || loading">Copy</button>
+                        <button @click="deleteSelected" :disabled="!selectedFile || loading">Delete</button>
+                    </div>
+                    <div v-if="selectedFile">
+                        <p><strong>Editing:</strong> {{ selectedFile }}</p>
+                        <textarea v-model="editingContent"
+                                  class="editor-pane"
+                                  placeholder="File content..."
+                                  rows="10"></textarea>
+                    </div>
+                    <div v-else class="editor-pane" style="color: #666; font-style: italic;">
+                        Select a file to edit
+                    </div>
+                </div>
+
+                <!-- File Operations -->
+                <div class="demo-section">
+                    <h3>🛠️ File Operations</h3>
+                    <div class="input-group">
+                        <label>Create New File:</label>
+                        <input v-model="newFileName" placeholder="e.g., src/utils/helper.ts" @keyup.enter="createFile">
+                        <button @click="createFile" :disabled="!newFileName || loading" style="margin-top: 5px;">Create File</button>
+                    </div>
+                    <div class="input-group">
+                        <label>Create New Directory:</label>
+                        <input v-model="newDirName" placeholder="e.g., src/components" @keyup.enter="createDirectory">
+                        <button @click="createDirectory" :disabled="!newDirName || loading" style="margin-top: 5px;">Create Directory</button>
+                    </div>
+                </div>
+
+                <!-- Monaco Integration -->
+                <div class="demo-section">
+                    <h3>🎯 Monaco Integration</h3>
+                    <div class="controls">
+                        <button @click="openInMonaco" :disabled="!selectedFile">Open in Monaco (Simulated)</button>
+                        <button @click="simulateEditorChange" :disabled="!selectedFile">Simulate Edit</button>
+                    </div>
+                    <div class="log">{{ monacoLog }}</div>
+                    <p><strong>Editor Info:</strong> {{ editorInfo }}</p>
+                </div>
+
+                <!-- File Watcher -->
+                <div class="demo-section full-width">
+                    <h3>👁️ File Watcher</h3>
+                    <div class="controls">
+                        <button @click="toggleWatching">{{ isWatching ? 'Stop' : 'Start' }} Watching</button>
+                        <button @click="clearWatcherLog">Clear Log</button>
+                        <button @click="clearOperationLog">Clear Operation Log</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4>Watcher Events:</h4>
+                            <div class="log">{{ watcherLog }}</div>
+                        </div>
+                        <div>
+                            <h4>Operation Log:</h4>
+                            <div class="log">{{ operationLog }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const { createApp, ref, computed, onMounted } = Vue;
+
+        // Simplified VFS implementation for demo
+        class DemoVFS {
+            constructor() {
+                this.files = new Map();
+                this.watchers = new Set();
+                this.isWatching = false;
+
+                // Create root
+                this.files.set('/', {
+                    uri: '/',
+                    name: '',
+                    type: 'directory',
+                    children: []
+                });
+
+                console.log('DemoVFS initialized');
+            }
+
+            async writeFile(uri, content) {
+                const path = uri.replace('memory:', '');
+                const parentPath = this.getParentPath(path);
+                const fileName = this.getFileName(path);
+
+                // Ensure parent exists
+                await this.ensureDirectoryExists(parentPath);
+
+                const file = {
+                    uri: path,
+                    name: fileName,
+                    type: 'file',
+                    content: content,
+                    lastModified: Date.now()
+                };
+
+                this.files.set(path, file);
+                this.addToParent(parentPath, file);
+                this.emitChange('created', path);
+
+                return file;
+            }
+
+            async readFile(uri) {
+                const path = uri.replace('memory:', '');
+                const file = this.files.get(path);
+                if (!file || file.type !== 'file') {
+                    throw new Error(`File not found: ${uri}`);
+                }
+                return file.content || '';
+            }
+
+            async createDirectory(uri) {
+                const path = uri.replace('memory:', '');
+                const parentPath = this.getParentPath(path);
+                const dirName = this.getFileName(path);
+
+                if (this.files.has(path)) {
+                    return this.files.get(path);
+                }
+
+                // Ensure parent exists
+                if (parentPath !== '/') {
+                    await this.ensureDirectoryExists(parentPath);
+                }
+
+                const directory = {
+                    uri: path,
+                    name: dirName,
+                    type: 'directory',
+                    children: [],
+                    lastModified: Date.now()
+                };
+
+                this.files.set(path, directory);
+                this.addToParent(parentPath, directory);
+                this.emitChange('created', path);
+
+                return directory;
+            }
+
+            async delete(uri) {
+                const path = uri.replace('memory:', '');
+                const item = this.files.get(path);
+
+                if (!item) {
+                    throw new Error(`Item not found: ${uri}`);
+                }
+
+                // If directory, delete recursively
+                if (item.type === 'directory') {
+                    for (const child of item.children || []) {
+                        await this.delete('memory:' + child.uri);
+                    }
+                }
+
+                this.files.delete(path);
+                this.removeFromParent(this.getParentPath(path), item);
+                this.emitChange('deleted', path);
+            }
+
+            async copy(sourceUri, targetUri) {
+                const sourcePath = sourceUri.replace('memory:', '');
+                const targetPath = targetUri.replace('memory:', '');
+                const sourceItem = this.files.get(sourcePath);
+
+                if (!sourceItem) {
+                    throw new Error(`Source not found: ${sourceUri}`);
+                }
+
+                if (sourceItem.type === 'file') {
+                    await this.writeFile(targetUri, sourceItem.content);
+                } else {
+                    await this.createDirectory(targetUri);
+                    for (const child of sourceItem.children || []) {
+                        const childTargetPath = targetPath + '/' + child.name;
+                        await this.copy('memory:' + child.uri, 'memory:' + childTargetPath);
+                    }
+                }
+            }
+
+            async list(uri = '/') {
+                const path = uri.replace('memory:', '') || '/';
+                const directory = this.files.get(path);
+
+                if (!directory || directory.type !== 'directory') {
+                    return [];
+                }
+
+                return (directory.children || []).map(child => ({
+                    ...child,
+                    uri: 'memory:' + child.uri
+                }));
+            }
+
+            watch(callback) {
+                this.watchers.add(callback);
+                return () => this.watchers.delete(callback);
+            }
+
+            emitChange(type, path) {
+                if (this.isWatching) {
+                    this.watchers.forEach(callback => {
+                        try {
+                            callback({ type, path, timestamp: Date.now() });
+                        } catch (error) {
+                            console.error('Watcher error:', error);
+                        }
+                    });
+                }
+            }
+
+            async ensureDirectoryExists(path) {
+                if (path === '/' || this.files.has(path)) {
+                    return;
+                }
+
+                const parentPath = this.getParentPath(path);
+                await this.ensureDirectoryExists(parentPath);
+                await this.createDirectory('memory:' + path);
+            }
+
+            getParentPath(path) {
+                if (path === '/' || path === '') return '/';
+                const lastSlash = path.lastIndexOf('/');
+                return lastSlash <= 0 ? '/' : path.substring(0, lastSlash);
+            }
+
+            getFileName(path) {
+                if (path === '/') return '';
+                const lastSlash = path.lastIndexOf('/');
+                return path.substring(lastSlash + 1);
+            }
+
+            addToParent(parentPath, item) {
+                const parent = this.files.get(parentPath);
+                if (parent && parent.type === 'directory') {
+                    parent.children = parent.children || [];
+                    const existing = parent.children.find(child => child.uri === item.uri);
+                    if (!existing) {
+                        parent.children.push(item);
+                        parent.children.sort((a, b) => {
+                            if (a.type !== b.type) {
+                                return a.type === 'directory' ? -1 : 1;
+                            }
+                            return a.name.localeCompare(b.name);
+                        });
+                    }
+                }
+            }
+
+            removeFromParent(parentPath, item) {
+                const parent = this.files.get(parentPath);
+                if (parent && parent.type === 'directory' && parent.children) {
+                    parent.children = parent.children.filter(child => child.uri !== item.uri);
+                }
+            }
+        }
+
+        // Monaco Editor Service simulation
+        class DemoMonacoService {
+            constructor() {
+                this.editors = new Map();
+                this.changeListeners = new Set();
+            }
+
+            createEditor(container, options = {}) {
+                const editor = {
+                    id: `editor-${Date.now()}`,
+                    container,
+                    value: options.value || '',
+                    language: options.language || 'plaintext',
+                    selections: [],
+                    cursor: { line: 1, column: 1 }
+                };
+
+                this.editors.set(editor.id, editor);
+                return editor;
+            }
+
+            getValue(editorId) {
+                const editor = this.editors.get(editorId);
+                return editor ? editor.value : '';
+            }
+
+            setValue(editorId, value) {
+                const editor = this.editors.get(editorId);
+                if (editor) {
+                    editor.value = value;
+                    this.emitChange(editorId, 'setValue');
+                }
+            }
+
+            onDidChangeContent(callback) {
+                this.changeListeners.add(callback);
+                return () => this.changeListeners.delete(callback);
+            }
+
+            emitChange(editorId, type) {
+                this.changeListeners.forEach(callback => {
+                    try {
+                        callback({ editorId, type, timestamp: Date.now() });
+                    } catch (error) {
+                        console.error('Monaco listener error:', error);
+                    }
+                });
+            }
+
+            detectLanguage(filename) {
+                const ext = filename.split('.').pop()?.toLowerCase();
+                const languageMap = {
+                    'js': 'javascript', 'ts': 'typescript', 'vue': 'vue',
+                    'html': 'html', 'css': 'css', 'json': 'json',
+                    'md': 'markdown', 'py': 'python', 'java': 'java'
+                };
+                return languageMap[ext] || 'plaintext';
+            }
+        }
+
+        // Vue App
+        const app = createApp({
+            setup() {
+                // State
+                const loading = ref(false);
+                const fileTree = ref([]);
+                const selectedFile = ref('');
+                const selectedFileContent = ref('');
+                const editingContent = ref('');
+                const newFileName = ref('');
+                const newDirName = ref('');
+                const isWatching = ref(false);
+                const watcherLog = ref('');
+                const operationLog = ref('');
+                const monacoLog = ref('');
+                const editorInfo = ref('No editor active');
+                const operationCount = ref(0);
+                const lastOperation = ref('None');
+
+                // Services
+                const vfs = new DemoVFS();
+                const monaco = new DemoMonacoService();
+
+                // Computed
+                const fileCount = computed(() => {
+                    return Array.from(vfs.files.values()).filter(f => f.type === 'file').length;
+                });
+
+                const directoryCount = computed(() => {
+                    return Array.from(vfs.files.values()).filter(f => f.type === 'directory').length;
+                });
+
+                const watcherStatus = computed(() => isWatching.value ? 'Active' : 'Inactive');
+                const watcherEventCount = computed(() => {
+                    return (watcherLog.value.match(/\[.*?\]/g) || []).length;
+                });
+
+                const currentLanguage = computed(() => {
+                    if (!selectedFile.value) return 'None';
+                    return monaco.detectLanguage(selectedFile.value);
+                });
+
+                // Utility functions
+                function addLog(message, logRef) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    logRef.value += `[${timestamp}] ${message}\n`;
+                }
+
+                function refreshFileTree() {
+                    vfs.list().then(entries => {
+                        fileTree.value = entries;
+                        addLog('File tree refreshed', operationLog);
+                    });
+                }
+
+                async function createSampleProject() {
+                    try {
+                        loading.value = true;
+                        addLog('Creating sample project...', operationLog);
+
+                        // Create directories
+                        await vfs.createDirectory('memory:/src');
+                        await vfs.createDirectory('memory:/src/components');
+                        await vfs.createDirectory('memory:/src/services');
+                        await vfs.createDirectory('memory:/tests');
+
+                        // Create files
+                        await vfs.writeFile('memory:/package.json', JSON.stringify({
+                            "name": "demo-project",
+                            "version": "1.0.0",
+                            "description": "A sample project for VFS demo"
+                        }, null, 2));
+
+                        await vfs.writeFile('memory:/src/main.ts', `// Main application entry point
+import { createApp } from 'vue';
+import App from './App.vue';
+
+const app = createApp(App);
+app.mount('#app');
+`);
+
+                        // Create Vue component - using string concatenation to avoid script tag conflicts
+                        const scriptTag = '<' + 'script setup lang="ts">';
+                        const endScriptTag = '</' + 'script>';
+                        const vueComponent = `<template>
+  <div class="hello">
+    <h1>{{ message }}</h1>
+    <button @click="updateMessage">Click me!</button>
+  </div>
+</template>
+
+${scriptTag}
+import { ref } from 'vue';
+
+const message = ref('Hello from Vue!');
+
+const updateMessage = () => {
+  message.value = 'Button clicked!';
+};
+${endScriptTag}
+
+<style scoped>
+.hello {
+  padding: 20px;
+  text-align: center;
+}
+</style>`;
+                        await vfs.writeFile('memory:/src/components/HelloWorld.vue', vueComponent);
+
+                        await vfs.writeFile('memory:/README.md', `# Demo Project
+
+This is a sample project created by the Virtual File System demo.
+
+## Features
+
+- Virtual file system operations
+- File watching and change detection
+- Monaco editor integration
+- Browser-compatible file handling
+
+## Structure
+
+- \`src/\` - Source code
+  - \`components/\` - Vue components
+  - \`services/\` - Business logic
+- \`tests/\` - Test files
+
+Try editing files, creating new ones, or deleting them to see the VFS in action!
+`);
+
+                        console.log('Sample project created, refreshing file tree...');
+                        refreshFileTree();
+                        addLog('Sample project created successfully!', operationLog);
+                        operationCount.value++;
+                        lastOperation.value = 'Create Sample Project';
+                    } catch (error) {
+                        addLog(`Error creating project: ${error.message}`, operationLog);
+                    } finally {
+                        loading.value = false;
+                    }
+                }
+
+                async function selectFile(entry) {
+                    try {
+                        if (entry.type === 'file') {
+                            selectedFileContent.value = await vfs.readFile(`memory:${entry.uri}`);
+                            editingContent.value = selectedFileContent.value;
+                            addLog(`Opened file: ${entry.uri}`, operationLog);
+                        } else {
+                            addLog(`Error opening file: ${error.message}`, operationLog);
+                        }
+                    } catch (error) {
+                        addLog(`Error opening file: ${error.message}`, operationLog);
+                    }
+                    selectedFile.value = entry.uri;
+                    addLog(`Selected: ${entry.uri}`, operationLog);
+                }
+
+                async function createFile() {
+                    try {
+                        loading.value = true;
+                        await vfs.writeFile(`memory:/${newFileName.value}`, '// New file\n');
+                        addLog(`Created file: ${newFileName.value}`, operationLog);
+                        newFileName.value = '';
+                        refreshFileTree();
+                        operationCount.value++;
+                        lastOperation.value = 'Create File';
+                    } catch (error) {
+                        addLog(`Error creating file: ${error.message}`, operationLog);
+                    } finally {
+                        loading.value = false;
+                    }
+                }
+
+                async function createDirectory() {
+                    try {
+                        loading.value = true;
+                        await vfs.createDirectory(`memory:/${newDirName.value}`);
+                        addLog(`Created directory: ${newDirName.value}`, operationLog);
+                        newDirName.value = '';
+                        refreshFileTree();
+                        operationCount.value++;
+                        lastOperation.value = 'Create Directory';
+                    } catch (error) {
+                        addLog(`Error creating directory: ${error.message}`, operationLog);
+                    } finally {
+                        loading.value = false;
+                    }
+                }
+
+                async function saveFile() {
+                    if (!selectedFile.value) return;
+                    try {
+                        loading.value = true;
+                        await vfs.writeFile(`memory:${selectedFile.value}`, editingContent.value);
+                        selectedFileContent.value = editingContent.value;
+                        addLog(`Saved file: ${selectedFile.value}`, operationLog);
+                        operationCount.value++;
+                        lastOperation.value = 'Save File';
+                    } catch (error) {
+                        addLog(`Error saving file: ${error.message}`, operationLog);
+                    } finally {
+                        loading.value = false;
+                    }
+                }
+
+                function closeFile() {
+                    selectedFile.value = '';
+                    selectedFileContent.value = '';
+                    editingContent.value = '';
+                    addLog('Closed file', operationLog);
+                }
+
+                async function copySelected() {
+                    if (!selectedFile.value) return;
+                    try {
+                        loading.value = true;
+                        const copyPath = selectedFile.value + '.copy';
+                        await vfs.copy(`memory:${selectedFile.value}`, `memory:${copyPath}`);
+                        addLog(`Copied to: ${copyPath}`, operationLog);
+                        refreshFileTree();
+                        operationCount.value++;
+                        lastOperation.value = 'Copy File';
+                    } catch (error) {
+                        addLog(`Error copying: ${error.message}`, operationLog);
+                    } finally {
+                        loading.value = false;
+                    }
+                }
+
+                async function deleteSelected() {
+                    if (!selectedFile.value) return;
+                    try {
+                        loading.value = true;
+                        await vfs.delete(`memory:${selectedFile.value}`);
+                        addLog(`Deleted: ${selectedFile.value}`, operationLog);
+                        selectedFile.value = '';
+                        selectedFileContent.value = '';
+                        editingContent.value = '';
+                        refreshFileTree();
+                        operationCount.value++;
+                        lastOperation.value = 'Delete File';
+                    } catch (error) {
+                        addLog(`Error deleting: ${error.message}`, operationLog);
+                    } finally {
+                        loading.value = false;
+                    }
+                }
+
+                function clearFileSystem() {
+                    vfs.files.clear();
+                    vfs.files.set('/', { uri: '/', name: '', type: 'directory', children: [] });
+                    fileTree.value = [];
+                    selectedFile.value = '';
+                    selectedFileContent.value = '';
+                    editingContent.value = '';
+                    addLog('File system cleared', operationLog);
+                    operationCount.value++;
+                    lastOperation.value = 'Clear File System';
+                }
+
+                function toggleWatching() {
+                    isWatching.value = !isWatching.value;
+                    vfs.isWatching = isWatching.value;
+
+                    if (isWatching.value) {
+                        vfs.watch((event) => {
+                            addLog(`${event.type.toUpperCase()}: ${event.path}`, { value: watcherLog.value });
+                            watcherLog.value += `[${new Date(event.timestamp).toLocaleTimeString()}] ${event.type.toUpperCase()}: ${event.path}\n`;
+                        });
+                        addLog('File watching started', operationLog);
+                    } else {
+                        addLog('File watching stopped', operationLog);
+                    }
+                }
+
+                function clearWatcherLog() {
+                    watcherLog.value = '';
+                }
+
+                function clearOperationLog() {
+                    operationLog.value = '';
+                }
+
+                function openInMonaco() {
+                    if (!selectedFile.value) return;
+                    const editor = monaco.createEditor('simulated-container', {
+                        value: editingContent.value,
+                        language: monaco.detectLanguage(selectedFile.value)
+                    });
+                    editorInfo.value = `Editor ${editor.id} (${editor.language})`;
+                    addLog(`Opened in Monaco: ${selectedFile.value}`, { value: monacoLog.value });
+                    monacoLog.value += `[${new Date().toLocaleTimeString()}] Opened: ${selectedFile.value}\n`;
+                }
+
+                function simulateEditorChange() {
+                    if (!selectedFile.value) return;
+                    const change = `\n// Simulated edit at ${new Date().toLocaleTimeString()}`;
+                    editingContent.value += change;
+                    addLog(`Simulated edit in: ${selectedFile.value}`, { value: monacoLog.value });
+                    monacoLog.value += `[${new Date().toLocaleTimeString()}] Edit simulated\n`;
+                }
+
+                function getFileIcon(type, name) {
+                    if (type === 'directory') return '📁';
+                    const ext = name.split('.').pop()?.toLowerCase();
+                    const iconMap = {
+                        'js': '📄', 'ts': '📘', 'vue': '💚',
+                        'html': '🌐', 'css': '🎨', 'json': '⚙️',
+                        'md': '📝', 'py': '🐍', 'java': '☕'
+                    };
+                    return iconMap[ext] || '📄';
+                }
+
+                // Initialize
+                onMounted(() => {
+                    refreshFileTree();
+                    addLog('VFS Demo initialized', operationLog);
+                });
+
+                return {
+                    loading,
+                    fileTree,
+                    selectedFile,
+                    selectedFileContent,
+                    editingContent,
+                    newFileName,
+                    newDirName,
+                    isWatching,
+                    watcherLog,
+                    operationLog,
+                    monacoLog,
+                    editorInfo,
+                    operationCount,
+                    lastOperation,
+                    fileCount,
+                    directoryCount,
+                    watcherStatus,
+                    watcherEventCount,
+                    currentLanguage,
+                    createSampleProject,
+                    refreshFileTree,
+                    selectFile,
+                    createFile,
+                    createDirectory,
+                    saveFile,
+                    closeFile,
+                    copySelected,
+                    deleteSelected,
+                    clearFileSystem,
+                    toggleWatching,
+                    clearWatcherLog,
+                    clearOperationLog,
+                    openInMonaco,
+                    simulateEditorChange,
+                    getFileIcon
+                };
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
