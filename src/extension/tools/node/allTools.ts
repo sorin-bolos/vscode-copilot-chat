@@ -26,7 +26,6 @@ import './runNotebookCellTool';
 import './scmChangesTool';
 import './simpleBrowserTool';
 import './terminalStateTools';
-import './testFailureTool';
 import './thinkTool';
 import './usagesTool';
 import './vscodeCmdTool';

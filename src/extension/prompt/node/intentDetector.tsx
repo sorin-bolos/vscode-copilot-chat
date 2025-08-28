@@ -148,10 +148,6 @@ export class IntentDetector implements ChatParticipantDetectionProvider {
 				preferredIntent = Intent.Edit;
 			}
 		}
-		// /fixTestFailure was removed, delegate to /fix if there are historical usages of it.
-		if (messageText?.trimStart().startsWith('/fixTestFailure')) {
-			preferredIntent = Intent.Fix;
-		}
 
 		return preferredIntent;
 	}

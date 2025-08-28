@@ -7,7 +7,6 @@ import { cloneAndChange } from '../../../util/vs/base/common/objects';
 
 export const enum ToolName {
 	ApplyPatch = 'apply_patch',
-	TestFailure = 'test_failure',
 	RunTests = 'run_tests',
 	FindTextInFiles = 'grep_search',
 	ReadFile = 'read_file',
@@ -51,7 +50,6 @@ export const enum ToolName {
 export const enum ContributedToolName {
 	ApplyPatch = 'copilot_applyPatch',
 	Usages = 'copilot_listCodeUsages',
-	TestFailure = 'copilot_testFailure',
 	/** @deprecated moving to core soon */
 	RunTests = 'copilot_runTests1',
 	FindTextInFiles = 'copilot_findTextInFiles',
@@ -86,7 +84,6 @@ export const enum ContributedToolName {
 const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.ApplyPatch, ToolName.ApplyPatch],
 	[ContributedToolName.Usages, ToolName.Usages],
-	[ContributedToolName.TestFailure, ToolName.TestFailure],
 	[ContributedToolName.FindTextInFiles, ToolName.FindTextInFiles],
 	[ContributedToolName.ReadFile, ToolName.ReadFile],
 	[ContributedToolName.GetErrors, ToolName.GetErrors],

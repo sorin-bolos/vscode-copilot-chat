@@ -333,21 +333,6 @@
 				}
 			},
 			{
-				"name": "copilot_testFailure",
-				"toolReferenceName": "testFailure",
-				"displayName": "%copilot.tools.testFailure.name%",
-				"icon": "$(beaker)",
-				"userDescription": "%copilot.testFailure.tool.description%",
-				"modelDescription": "Includes test failure information in the prompt.",
-				"inputSchema": {},
-				"tags": [
-					"vscode_editing_with_tests",
-					"enable_other_tool_copilot_readFile",
-					"enable_other_tool_copilot_runTests"
-				],
-				"canBeReferencedInPrompt": true
-			},
-			{
 				"name": "copilot_getTerminalSelection",
 				"toolReferenceName": "terminalSelection",
 				"displayName": "%github.copilot.tools.terminalSelection.name%",
@@ -1716,17 +1701,6 @@
 				"category": "GitHub Copilot"
 			},
 			{
-				"command": "github.copilot.tests.fixTestFailure",
-				"icon": "$(sparkle)",
-				"title": "%github.copilot.command.fixTestFailure%",
-				"category": "GitHub Copilot"
-			},
-			{
-				"command": "github.copilot.tests.fixTestFailure.fromInline",
-				"icon": "$(sparkle)",
-				"title": "%github.copilot.command.fixTestFailure%"
-			},
-			{
 				"command": "github.copilot.chat.attachSelection",
 				"title": "%github.copilot.chat.attachSelection%",
 				"icon": "$(comment-discussion)",
@@ -2706,20 +2680,6 @@
 					"group": "zEditContext@1"
 				}
 			],
-			"testing/item/result": [
-				{
-					"command": "github.copilot.tests.fixTestFailure.fromInline",
-					"when": "testResultState == failed && !testResultOutdated",
-					"group": "inline@2"
-				}
-			],
-			"testing/item/context": [
-				{
-					"command": "github.copilot.tests.fixTestFailure.fromInline",
-					"when": "testResultState == failed && !testResultOutdated",
-					"group": "inline@2"
-				}
-			],
 			"commandPalette": [
 				{
 					"command": "github.copilot.interactiveSession.feedback",
@@ -2815,14 +2775,6 @@
 				},
 				{
 					"command": "github.copilot.devcontainer.generateDevContainerConfig",
-					"when": "false"
-				},
-				{
-					"command": "github.copilot.tests.fixTestFailure",
-					"when": "false"
-				},
-				{
-					"command": "github.copilot.tests.fixTestFailure.fromInline",
 					"when": "false"
 				},
 				{
@@ -3065,13 +3017,6 @@
 				{
 					"command": "github.copilot.git.generateCommitMessage",
 					"when": "scmProvider == git"
-				}
-			],
-			"testing/message/context": [
-				{
-					"command": "github.copilot.tests.fixTestFailure",
-					"when": "testing.testItemHasUri",
-					"group": "inline@1"
 				}
 			],
 			"debug/createConfiguration": [
