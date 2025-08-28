@@ -1743,14 +1743,6 @@
     "score": 0
   },
   {
-    "name": "findFilesTool (toolCalling) [panel] - proper glob patterns",
-    "optional": true,
-    "contentFilterCount": 0,
-    "passCount": 5,
-    "failCount": 5,
-    "score": 0.5
-  },
-  {
     "name": "fix (cpp) [inline] [cpp] - code fix for C++",
     "contentFilterCount": 0,
     "passCount": 0,

@@ -6,7 +6,6 @@ import './codeMapper/codeMapper.stest';
 import './e2e/edit.stest';
 import './e2e/explain.stest';
 import './e2e/fetchWebPageTool.stest';
-import './e2e/findFilesTool.stest';
 import './e2e/markdown.stest';
 import './e2e/newWorkspace.stest';
 import './e2e/notebook.stest';

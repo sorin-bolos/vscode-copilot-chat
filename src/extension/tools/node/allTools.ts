@@ -8,7 +8,6 @@ import './createDirectoryTool';
 import './createFileTool';
 import './docTool';
 import './editNotebookTool';
-import './findFilesTool';
 import './findTestsFilesTool';
 import './findTextInFilesTool';
 import './getErrorsTool';

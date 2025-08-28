@@ -9,7 +9,6 @@ export const enum ToolName {
 	ApplyPatch = 'apply_patch',
 	TestFailure = 'test_failure',
 	RunTests = 'run_tests',
-	FindFiles = 'file_search',
 	FindTextInFiles = 'grep_search',
 	ReadFile = 'read_file',
 	ListDirectory = 'list_dir',
@@ -59,7 +58,6 @@ export const enum ContributedToolName {
 	TestFailure = 'copilot_testFailure',
 	/** @deprecated moving to core soon */
 	RunTests = 'copilot_runTests1',
-	FindFiles = 'copilot_findFiles',
 	FindTextInFiles = 'copilot_findTextInFiles',
 	ReadFile = 'copilot_readFile',
 	ListDirectory = 'copilot_listDirectory',
@@ -95,7 +93,6 @@ const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.ApplyPatch, ToolName.ApplyPatch],
 	[ContributedToolName.Usages, ToolName.Usages],
 	[ContributedToolName.TestFailure, ToolName.TestFailure],
-	[ContributedToolName.FindFiles, ToolName.FindFiles],
 	[ContributedToolName.FindTextInFiles, ToolName.FindTextInFiles],
 	[ContributedToolName.ReadFile, ToolName.ReadFile],
 	[ContributedToolName.ListDirectory, ToolName.ListDirectory],

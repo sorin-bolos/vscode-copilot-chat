@@ -406,7 +406,7 @@ class CodesearchModeInstructions extends PromptElement<DefaultAgentPromptProps> 
 				Unless it is clear that the user's question relates to the current workspace, you should avoid using the code search tools and instead prefer to answer the user's question directly.<br />
 				Remember that you can call multiple tools in one response.<br />
 				Use {ToolName.FindTextInFiles} when you have precise keywords to search for.<br />
-				The tools {ToolName.FindFiles}, {ToolName.FindTextInFiles}, and {ToolName.GetScmChanges} are deterministic and comprehensive, so do not repeatedly invoke them with the same arguments.<br />
+				The tools {ToolName.FindTextInFiles} and {ToolName.GetScmChanges} are deterministic and comprehensive, so do not repeatedly invoke them with the same arguments.<br />
 			</Tag>
 			<CodeBlockFormattingRules />
 		</>;
@@ -486,19 +486,11 @@ export class SweBenchAgentPrompt extends PromptElement<DefaultAgentPromptProps> 
 			<Tag name="searchInstructions">
 				When searching for information in the codebase, follow these guidelines:<br />
 
-				1. For finding specific files:<br />
-				- Use {ToolName.FindFiles} when you know the exact file name or a clear pattern<br />
-				- Example: Use this to locate files you need to edit or view<br />
-
-				2. For locating specific code elements:<br />
+				1. For locating specific code elements:<br />
 				- Use {ToolName.FindTextInFiles} when searching for exact strings<br />
 				- Best for finding class names, function names, or specific code patterns<br />
 
-				3. For efficiency with multiple searches:<br />
-				- You may call {ToolName.FindFiles} and {ToolName.FindTextInFiles} in parallel<br />
-
-				4. Fallback search strategy:<br />
-				- Try your best to use {ToolName.FindFiles} first<br />
+				2. Fallback search strategy:<br />
 				- If these searches fail to find what you need, use bash commands via {ToolName.CoreRunInTerminal}<br />
 				- Example: `find . -name "*.py" | xargs grep -l "function_name"` or `grep -r "search_term" .`<br />
 

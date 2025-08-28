@@ -27,7 +27,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 		expectedToolCalls: ToolName.FetchWebPage,
 		tools: {
 			[ToolName.FetchWebPage]: true,
-			[ToolName.FindFiles]: true,
 			[ToolName.FindTextInFiles]: true,
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
@@ -64,7 +63,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 		expectedToolCalls: ToolName.FetchWebPage,
 		tools: {
 			[ToolName.FetchWebPage]: true,
-			[ToolName.FindFiles]: true,
 			[ToolName.FindTextInFiles]: true,
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
@@ -138,7 +136,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 		expectedToolCalls: ToolName.FetchWebPage,
 		tools: {
 			[ToolName.FetchWebPage]: true,
-			[ToolName.FindFiles]: true,
 			[ToolName.FindTextInFiles]: true,
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
@@ -181,7 +178,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 		expectedToolCalls: ToolName.FetchWebPage,
 		tools: {
 			[ToolName.FetchWebPage]: true,
-			[ToolName.FindFiles]: true,
 			[ToolName.FindTextInFiles]: true,
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,

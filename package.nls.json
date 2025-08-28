@@ -259,7 +259,6 @@
 	"copilot.tools.searchCodebase.name": "Codebase",
 	"copilot.tools.listCodeUsages.name": "Find Usages",
 	"copilot.tools.think.name": "Think",
-	"copilot.tools.findFiles.name": "Find Files",
 	"copilot.tools.findTextInFiles.name": "Find Text In Files",
 	"copilot.tools.applyPatch.name": "Apply Patch",
 	"copilot.tools.readFile.name": "Read File",
