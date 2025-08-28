@@ -29,7 +29,6 @@ export enum NotebookEditGenrationSource {
 	codeMapperEditNotebook = 'codeMapperEditNotebook',
 	codeMapperEmptyNotebook = 'codeMapperEmptyNotebook',
 	codeMapperFastApply = 'codeMapperFastApply',
-	createFile = 'createFile',
 	stringReplace = 'stringReplace',
 	applyPatch = 'applyPatch',
 	newNotebookIntent = 'newNotebookIntent',

@@ -362,30 +362,6 @@
 				}
 			},
 			{
-				"name": "copilot_createFile",
-				"toolReferenceName": "createFile",
-				"displayName": "%copilot.tools.createFile.name%",
-				"modelDescription": "This is a tool for creating a new file in the workspace. The file will be created with the specified content. The directory will be created if it does not already exist. Never use this tool to edit a file that already exists.",
-				"tags": [],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"filePath": {
-							"type": "string",
-							"description": "The absolute path to the file to create."
-						},
-						"content": {
-							"type": "string",
-							"description": "The content to write to the file."
-						}
-					},
-					"required": [
-						"filePath",
-						"content"
-					]
-				}
-			},
-			{
 				"name": "copilot_createDirectory",
 				"toolReferenceName": "createDirectory",
 				"displayName": "%copilot.tools.createDirectory.name%",
@@ -719,7 +695,6 @@
 					"insertEdit",
 					"replaceString",
 					"applyPatch",
-					"createFile",
 					"createDirectory",
 					"editNotebook",
 					"newJupyterNotebook"

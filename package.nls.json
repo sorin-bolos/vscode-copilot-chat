@@ -253,7 +253,6 @@
 	"copilot.tools.getErrors.name": "Get Problems",
 	"copilot.tools.getChangedFiles.name": "Git Changes",
 	"copilot.tools.openSimpleBrowser.name": "Open Simple Browser",
-	"copilot.tools.createFile.name": "Create File",
 	"copilot.tools.insertEdit.name": "Edit File",
 	"copilot.tools.replaceString.name": "Replace String in File",
 	"copilot.tools.editNotebook.name": "Edit Notebook",
