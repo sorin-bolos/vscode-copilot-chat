@@ -15,7 +15,6 @@ import './getNotebookCellOutputTool';
 import './getSearchViewResultsTool';
 import './githubRepoTool';
 import './insertEditTool';
-import './installExtensionTool';
 import './newNotebookTool';
 import './notebookSummaryTool';
 import './readFileTool';
