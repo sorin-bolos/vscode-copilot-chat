@@ -9,13 +9,11 @@ import { ConfigKey, IConfigurationService } from '../../../../platform/configura
 import { IEnvService } from '../../../../platform/env/common/envService';
 import { IExperimentationService } from '../../../../platform/telemetry/common/nullExperimentationService';
 import { GenericBasePromptElementProps } from '../../../context/node/resolvers/genericPanelIntentInvocation';
-import { ToolName } from '../../../tools/common/toolNames';
 import { Capabilities } from '../base/capabilities';
 import { CopilotIdentityRules } from '../base/copilotIdentity';
 import { InstructionMessage } from '../base/instructionMessage';
 import { ResponseTranslationRules } from '../base/responseTranslationRules';
 import { SafetyRules } from '../base/safetyRules';
-import { Tag } from '../base/tag';
 import { ChatToolReferences, ChatVariablesAndQuery } from './chatVariables';
 import { CodeBlockFormattingRules } from './codeBlockFormattingRules';
 import { HistoryWithInstructions } from './conversationHistory';
@@ -64,12 +62,6 @@ export class PanelChatBasePrompt extends PromptElement<PanelChatBasePromptProps>
 						You can only give one reply for each conversation turn.<br />
 						<ResponseTranslationRules />
 						<br />
-						{this.props.promptContext.tools?.toolReferences.find((tool) => tool.name === ToolName.Codebase)
-							? <Tag name='codebaseToolInstructions'>
-								1. Consider how to answer the user's prompt based on the provided information. Always assume that the user is asking about the code in their workspace instead of asking a general programming question. Prefer using variables, functions, types, and classes from the workspace over those from the standard library.<br />
-								2. Generate a response that clearly and accurately answers the user's question. In your response, add fully qualified links for referenced symbols (example: [`namespace.VariableName`](path/to/file.ts)) and links for files (example: [path/to/file](path/to/file.ts)) so that the user can open them. If you do not have enough information to answer the question, respond with "I'm sorry, I can't answer that question with what I currently know about your workspace".
-							</Tag>
-							: undefined}
 					</InstructionMessage>
 				</HistoryWithInstructions>
 				<UserMessage flexGrow={2}>

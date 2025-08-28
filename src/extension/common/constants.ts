@@ -84,3 +84,14 @@ export function getAgentForIntent(intentId: Intent, location: ChatLocation): { a
 }
 
 export const EXTENSION_ID = 'GitHub.copilot-chat';
+
+// Workspace-related constants moved from deleted workspaceContext
+export const MAX_CHUNK_TITLE_LENGTH = 60;
+export const MAX_CHUNKS_IN_WORKSPACE_SEARCH_INSTRUCTION = 40;
+
+// Types that were in the deleted workspaceContext
+export interface ChunksToolProps {
+	readonly query?: string;
+	readonly maxChunks?: number;
+	readonly tokenBudget?: number;
+}

@@ -32,7 +32,6 @@ import { getAgentForIntent, Intent } from '../../common/constants';
 import { IConversationStore } from '../../conversationStore/node/conversationStore';
 import { IIntentService } from '../../intents/node/intentService';
 import { UnknownIntent } from '../../intents/node/unknownIntent';
-import { ContributedToolName } from '../../tools/common/toolNames';
 import { ChatVariablesCollection } from '../common/chatVariablesCollection';
 import { Conversation, GlobalContextMessageMetadata, ICopilotChatResult, ICopilotChatResultIn, normalizeSummariesOnRounds, RenderedUserMessageMetadata, Turn, TurnStatus } from '../common/conversation';
 import { InternalToolReference } from '../common/intents';
@@ -191,9 +190,8 @@ export class ChatParticipantRequestHandler {
 			return false;
 		}
 
-		// Only ask for confirmation if we're invoking the codebase tool or workspace chat participant
-		const isWorkspaceCall = this.request.toolReferences.some(ref => ref.name === ContributedToolName.Codebase) ||
-			this.chatAgentArgs.agentId === getChatParticipantIdFromName(workspaceAgentName);
+		// Only ask for confirmation if we're invoking workspace chat participant
+		const isWorkspaceCall = this.chatAgentArgs.agentId === getChatParticipantIdFromName(workspaceAgentName);
 		// and only if we can't access all repos in the workspace
 		if (isWorkspaceCall && await this._authenticationUpgradeService.shouldRequestPermissiveSessionUpgrade()) {
 			this._authenticationUpgradeService.showPermissiveSessionUpgradeInChat(this.stream, this.request);

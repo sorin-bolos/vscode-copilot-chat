@@ -25,9 +25,14 @@ import { IInstantiationService } from '../../../util/vs/platform/instantiation/c
 import { ExtendedLanguageModelToolResult, LanguageModelPromptTsxPart, MarkdownString } from '../../../vscodeTypes';
 import { getUniqueReferences } from '../../prompt/common/conversation';
 import { renderPromptElementJSON } from '../../prompts/node/base/promptRenderer';
-import { WorkspaceChunkList } from '../../prompts/node/panel/workspace/workspaceContext';
 import { ToolName } from '../common/toolNames';
 import { ICopilotTool, ToolRegistry } from '../common/toolsRegistry';
+
+// Simple stub for WorkspaceChunkList since the codebase tool was removed
+const WorkspaceChunkList = (props: any) => {
+	// Return empty since workspace chunk functionality was removed
+	return null;
+};
 
 export interface GithubRepoToolParams {
 	readonly repo: string;

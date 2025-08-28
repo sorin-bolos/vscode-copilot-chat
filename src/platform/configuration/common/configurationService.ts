@@ -685,7 +685,6 @@ export namespace ConfigKey {
 		/** Configure temporal context max age */
 		export const TemporalContextMaxAge = defineExpSetting<number>('chat.advanced.temporalContext.maxAge', 100, INTERNAL);
 		export const TemporalContextPreferSameLang = defineExpSetting<boolean>('chat.advanced.temporalContext.preferSameLang', false, INTERNAL);
-		export const CodeSearchAgentEnabled = defineSetting<boolean | undefined>('chat.advanced.codesearch.agent.enabled', true, INTERNAL_RESTRICTED);
 		export const EditLinkification = defineSetting<boolean | undefined>('chat.advanced.edits.linkification', undefined, INTERNAL_RESTRICTED);
 		export const AgentTemperature = defineSetting<number | undefined>('chat.advanced.agent.temperature', undefined, INTERNAL_RESTRICTED);
 
@@ -748,7 +747,6 @@ export namespace ConfigKey {
 	export const GitHistoryRelatedFilesProvider = defineSetting('chat.edits.suggestRelatedFilesFromGitHistory', true);
 	export const Test2SrcRelatedFilesProvider = defineSetting('chat.edits.suggestRelatedFilesForTests', true);
 	export const TerminalToDebuggerEnabled = defineSetting('chat.copilotDebugCommand.enabled', true);
-	export const CodeSearchAgentEnabled = defineSetting<boolean>('chat.codesearch.enabled', false);
 	export const InlineEditsEnabled = defineExpSetting<boolean>('nextEditSuggestions.enabled', { defaultValue: false, teamDefaultValue: true });
 	export const InlineEditsEnableDiagnosticsProvider = defineExpSetting<boolean>('nextEditSuggestions.fixes', { defaultValue: true, teamDefaultValue: true });
 	export const AgentCanRunTasks = defineValidatedSetting('chat.agent.runTasks', vBoolean(), true);

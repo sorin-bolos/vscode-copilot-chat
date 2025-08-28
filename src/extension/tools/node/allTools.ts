@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import './applyPatchTool';
-import './codebaseTool';
 import './createDirectoryTool';
 import './createFileTool';
 import './docTool';

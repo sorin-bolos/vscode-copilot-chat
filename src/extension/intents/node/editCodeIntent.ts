@@ -37,26 +37,22 @@ import { ICommandService } from '../../commands/node/commandService';
 import { Intent } from '../../common/constants';
 import { GenericInlineIntentInvocation } from '../../context/node/resolvers/genericInlineIntentInvocation';
 import { ChatVariablesCollection, isPromptInstruction } from '../../prompt/common/chatVariablesCollection';
-import { CodeBlock, Conversation, Turn } from '../../prompt/common/conversation';
+import { CodeBlock, Conversation } from '../../prompt/common/conversation';
 import { IBuildPromptContext, InternalToolReference, IWorkingSet, IWorkingSetEntry, WorkingSetEntryState } from '../../prompt/common/intents';
 import { ChatTelemetryBuilder } from '../../prompt/node/chatParticipantTelemetry';
-import { CodebaseToolCallingLoop } from '../../prompt/node/codebaseToolCalling';
 import { IntentInvocationMetadata } from '../../prompt/node/conversation';
 import { DefaultIntentRequestHandler, IDefaultIntentRequestHandlerOptions } from '../../prompt/node/defaultIntentRequestHandler';
 import { IDocumentContext } from '../../prompt/node/documentContext';
 import { EditStrategy } from '../../prompt/node/editGeneration';
 import { IBuildPromptResult, IIntent, IIntentInvocation, IIntentInvocationContext, IntentLinkificationOptions, IResponseProcessorContext } from '../../prompt/node/intents';
 import { reportCitations } from '../../prompt/node/pseudoStartStopConversationCallback';
-import { PromptRenderer, renderPromptElement } from '../../prompts/node/base/promptRenderer';
+import { PromptRenderer } from '../../prompts/node/base/promptRenderer';
 import { ICodeMapperService, IMapCodeRequest, IMapCodeResult } from '../../prompts/node/codeMapper/codeMapperService';
 import { TemporalContextStats } from '../../prompts/node/inline/temporalContext';
-import { ChatToolReferences } from '../../prompts/node/panel/chatVariables';
 import { EXISTING_CODE_MARKER } from '../../prompts/node/panel/codeBlockFormattingRules';
 import { EditCodePrompt } from '../../prompts/node/panel/editCodePrompt';
-import { ToolCallResultWrapper, ToolResultMetadata } from '../../prompts/node/panel/toolCalling';
 import { getToolName, ToolName } from '../../tools/common/toolNames';
 import { IToolsService } from '../../tools/common/toolsService';
-import { CodebaseTool } from '../../tools/node/codebaseTool';
 import { sendEditNotebookTelemetry } from '../../tools/node/editNotebookTool';
 import { EditCodeStep, EditCodeStepTurnMetaData, PreviousEditCodeStep } from './editCodeStep';
 
@@ -101,32 +97,7 @@ export class EditCodeIntent implements IIntent {
 	) { }
 
 	private async _handleCodesearch(conversation: Conversation, request: vscode.ChatRequest, location: ChatLocation, stream: vscode.ChatResponseStream, token: CancellationToken, documentContext: IDocumentContext | undefined, chatTelemetry: ChatTelemetryBuilder): Promise<{ request: vscode.ChatRequest; conversation: Conversation }> {
-		const foundReferences: vscode.ChatPromptReference[] = [];
-		if ((this.configurationService.getConfig(ConfigKey.CodeSearchAgentEnabled) || this.configurationService.getConfig(ConfigKey.Internal.CodeSearchAgentEnabled)) && request.toolReferences.find((r) => r.name === CodebaseTool.toolName && !isDirectorySemanticSearch(r))) {
-
-			const latestTurn = conversation.getLatestTurn();
-
-			const codebaseTool = this.instantiationService.createInstance(CodebaseToolCallingLoop, {
-				conversation,
-				toolCallLimit: 5,
-				request,
-				location,
-			});
-
-			const toolCallLoopResult = await codebaseTool.run(stream, token);
-
-			const toolCallResults = toolCallLoopResult.toolCallResults;
-			if (!toolCallLoopResult.chatResult?.errorDetails && toolCallResults) {
-				// TODO: do these new references need a lower priority?
-				const variables = new ChatVariablesCollection(request.references);
-				const endpoint = await this.endpointProvider.getChatEndpoint(request);
-				const { references } = await renderPromptElement(this.instantiationService, endpoint, ToolCallResultWrapper, { toolCallResults }, undefined, token);
-				foundReferences.push(...toNewChatReferences(variables, references));
-				// TODO: how should we splice in the assistant message?
-				conversation = new Conversation(conversation.sessionId, [...conversation.turns.slice(0, -1), new Turn(latestTurn.id, latestTurn.request, undefined)]);
-			}
-			return { conversation, request: { ...request, references: [...request.references, ...foundReferences], toolReferences: request.toolReferences.filter((r) => r.name !== CodebaseTool.toolName) } };
-		}
+		// Codebase tool has been removed
 		return { conversation, request };
 	}
 
@@ -326,7 +297,6 @@ export class EditCodeIntentInvocation implements IIntentInvocation {
 		@ICodeMapperService private readonly codeMapperService: ICodeMapperService,
 		@IEnvService private readonly envService: IEnvService,
 		@IPromptPathRepresentationService private readonly promptPathRepresentationService: IPromptPathRepresentationService,
-		@IEndpointProvider private readonly endpointProvider: IEndpointProvider,
 		@IWorkspaceService private readonly workspaceService: IWorkspaceService,
 		@IToolsService protected readonly toolsService: IToolsService,
 		@IConfigurationService protected readonly configurationService: IConfigurationService,
@@ -346,15 +316,9 @@ export class EditCodeIntentInvocation implements IIntentInvocation {
 		token: vscode.CancellationToken
 	): Promise<IBuildPromptResult> {
 
-		// Add any references from the codebase invocation to the request
-		const codebase = await this._getCodebaseReferences(promptContext, token);
-
+		// Codebase tool has been removed - no longer adding codebase references
 		let variables = promptContext.chatVariables;
-		let toolReferences: vscode.ChatPromptReference[] = [];
-		if (codebase) {
-			toolReferences = toNewChatReferences(variables, codebase.references);
-			variables = new ChatVariablesCollection([...this.request.references, ...toolReferences]);
-		}
+		const toolReferences: vscode.ChatPromptReference[] = [];
 
 		if (this.request.location2 instanceof ChatRequestEditorData) {
 			const editorRequestReference: vscode.ChatPromptReference = {
@@ -395,10 +359,10 @@ export class EditCodeIntentInvocation implements IIntentInvocation {
 				chatVariables,
 				workingSet: editCodeStep.workingSet,
 				promptInstructions: editCodeStep.promptInstructions,
-				toolCallResults: { ...promptContext.toolCallResults, ...codebase?.toolCallResults },
+				toolCallResults: promptContext.toolCallResults,
 				tools: promptContext.tools && {
 					...promptContext.tools,
-					toolReferences: this.stableToolReferences.filter((r) => r.name !== ToolName.Codebase).concat(commandToolReferences),
+					toolReferences: this.stableToolReferences.concat(commandToolReferences),
 				},
 			},
 			location: this.location
@@ -416,10 +380,8 @@ export class EditCodeIntentInvocation implements IIntentInvocation {
 
 		return {
 			...result,
-			// The codebase tool is not actually called/referenced in the edit prompt, so we ned to
-			// merge its metadata so that its output is not lost and it's not called repeatedly every turn
-			// todo@connor4312/joycerhl: this seems a bit janky
-			metadata: codebase ? mergeMetadata(result.metadata, codebase.metadatas) : result.metadata,
+			// Codebase tool has been removed - no longer merging codebase metadata
+			metadata: result.metadata,
 			// Don't report file references that came in via chat variables in an editing session, unless they have warnings,
 			// because they are already displayed as part of the working set
 			references: result.references.filter((ref) => this.shouldKeepReference(editCodeStep, ref, toolReferences, chatVariables)),
@@ -447,16 +409,8 @@ export class EditCodeIntentInvocation implements IIntentInvocation {
 		promptContext: IBuildPromptContext,
 		token: vscode.CancellationToken,
 	) {
-		const codebaseTools = this.stableToolReferences.filter(t => t.name === ToolName.Codebase);
-		if (!codebaseTools.length) {
-			return;
-		}
-
-		const history = promptContext.history;
-		const endpoint = await this.endpointProvider.getChatEndpoint(this.request);
-
-		const { references, metadatas } = await renderPromptElement(this.instantiationService, endpoint, ChatToolReferences, { promptContext: { requestId: promptContext.requestId, query: this.request.prompt, chatVariables: promptContext.chatVariables, history, toolCallResults: promptContext.toolCallResults, tools: { toolReferences: codebaseTools, toolInvocationToken: this.request.toolInvocationToken, availableTools: promptContext.tools?.availableTools ?? [] } }, embeddedInsideUserMessage: false }, undefined, token);
-		return { toolCallResults: getToolCallResults(metadatas), references, metadatas };
+		// Codebase tool has been removed
+		return;
 	}
 
 	private shouldKeepReference(editCodeStep: EditCodeStep, ref: PromptReference, toolReferences: vscode.ChatPromptReference[], chatVariables: ChatVariablesCollection): boolean {
@@ -754,36 +708,9 @@ export function toNewChatReferences(chatVariables: ChatVariablesCollection, prom
 	return toolReferences;
 }
 
-function getToolCallResults(metadatas: MetadataMap) {
-	const toolCallResults: Record<string, vscode.LanguageModelToolResult2> = {};
-	for (const metadata of metadatas.getAll(ToolResultMetadata)) {
-		toolCallResults[metadata.toolCallId] = metadata.result;
-	}
-
-	return toolCallResults;
-}
-
 export function mergeMetadata(m1: MetadataMap, m2: MetadataMap): MetadataMap {
 	return {
 		get: key => m1.get(key) ?? m2.get(key),
 		getAll: key => m1.getAll(key).concat(m2.getAll(key)),
 	};
-}
-
-function isDirectorySemanticSearch(toolCall: vscode.ChatLanguageModelToolReference) {
-	if (toolCall.name !== ToolName.Codebase) {
-		return false;
-	}
-
-	const input = (toolCall as any).input;
-	if (!input) {
-		return false;
-	}
-
-	const scopedDirectories = input.scopedDirectories;
-	if (!Array.isArray(scopedDirectories)) {
-		return false;
-	}
-
-	return scopedDirectories.length > 0;
 }

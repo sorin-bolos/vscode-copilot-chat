@@ -7,7 +7,6 @@ import { cloneAndChange } from '../../../util/vs/base/common/objects';
 
 export const enum ToolName {
 	ApplyPatch = 'apply_patch',
-	Codebase = 'semantic_search',
 	VSCodeAPI = 'get_vscode_api',
 	TestFailure = 'test_failure',
 	RunTests = 'run_tests',
@@ -57,7 +56,6 @@ export const enum ToolName {
 // When updating this, also update contributedToolNameToToolNames
 export const enum ContributedToolName {
 	ApplyPatch = 'copilot_applyPatch',
-	Codebase = 'copilot_searchCodebase',
 	SearchWorkspaceSymbols = 'copilot_searchWorkspaceSymbols',
 	Usages = 'copilot_listCodeUsages',
 	UpdateUserPreferences = 'copilot_updateUserPreferences',
@@ -99,7 +97,6 @@ export const enum ContributedToolName {
 
 const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.ApplyPatch, ToolName.ApplyPatch],
-	[ContributedToolName.Codebase, ToolName.Codebase],
 	[ContributedToolName.SearchWorkspaceSymbols, ToolName.SearchWorkspaceSymbols],
 	[ContributedToolName.Usages, ToolName.Usages],
 	[ContributedToolName.VSCodeAPI, ToolName.VSCodeAPI],

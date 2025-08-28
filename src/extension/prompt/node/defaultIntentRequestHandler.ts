@@ -517,7 +517,7 @@ class DefaultToolCallingLoop extends ToolCallingLoop<IDefaultToolLoopOptions> {
 		@ICopilotTokenStore private readonly _copilotTokenStore: ICopilotTokenStore,
 		@IThinkingDataService thinkingDataService: IThinkingDataService,
 	) {
-		super(options, instantiationService, endpointProvider, logService, requestLogger, authenticationChatUpgradeService, telemetryService, thinkingDataService);
+		super(options, instantiationService, endpointProvider, logService, requestLogger, telemetryService, thinkingDataService);
 
 		this._register(this.onDidBuildPrompt(({ result, tools, promptTokenLength }) => {
 			if (result.metadata.get(SummarizedConversationHistoryMetadata)) {

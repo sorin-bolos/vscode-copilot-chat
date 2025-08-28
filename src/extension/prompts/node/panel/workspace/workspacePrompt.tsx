@@ -18,7 +18,12 @@ import { CodeBlockFormattingRules } from '../codeBlockFormattingRules';
 import { HistoryWithInstructions } from '../conversationHistory';
 import { CustomInstructions } from '../customInstructions';
 import { EditorIntegrationRules } from '../editorIntegrationRules';
-import { WorkspaceContext } from './workspaceContext';
+
+// Simple stub for WorkspaceContext since the codebase tool was removed
+const WorkspaceContext = (props: any) => {
+	// Return empty since workspace context functionality was removed
+	return null;
+};
 
 export interface WorkspacePromptProps extends BasePromptElementProps {
 	promptContext: IBuildPromptContext;

@@ -52,7 +52,6 @@ export interface EditCodePromptProps extends GenericBasePromptElementProps {
 export class EditCodePrompt extends PromptElement<EditCodePromptProps> {
 	constructor(
 		props: EditCodePromptProps,
-		@IConfigurationService private readonly configurationService: IConfigurationService,
 		@IPromptPathRepresentationService private readonly promptPathRepresentationService: IPromptPathRepresentationService,
 	) {
 		super(props);
@@ -66,7 +65,7 @@ export class EditCodePrompt extends PromptElement<EditCodePromptProps> {
 			{hasFilesInWorkingSet
 				? <>The user has a request for modifying one or more files.<br /></>
 				: <>If the user asks a question, then answer it.<br />
-					If you need to change existing files and it's not clear which files should be changed, then refuse and answer with "Please add the files to be modified to the working set{(this.configurationService.getConfig(ConfigKey.CodeSearchAgentEnabled) || this.configurationService.getConfig(ConfigKey.Internal.CodeSearchAgentEnabled)) ? ", or use `#codebase` in your request to automatically discover working set files." : ""}".<br />
+					If you need to change existing files and it's not clear which files should be changed, then refuse and answer with "Please add the files to be modified to the working set".<br />
 					The only exception is if you need to create new files. In that case, follow the following instructions.<br /></>}
 			1. Please come up with a solution that you first describe step-by-step.<br />
 			2. Group your changes by file. Use the file path as the header.<br />

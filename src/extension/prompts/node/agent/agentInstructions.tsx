@@ -23,7 +23,6 @@ interface ToolCapabilities {
 	hasApplyPatchTool: boolean;
 	hasReadFileTool: boolean;
 	hasFindTextTool: boolean;
-	hasCodebaseTool: boolean;
 	hasUpdateUserPreferencesTool: boolean;
 	hasSomeEditTool: boolean;
 	hasFetchTool: boolean;
@@ -40,7 +39,6 @@ function detectToolCapabilities(availableTools: readonly LanguageModelToolInform
 		hasApplyPatchTool: !!availableTools?.find(tool => tool.name === ToolName.ApplyPatch),
 		hasReadFileTool: !!availableTools?.find(tool => tool.name === ToolName.ReadFile),
 		hasFindTextTool: !!availableTools?.find(tool => tool.name === ToolName.FindTextInFiles),
-		hasCodebaseTool: !!availableTools?.find(tool => tool.name === ToolName.Codebase),
 		hasUpdateUserPreferencesTool: !!availableTools?.find(tool => tool.name === ToolName.UpdateUserPreferences),
 		hasFetchTool: !!availableTools?.find(tool => tool.name === ToolName.FetchWebPage),
 		hasTodoListTool: !!availableTools?.find(tool => tool.name === ToolName.CoreManageTodoList),
@@ -118,18 +116,16 @@ export class DefaultAgentPrompt extends PromptElement<DefaultAgentPromptProps> {
 				When using a tool, follow the JSON schema very carefully and make sure to include ALL required properties.<br />
 				No need to ask permission before using a tool.<br />
 				NEVER say the name of a tool to a user. For example, instead of saying that you'll use the {ToolName.CoreRunInTerminal} tool, say "I'll run the command in a terminal".<br />
-				If you think running multiple tools can answer the user's question, prefer calling them in parallel whenever possible{tools.hasCodebaseTool && <>, but do not call {ToolName.Codebase} in parallel.</>}<br />
+				If you think running multiple tools can answer the user's question, prefer calling them in parallel whenever possible<br />
 				{isGpt5 && <>
 					Before notable tool batches, briefly tell the user what you're about to do and why. After the results return, briefly interpret them and state what you'll do next. Don't narrate every trivial call.<br />
 					You MUST preface each tool call batch with a one-sentence “why/what/outcome” preamble (why you're doing it, what you'll run, expected outcome). If you make many tool calls in a row, you MUST checkpoint progress after roughly every 3-5 calls: what you ran, key results, and what you'll do next. If you create or edit more than ~3 files in a burst, checkpoint immediately with a compact bullet summary.<br />
-					If you think running multiple tools can answer the user's question, prefer calling them in parallel whenever possible{tools.hasCodebaseTool && <>, but do not call {ToolName.Codebase} in parallel.</>} Parallelize read-only, independent operations only; do not parallelize edits or dependent steps.<br />
+					If you think running multiple tools can answer the user's question, prefer calling them in parallel whenever possible. Parallelize read-only, independent operations only; do not parallelize edits or dependent steps.<br />
 					Context acquisition: Trace key symbols to their definitions and usages. Read sufficiently large, meaningful chunks to avoid missing context. Prefer semantic or codebase search when you don't know the exact string; prefer exact search or direct reads when you do. Avoid redundant reads when the content is already attached and sufficient.<br />
 					Verification preference: For service or API checks, prefer a tiny code-based test (unit/integration or a short script) over shell probes. Use shell probes (e.g., curl) only as optional documentation or quick one-off sanity checks, and mark them as optional.<br />
 				</>}
 				{tools.hasReadFileTool && <>When using the {ToolName.ReadFile} tool, prefer reading a large section over calling the {ToolName.ReadFile} tool many times in sequence. You can also think of all the pieces you may be interested in and read them in parallel. Read large enough context to ensure you get what you need.<br /></>}
-				{tools.hasCodebaseTool && <>If {ToolName.Codebase} returns the full contents of the text files in the workspace, you have all the workspace context.<br /></>}
 				{tools.hasFindTextTool && <>You can use the {ToolName.FindTextInFiles} to get an overview of a file by searching for a string within that one file, instead of using {ToolName.ReadFile} many times.<br /></>}
-				{tools.hasCodebaseTool && <>If you don't know exactly the string or filename pattern you're looking for, use {ToolName.Codebase} to do a semantic search across the workspace.<br /></>}
 				{tools.hasTerminalTool && <>Don't call the {ToolName.CoreRunInTerminal} tool multiple times in parallel. Instead, run one command and wait for the output before running the next command.<br /></>}
 				{tools.hasUpdateUserPreferencesTool && <>After you have performed the user's task, if the user corrected something you did, expressed a coding preference, or communicated a fact that you need to remember, use the {ToolName.UpdateUserPreferences} tool to save their preferences.<br /></>}
 				When invoking a tool that takes a file path, always use the absolute file path. If the file has a scheme like untitled: or vscode-userdata:, then use a URI with the scheme.<br />
@@ -290,11 +286,9 @@ export class AlternateGPTPrompt extends PromptElement<DefaultAgentPromptProps> {
 				When using a tool, follow the JSON schema very carefully and make sure to include ALL required properties.<br />
 				No need to ask permission before using a tool.<br />
 				NEVER say the name of a tool to a user. For example, instead of saying that you'll use the {ToolName.CoreRunInTerminal} tool, say "I'll run the command in a terminal".<br />
-				If you think running multiple tools can answer the user's question, prefer calling them in parallel whenever possible{tools.hasCodebaseTool && <>, but do not call {ToolName.Codebase} in parallel.</>}<br />
+				If you think running multiple tools can answer the user's question, prefer calling them in parallel whenever possible<br />
 				{tools.hasReadFileTool && <>When using the {ToolName.ReadFile} tool, prefer reading a large section over calling the {ToolName.ReadFile} tool many times in sequence. You can also think of all the pieces you may be interested in and read them in parallel. Read large enough context to ensure you get what you need.<br /></>}
-				{tools.hasCodebaseTool && <>If {ToolName.Codebase} returns the full contents of the text files in the workspace, you have all the workspace context.<br /></>}
 				{tools.hasFindTextTool && <>You can use the {ToolName.FindTextInFiles} to get an overview of a file by searching for a string within that one file, instead of using {ToolName.ReadFile} many times.<br /></>}
-				{tools.hasCodebaseTool && <>If you don't know exactly the string or filename pattern you're looking for, use {ToolName.Codebase} to do a semantic search across the workspace.<br /></>}
 				{tools.hasTerminalTool && <>Don't call the {ToolName.CoreRunInTerminal} tool multiple times in parallel. Instead, run one command and wait for the output before running the next command.<br /></>}
 				{tools.hasUpdateUserPreferencesTool && <>After you have performed the user's task, if the user corrected something you did, expressed a coding preference, or communicated a fact that you need to remember, use the {ToolName.UpdateUserPreferences} tool to save their preferences.<br /></>}
 				When invoking a tool that takes a file path, always use the absolute file path. If the file has a scheme like untitled: or vscode-userdata:, then use a URI with the scheme.<br />
@@ -411,9 +405,8 @@ class CodesearchModeInstructions extends PromptElement<DefaultAgentPromptProps> 
 				These instructions only apply when the question is about the user's workspace.<br />
 				Unless it is clear that the user's question relates to the current workspace, you should avoid using the code search tools and instead prefer to answer the user's question directly.<br />
 				Remember that you can call multiple tools in one response.<br />
-				Use {ToolName.Codebase} to search for high level concepts or descriptions of functionality in the user's question. This is the best place to start if you don't know where to look or the exact strings found in the codebase.<br />
 				Prefer {ToolName.SearchWorkspaceSymbols} over {ToolName.FindTextInFiles} when you have precise code identifiers to search for.<br />
-				Prefer {ToolName.FindTextInFiles} over {ToolName.Codebase} when you have precise keywords to search for.<br />
+				Use {ToolName.FindTextInFiles} when you have precise keywords to search for.<br />
 				The tools {ToolName.FindFiles}, {ToolName.FindTextInFiles}, and {ToolName.GetScmChanges} are deterministic and comprehensive, so do not repeatedly invoke them with the same arguments.<br />
 			</Tag>
 			<CodeBlockFormattingRules />

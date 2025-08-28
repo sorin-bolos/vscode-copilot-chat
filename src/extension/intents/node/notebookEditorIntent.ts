@@ -137,7 +137,7 @@ export class NotebookEditorIntentInvocation extends EditCode2IntentInvocation {
 			query,
 			tools: promptContext.tools && {
 				...promptContext.tools,
-				toolReferences: this.stableToolReferences.filter((r) => r.name !== ToolName.Codebase).concat(commandToolReferences),
+				toolReferences: this.stableToolReferences.concat(commandToolReferences),
 			},
 		}, progress, token);
 	}

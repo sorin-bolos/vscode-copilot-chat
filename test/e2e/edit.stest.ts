@@ -6,7 +6,6 @@
 import assert from 'assert';
 import path from 'path';
 import { ToolName } from '../../src/extension/tools/common/toolNames';
-import { ICodebaseToolParams } from '../../src/extension/tools/node/codebaseTool';
 import { IReadFileParamsV1 } from '../../src/extension/tools/node/readFileTool';
 import { deserializeWorkbenchState } from '../../src/platform/test/node/promptContextModel';
 import { ssuite, stest } from '../base/stest';
@@ -30,12 +29,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'edit', subtitle: 'toolCalling', 
 		toolCallValidators: {
 			[ToolName.ReadFile]: (toolCalls) => {
 				assert.ok(!toolCalls.some(tc => (tc.input as IReadFileParamsV1).filePath.endsWith('chatSetup.ts')), 'Should not read_file the attached file');
-			},
-			[ToolName.Codebase]: (toolCalls) => {
-				assert.ok(!toolCalls.some(tc => {
-					const query = (tc.input as ICodebaseToolParams).query;
-					return query.includes('doForwardRequestToCopilotWhenReady') || query.includes('whenLanguageModelReady');
-				}), 'Should not do semantic_search for something that is in the attached file');
 			}
 		}
 	}));

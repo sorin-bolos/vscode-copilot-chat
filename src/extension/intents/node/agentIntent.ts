@@ -28,7 +28,6 @@ import { Event } from '../../../util/vs/base/common/event';
 import { IInstantiationService } from '../../../util/vs/platform/instantiation/common/instantiation';
 import { ICommandService } from '../../commands/node/commandService';
 import { Intent } from '../../common/constants';
-import { ChatVariablesCollection } from '../../prompt/common/chatVariablesCollection';
 import { Conversation, RenderedUserMessageMetadata } from '../../prompt/common/conversation';
 import { IBuildPromptContext } from '../../prompt/common/intents';
 import { ChatTelemetryBuilder } from '../../prompt/node/chatParticipantTelemetry';
@@ -46,7 +45,7 @@ import { IToolsService } from '../../tools/common/toolsService';
 import { VirtualTool } from '../../tools/common/virtualTools/virtualTool';
 import { IToolGroupingService } from '../../tools/common/virtualTools/virtualToolTypes';
 import { addCacheBreakpoints } from './cacheBreakpoints';
-import { EditCodeIntent, EditCodeIntentInvocation, EditCodeIntentInvocationOptions, mergeMetadata, toNewChatReferences } from './editCodeIntent';
+import { EditCodeIntent, EditCodeIntentInvocation, EditCodeIntentInvocationOptions } from './editCodeIntent';
 import { getRequestedToolCallIterationLimit, IContinueOnErrorConfirmation } from './toolCallingLoop';
 
 const getTools = (instaService: IInstantiationService, request: vscode.ChatRequest) =>
@@ -188,7 +187,7 @@ export class AgentIntentInvocation extends EditCodeIntentInvocation {
 		@ILogService private readonly logService: ILogService,
 		@IExperimentationService private readonly experimentationService: IExperimentationService,
 	) {
-		super(intent, location, endpoint, request, intentOptions, instantiationService, codeMapperService, envService, promptPathRepresentationService, endpointProvider, workspaceService, toolsService, configurationService, editLogService, commandService, telemetryService, notebookService);
+		super(intent, location, endpoint, request, intentOptions, instantiationService, codeMapperService, envService, promptPathRepresentationService, workspaceService, toolsService, configurationService, editLogService, commandService, telemetryService, notebookService);
 	}
 
 	public override getAvailableTools(): Promise<vscode.LanguageModelToolInformation[]> {
@@ -200,15 +199,7 @@ export class AgentIntentInvocation extends EditCodeIntentInvocation {
 		progress: vscode.Progress<vscode.ChatResponseReferencePart | vscode.ChatResponseProgressPart>,
 		token: vscode.CancellationToken
 	): Promise<IBuildPromptResult> {
-		// Add any references from the codebase invocation to the request
-		const codebase = await this._getCodebaseReferences(promptContext, token);
-
-		let variables = promptContext.chatVariables;
-		let toolReferences: vscode.ChatPromptReference[] = [];
-		if (codebase) {
-			toolReferences = toNewChatReferences(variables, codebase.references);
-			variables = new ChatVariablesCollection([...this.request.references, ...toolReferences]);
-		}
+		// Codebase tool has been removed - no longer adding codebase references
 
 		const tools = await this.getAvailableTools();
 		const toolTokens = tools?.length ? await this.endpoint.acquireTokenizer().countToolTokens(tools) : 0;
@@ -232,7 +223,7 @@ export class AgentIntentInvocation extends EditCodeIntentInvocation {
 				...promptContext,
 				tools: promptContext.tools && {
 					...promptContext.tools,
-					toolReferences: this.stableToolReferences.filter((r) => r.name !== ToolName.Codebase),
+					toolReferences: this.stableToolReferences,
 				}
 			},
 			location: this.location,
@@ -308,10 +299,8 @@ export class AgentIntentInvocation extends EditCodeIntentInvocation {
 
 		return {
 			...result,
-			// The codebase tool is not actually called/referenced in the edit prompt, so we ned to
-			// merge its metadata so that its output is not lost and it's not called repeatedly every turn
-			// todo@connor4312/joycerhl: this seems a bit janky
-			metadata: codebase ? mergeMetadata(result.metadata, codebase.metadatas) : result.metadata,
+			// Codebase tool has been removed - no longer merging codebase metadata
+			metadata: result.metadata,
 			// Don't report file references that came in via chat variables in an editing session, unless they have warnings,
 			// because they are already displayed as part of the working set
 			// references: result.references.filter((ref) => this.shouldKeepReference(editCodeStep, ref, toolReferences, chatVariables)),

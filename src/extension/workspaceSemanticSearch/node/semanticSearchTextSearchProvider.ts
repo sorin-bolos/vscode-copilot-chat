@@ -15,6 +15,7 @@ import { IParserService } from '../../../platform/parser/node/parserService';
 import { ISearchService } from '../../../platform/search/common/searchService';
 import { ITelemetryService } from '../../../platform/telemetry/common/telemetry';
 import { IWorkspaceService } from '../../../platform/workspace/common/workspaceService';
+import { MAX_CHUNK_TOKEN_COUNT, MAX_CHUNKS_RESULTS } from '../../../platform/workspaceChunkSearch/common/constants';
 import { KeywordItem, ResolvedWorkspaceChunkQuery } from '../../../platform/workspaceChunkSearch/common/workspaceChunkSearch';
 import { IWorkspaceChunkSearchService } from '../../../platform/workspaceChunkSearch/node/workspaceChunkSearchService';
 import { TelemetryCorrelationId } from '../../../util/common/telemetryCorrelationId';
@@ -28,7 +29,6 @@ import { IIntentService } from '../../intents/node/intentService';
 import { ChatVariablesCollection } from '../../prompt/common/chatVariablesCollection';
 import { ISearchPanelKeywordsPromptContext } from '../../prompts/node/panel/searchPanelKeywordsPrompt';
 import { ISearchPanelPromptContext } from '../../prompts/node/panel/searchPanelPrompt';
-import { MAX_CHUNK_TOKEN_COUNT, MAX_CHUNKS_RESULTS } from '../../prompts/node/panel/workspace/workspaceContext';
 import { combinedRanking, combineRankingInsights } from './combinedRank';
 
 export interface ISearchFeedbackTelemetry {

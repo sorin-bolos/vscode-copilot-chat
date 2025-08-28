@@ -28,8 +28,6 @@ import { ChatVariablesAndQuery } from '../../prompts/node/panel/chatVariables';
 import { ConversationHistory, HistoryWithInstructions } from '../../prompts/node/panel/conversationHistory';
 import { CurrentSelection } from '../../prompts/node/panel/currentSelection';
 import { CodeBlock } from '../../prompts/node/panel/safeElements';
-import { getToolName } from '../../tools/common/toolNames';
-import { CodebaseTool } from '../../tools/node/codebaseTool';
 import { ChatVariablesCollection } from '../common/chatVariablesCollection';
 import { Turn } from '../common/conversation';
 import { addHistoryToConversation } from './chatParticipantRequestHandler';
@@ -85,10 +83,6 @@ export class IntentDetector implements ChatParticipantDetectionProvider {
 
 			if (detectedIntent && 'participant' in detectedIntent) {
 				if (detectedIntent.participant === getChatParticipantIdFromName('workspace')) {
-					if (chatRequest.toolReferences.find((ref) => getToolName(ref.name) === CodebaseTool.toolName)) {
-						return undefined;
-					}
-
 					if (this.configurationService.getExperimentBasedConfig<boolean>(ConfigKey.Internal.AskAgent, this.experimentationService)
 						&& chatRequest.model.capabilities.supportsToolCalling) {
 						return undefined;

@@ -24,7 +24,7 @@ import './e2e/variables.stest';
 import './e2e/vscode-metaprompt.stest';
 import './e2e/vscode.stest';
 import './e2e/workspace-e2e.stest';
-import './e2e/workspace-metaprompt.stest';
+// import './e2e/workspace-metaprompt.stest'; // File does not exist
 import './inline/agent.stest';
 import './inline/fixing.stest';
 import './inline/inlineEditCode.stest';

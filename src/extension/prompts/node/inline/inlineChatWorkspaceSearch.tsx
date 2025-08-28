@@ -4,11 +4,15 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { BasePromptElementProps, PromptElement, PromptSizing } from '@vscode/prompt-tsx';
-import { KeywordItem, ResolvedWorkspaceChunkQuery } from '../../../../platform/workspaceChunkSearch/common/workspaceChunkSearch';
-import { TelemetryCorrelationId } from '../../../../util/common/telemetryCorrelationId';
 import { Diagnostic } from '../../../../vscodeTypes';
+import { ChunksToolProps } from '../../../common/constants';
 import { IDocumentContext } from '../../../prompt/node/documentContext';
-import { ChunksToolProps, WorkspaceChunks } from '../panel/workspace/workspaceContext';
+
+// Simple stub for WorkspaceChunks since the codebase tool was removed
+const WorkspaceChunks = ({ query, maxChunks, tokenBudget }: ChunksToolProps) => {
+	// Return empty since workspace search functionality was removed
+	return null;
+};
 
 interface InlineChatWorkspaceSearchProps extends BasePromptElementProps {
 	readonly documentContext: IDocumentContext;
@@ -48,54 +52,19 @@ export class InlineChatWorkspaceSearch extends PromptElement<InlineChatWorkspace
 		});
 		const selectedText = document.getText(range);
 
-		const query = [
-			`Please find code that is similar to the following code block:\n`,
-			'```',
-			selectedText,
-			'```'
-		].join('\n');
 		return {
-			telemetryInfo: new TelemetryCorrelationId('InlineChatWorkspaceSearch::getChunkSearchPropsForSelection'),
-			query: {
-				rawQuery: query,
-				resolveQueryAndKeywords: async (): Promise<ResolvedWorkspaceChunkQuery> => ({
-					rephrasedQuery: query,
-					keywords: getKeywordsForContent(selectedText),
-				}),
-				resolveQuery: async () => query,
-			},
-			// do not return matches in the current file
-			globPatterns: { exclude: [document.uri.fsPath] }, // TODO: use relativePattern once supported
-			maxResults: 3,
+			query: `Please find code that is similar to the following code block:\n\`\`\`\n${selectedText}\n\`\`\``,
+			maxChunks: 3,
 		};
 	}
 
 	private getChunkSearchPropsForDiagnostics(tokenBudget: number): ChunksToolProps {
-		const document = this.props.documentContext.document;
 		const messages = this.props.diagnostics.map(d => d.message).join(' ');
 		const query = `Please find code that can help me fix the following problems: ${messages}`;
 		return {
-			telemetryInfo: new TelemetryCorrelationId('InlineChatWorkspaceSearch::getChunkSearchPropsForDiagnostics'),
-			query: {
-				rawQuery: query,
-				resolveQueryAndKeywords: async (): Promise<ResolvedWorkspaceChunkQuery> => ({
-					rephrasedQuery: query,
-					keywords: getKeywordsForContent(messages),
-				}),
-				resolveQuery: async () => query,
-			},
-			// do not return matches in the current file
-			globPatterns: { exclude: [document.uri.fsPath] },
-			maxResults: 3,
+			query,
+			maxChunks: 3,
+			tokenBudget,
 		};
 	}
-}
-
-function getKeywordsForContent(text: string): readonly KeywordItem[] {
-	// extract all identifiers in the selected text
-	const identifiers = new Set<string>();
-	for (const match of text.matchAll(/(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g)) {
-		identifiers.add(match[0]);
-	}
-	return Array.from(identifiers.values(), k => ({ keyword: k, variations: [] }));
 }

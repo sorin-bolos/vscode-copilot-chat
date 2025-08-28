@@ -137,31 +137,6 @@
 	"contributes": {
 		"languageModelTools": [
 			{
-				"name": "copilot_searchCodebase",
-				"toolReferenceName": "codebase",
-				"displayName": "%copilot.tools.searchCodebase.name%",
-				"icon": "$(folder)",
-				"canBeReferencedInPrompt": true,
-				"userDescription": "%copilot.codebase.tool.description%",
-				"modelDescription": "Run a natural language search for relevant code or documentation comments from the user's current workspace. Returns relevant code snippets from the user's current workspace if it is large, or the full contents of the workspace if it is small.",
-				"tags": [
-					"codesearch",
-					"vscode_codesearch"
-				],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"query": {
-							"type": "string",
-							"description": "The query to search the codebase for. Should contain all relevant context. Should ideally be text that might appear in the codebase, such as function names, variable names, or comments."
-						}
-					},
-					"required": [
-						"query"
-					]
-				}
-			},
-			{
 				"name": "copilot_searchWorkspaceSymbols",
 				"toolReferenceName": "symbols",
 				"displayName": "%copilot.tools.searchWorkspaceSymbols.name%",

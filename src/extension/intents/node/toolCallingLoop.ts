@@ -6,7 +6,6 @@
 import * as l10n from '@vscode/l10n';
 import { Raw } from '@vscode/prompt-tsx';
 import type { CancellationToken, ChatRequest, ChatResponseProgressPart, ChatResponseReferencePart, ChatResponseStream, ChatResult, LanguageModelToolInformation, Progress } from 'vscode';
-import { IAuthenticationChatUpgradeService } from '../../../platform/authentication/common/authenticationUpgrade';
 import { FetchStreamSource, IResponsePart } from '../../../platform/chat/common/chatMLFetcher';
 import { CanceledResult, ChatFetchResponseType, ChatResponse } from '../../../platform/chat/common/commonTypes';
 import { IEndpointProvider } from '../../../platform/endpoint/common/endpointProvider';
@@ -36,7 +35,6 @@ import { ResponseProcessorContext } from '../../prompt/node/responseProcessorCon
 import { SummarizedConversationHistoryMetadata } from '../../prompts/node/agent/summarizedConversationHistory';
 import { ToolFailureEncountered, ToolResultMetadata } from '../../prompts/node/panel/toolCalling';
 import { ToolName } from '../../tools/common/toolNames';
-import { ToolCallCancelledError } from '../../tools/common/toolsService';
 import { ReadFileParams } from '../../tools/node/readFileTool';
 import { PauseController } from './pauseController';
 
@@ -112,7 +110,6 @@ export abstract class ToolCallingLoop<TOptions extends IToolCallingLoopOptions =
 		@IEndpointProvider private readonly _endpointProvider: IEndpointProvider,
 		@ILogService protected readonly _logService: ILogService,
 		@IRequestLogger private readonly _requestLogger: IRequestLogger,
-		@IAuthenticationChatUpgradeService private readonly _authenticationChatUpgradeService: IAuthenticationChatUpgradeService,
 		@ITelemetryService protected readonly _telemetryService: ITelemetryService,
 		@IThinkingDataService private readonly _thinkingDataService: IThinkingDataService,
 	) {
@@ -465,15 +462,7 @@ export abstract class ToolCallingLoop<TOptions extends IToolCallingLoopOptions =
 		fetchStreamSource?.resolve();
 		const chatResult = await processResponsePromise ?? undefined;
 
-		// Validate authentication session upgrade and handle accordingly
-		if (
-			outputStream &&
-			toolCalls.some(tc => tc.name === ToolName.Codebase) &&
-			await this._authenticationChatUpgradeService.shouldRequestPermissiveSessionUpgrade()
-		) {
-			this._authenticationChatUpgradeService.showPermissiveSessionUpgradeInChat(outputStream, this.options.request);
-			throw new ToolCallCancelledError(new CancellationError());
-		}
+		// Codebase tool removed - no longer need authentication session upgrade check
 
 		await finalizeStreams(streamParticipants);
 		this._onDidReceiveResponse.fire({ interactionOutcome: interactionOutcomeComputer, response: fetchResult, toolCalls });

@@ -37,7 +37,7 @@ export class McpToolCallingLoop extends ToolCallingLoop<IMcpToolCallingLoopOptio
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IThinkingDataService thinkingDataService: IThinkingDataService
 	) {
-		super(options, instantiationService, endpointProvider, logService, requestLogger, authenticationChatUpgradeService, telemetryService, thinkingDataService);
+		super(options, instantiationService, endpointProvider, logService, requestLogger, telemetryService, thinkingDataService);
 	}
 
 	private async getEndpoint(request: ChatRequest) {
