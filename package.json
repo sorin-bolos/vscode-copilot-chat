@@ -211,39 +211,6 @@
 				}
 			},
 			{
-				"name": "copilot_getChangedFiles",
-				"displayName": "%copilot.tools.getChangedFiles.name%",
-				"toolReferenceName": "changes",
-				"icon": "$(diff)",
-				"canBeReferencedInPrompt": true,
-				"userDescription": "%copilot.tools.changes.description%",
-				"modelDescription": "Get git diffs of current file changes in a git repository. Don't forget that you can use run_in_terminal to run git commands in a terminal as well.",
-				"tags": [
-					"vscode_codesearch"
-				],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"repositoryPath": {
-							"type": "string",
-							"description": "The absolute path to the git repository to look for changes in. If not provided, the active git repository will be used."
-						},
-						"sourceControlState": {
-							"type": "array",
-							"items": {
-								"type": "string",
-								"enum": [
-									"staged",
-									"unstaged",
-									"merge-conflicts"
-								]
-							},
-							"description": "The kinds of git state to filter by. Allowed values are: 'staged', 'unstaged', and 'merge-conflicts'. If not provided, all states will be included."
-						}
-					}
-				}
-			},
-			{
 				"name": "copilot_insertEdit",
 				"toolReferenceName": "insertEdit",
 				"displayName": "%copilot.tools.insertEdit.name%",

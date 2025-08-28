@@ -394,7 +394,6 @@ class CodesearchModeInstructions extends PromptElement<DefaultAgentPromptProps> 
 				These instructions only apply when the question is about the user's workspace.<br />
 				Unless it is clear that the user's question relates to the current workspace, you should avoid using the code search tools and instead prefer to answer the user's question directly.<br />
 				Remember that you can call multiple tools in one response.<br />
-				The tool {ToolName.GetScmChanges} is deterministic and comprehensive, so do not repeatedly invoke it with the same arguments.<br />
 			</Tag>
 			<CodeBlockFormattingRules />
 		</>;

@@ -10,6 +10,5 @@ import './notebookSummaryTool';
 import './readFileTool';
 import './replaceStringTool';
 import './runNotebookCellTool';
-import './scmChangesTool';
 import './thinkTool';
 

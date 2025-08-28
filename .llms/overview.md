@@ -117,7 +117,7 @@ export class ContributionCollection extends Disposable {
 The extension provides a comprehensive set of tools for AI models:
 
 - **File Operations**: `copilot_readFile`, `copilot_replaceString`
-- **Development**: `copilot_runNotebookCell`, `copilot_getChangedFiles`, `copilot_createNewWorkspace`
+- **Development**: `copilot_runNotebookCell`, `copilot_createNewWorkspace`
 
 ### 5. Context & Intelligence (`src/extension/context/`, `src/extension/workspaceSemanticSearch/`)
 

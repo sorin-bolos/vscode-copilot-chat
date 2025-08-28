@@ -17,8 +17,8 @@ import { getLanguage } from '../../../util/common/languages';
 import { timeout } from '../../../util/vs/base/common/async';
 import { URI } from '../../../util/vs/base/common/uri';
 import { Diagnostic, DiagnosticSeverity } from '../../../vscodeTypes';
-import { ToolName } from '../common/toolNames';
 import { Diagnostics } from '../../prompts/node/inline/diagnosticsContext';
+import { ToolName } from '../common/toolNames';
 
 export interface IEditedFile {
 	operation: 'add' | 'delete' | 'update';

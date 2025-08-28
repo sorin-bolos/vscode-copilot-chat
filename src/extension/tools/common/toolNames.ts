@@ -9,7 +9,6 @@ export const enum ToolName {
 	ApplyPatch = 'apply_patch',
 	RunTests = 'run_tests',
 	ReadFile = 'read_file',
-	GetScmChanges = 'get_changed_files',
 	EditFile = 'insert_edit_into_file',
 	ReplaceString = 'replace_string_in_file',
 	EditNotebook = 'edit_notebook_file',
@@ -34,7 +33,6 @@ export const enum ContributedToolName {
 	/** @deprecated moving to core soon */
 	RunTests = 'copilot_runTests1',
 	ReadFile = 'copilot_readFile',
-	GetScmChanges = 'copilot_getChangedFiles',
 	EditFile = 'copilot_insertEdit',
 	ReplaceString = 'copilot_replaceString',
 	EditNotebook = 'copilot_editNotebook',
@@ -48,7 +46,6 @@ export const enum ContributedToolName {
 const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.ApplyPatch, ToolName.ApplyPatch],
 	[ContributedToolName.ReadFile, ToolName.ReadFile],
-	[ContributedToolName.GetScmChanges, ToolName.GetScmChanges],
 	[ContributedToolName.EditFile, ToolName.EditFile],
 	[ContributedToolName.Think, ToolName.Think],
 	[ContributedToolName.FetchWebPage, ToolName.FetchWebPage],

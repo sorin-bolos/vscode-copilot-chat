@@ -19,10 +19,6 @@ import { BaseToolsService, IToolsService } from '../../common/toolsService';
 export class TestToolsService extends BaseToolsService implements IToolsService {
 	_serviceBrand: undefined;
 
-	private static readonly ExcludedTools = [
-		ToolName.GetScmChanges
-	];
-
 	private static readonly ContainerOnlyTools = [
 		ToolName.CoreRunInTerminal,
 		ToolName.CoreGetTerminalOutput
@@ -54,10 +50,6 @@ export class TestToolsService extends BaseToolsService implements IToolsService 
 			.map(t => [t.toolName, new Lazy(() => instantiationService.createInstance(t))] as const));
 
 		for (const tool of filteredTools) {
-			if (TestToolsService.ExcludedTools.includes(tool.toolName)) {
-				continue;
-			}
-
 			const contributedName = getContributedToolName(tool.toolName);
 			const contributedTool = packageJson.contributes.languageModelTools.find(contributedTool => contributedTool.name === contributedName);
 			if (!contributedTool) {
@@ -80,7 +72,6 @@ export class TestToolsService extends BaseToolsService implements IToolsService 
 		const isSwebenchContainer = process.env.HOME === '/root';
 		const filteredTools = ToolRegistry.getTools()
 			.filter(t => !disabledTools.has(t.toolName))
-			.filter(t => !TestToolsService.ExcludedTools.includes(t.toolName))
 			.filter(t => isSwebenchContainer || !TestToolsService.ContainerOnlyTools.includes(t.toolName));
 
 		return filteredTools;
