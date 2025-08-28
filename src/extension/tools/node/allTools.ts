@@ -5,7 +5,6 @@
 
 import './applyPatchTool';
 import './createDirectoryTool';
-import './docTool';
 import './editNotebookTool';
 import './findTextInFilesTool';
 import './getErrorsTool';
