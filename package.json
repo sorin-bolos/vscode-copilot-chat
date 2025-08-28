@@ -97,8 +97,6 @@
 		"contribCommentsViewThreadMenus",
 		"documentFiltersExclusive",
 		"embeddings",
-		"findTextInFiles",
-		"findTextInFiles2",
 		"findFiles2@2",
 		"textSearchProvider",
 		"terminalDataWriteEvent",
@@ -154,40 +152,6 @@
 					},
 					"required": [
 						"thoughts"
-					]
-				}
-			},
-			{
-				"name": "copilot_findTextInFiles",
-				"toolReferenceName": "textSearch",
-				"displayName": "%copilot.tools.findTextInFiles.name%",
-				"modelDescription": "Do a fast text search in the workspace. Use this tool when you want to search with an exact string or regex. If you are not sure what words will appear in the workspace, prefer using regex patterns with alternation (|) or character classes to search for multiple potential words at once instead of making separate searches. For example, use 'function|method|procedure' to look for all of those words at once. Use includePattern to search within files matching a specific pattern, or in a specific file, using a relative path. Use this tool when you want to see an overview of a particular file, instead of using read_file many times to look for code within a file.",
-				"tags": [
-					"vscode_codesearch"
-				],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"query": {
-							"type": "string",
-							"description": "The pattern to search for in files in the workspace. Use regex with alternation (e.g., 'word1|word2|word3') or character classes to find multiple potential words in a single search. Be sure to set the isRegexp property properly to declare whether it's a regex or plain text pattern. Is case-insensitive."
-						},
-						"isRegexp": {
-							"type": "boolean",
-							"description": "Whether the pattern is a regex."
-						},
-						"includePattern": {
-							"type": "string",
-							"description": "Search files matching this glob pattern. Will be applied to the relative path of files within the workspace. To search recursively inside a folder, use a proper glob pattern like \"src/folder/**\". Do not use | in includePattern."
-						},
-						"maxResults": {
-							"type": "number",
-							"description": "The maximum number of results to return. Do not use this unless necessary, it can slow things down. By default, only some matches are returned. If you use this and don't see what you're looking for, you can try again with a more specific query or a larger maxResults."
-						}
-					},
-					"required": [
-						"query",
-						"isRegexp"
 					]
 				}
 			},

@@ -22,7 +22,6 @@ interface ToolCapabilities {
 	hasInsertEditTool: boolean;
 	hasApplyPatchTool: boolean;
 	hasReadFileTool: boolean;
-	hasFindTextTool: boolean;
 	hasSomeEditTool: boolean;
 	hasFetchTool: boolean;
 	hasTodoListTool: boolean;
@@ -37,7 +36,6 @@ function detectToolCapabilities(availableTools: readonly LanguageModelToolInform
 		hasInsertEditTool: !!availableTools?.find(tool => tool.name === ToolName.EditFile),
 		hasApplyPatchTool: !!availableTools?.find(tool => tool.name === ToolName.ApplyPatch),
 		hasReadFileTool: !!availableTools?.find(tool => tool.name === ToolName.ReadFile),
-		hasFindTextTool: !!availableTools?.find(tool => tool.name === ToolName.FindTextInFiles),
 		hasFetchTool: !!availableTools?.find(tool => tool.name === ToolName.FetchWebPage),
 		hasTodoListTool: !!availableTools?.find(tool => tool.name === ToolName.CoreManageTodoList),
 		hasGetErrorsTool: !!availableTools?.find(tool => tool.name === ToolName.GetErrors) || !!toolsService?.getTool(ToolName.GetErrors),
@@ -123,7 +121,6 @@ export class DefaultAgentPrompt extends PromptElement<DefaultAgentPromptProps> {
 					Verification preference: For service or API checks, prefer a tiny code-based test (unit/integration or a short script) over shell probes. Use shell probes (e.g., curl) only as optional documentation or quick one-off sanity checks, and mark them as optional.<br />
 				</>}
 				{tools.hasReadFileTool && <>When using the {ToolName.ReadFile} tool, prefer reading a large section over calling the {ToolName.ReadFile} tool many times in sequence. You can also think of all the pieces you may be interested in and read them in parallel. Read large enough context to ensure you get what you need.<br /></>}
-				{tools.hasFindTextTool && <>You can use the {ToolName.FindTextInFiles} to get an overview of a file by searching for a string within that one file, instead of using {ToolName.ReadFile} many times.<br /></>}
 				{tools.hasTerminalTool && <>Don't call the {ToolName.CoreRunInTerminal} tool multiple times in parallel. Instead, run one command and wait for the output before running the next command.<br /></>}
 				When invoking a tool that takes a file path, always use the absolute file path. If the file has a scheme like untitled: or vscode-userdata:, then use a URI with the scheme.<br />
 				{tools.hasTerminalTool && <>NEVER try to edit a file by running terminal commands unless the user specifically asks for it.<br /></>}
@@ -285,7 +282,6 @@ export class AlternateGPTPrompt extends PromptElement<DefaultAgentPromptProps> {
 				NEVER say the name of a tool to a user. For example, instead of saying that you'll use the {ToolName.CoreRunInTerminal} tool, say "I'll run the command in a terminal".<br />
 				If you think running multiple tools can answer the user's question, prefer calling them in parallel whenever possible<br />
 				{tools.hasReadFileTool && <>When using the {ToolName.ReadFile} tool, prefer reading a large section over calling the {ToolName.ReadFile} tool many times in sequence. You can also think of all the pieces you may be interested in and read them in parallel. Read large enough context to ensure you get what you need.<br /></>}
-				{tools.hasFindTextTool && <>You can use the {ToolName.FindTextInFiles} to get an overview of a file by searching for a string within that one file, instead of using {ToolName.ReadFile} many times.<br /></>}
 				{tools.hasTerminalTool && <>Don't call the {ToolName.CoreRunInTerminal} tool multiple times in parallel. Instead, run one command and wait for the output before running the next command.<br /></>}
 				When invoking a tool that takes a file path, always use the absolute file path. If the file has a scheme like untitled: or vscode-userdata:, then use a URI with the scheme.<br />
 				{tools.hasTerminalTool && <>NEVER try to edit a file by running terminal commands unless the user specifically asks for it.<br /></>}
@@ -401,8 +397,7 @@ class CodesearchModeInstructions extends PromptElement<DefaultAgentPromptProps> 
 				These instructions only apply when the question is about the user's workspace.<br />
 				Unless it is clear that the user's question relates to the current workspace, you should avoid using the code search tools and instead prefer to answer the user's question directly.<br />
 				Remember that you can call multiple tools in one response.<br />
-				Use {ToolName.FindTextInFiles} when you have precise keywords to search for.<br />
-				The tools {ToolName.FindTextInFiles} and {ToolName.GetScmChanges} are deterministic and comprehensive, so do not repeatedly invoke them with the same arguments.<br />
+				The tool {ToolName.GetScmChanges} is deterministic and comprehensive, so do not repeatedly invoke it with the same arguments.<br />
 			</Tag>
 			<CodeBlockFormattingRules />
 		</>;
@@ -483,7 +478,6 @@ export class SweBenchAgentPrompt extends PromptElement<DefaultAgentPromptProps> 
 				When searching for information in the codebase, follow these guidelines:<br />
 
 				1. For locating specific code elements:<br />
-				- Use {ToolName.FindTextInFiles} when searching for exact strings<br />
 				- Best for finding class names, function names, or specific code patterns<br />
 
 				2. Fallback search strategy:<br />
