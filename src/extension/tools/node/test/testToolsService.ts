@@ -22,7 +22,6 @@ export class TestToolsService extends BaseToolsService implements IToolsService 
 
 	private static readonly ExcludedTools = [
 		ToolName.GetScmChanges,
-		ToolName.UpdateUserPreferences,
 		ToolName.Usages
 	];
 

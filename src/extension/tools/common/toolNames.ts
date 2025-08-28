@@ -13,7 +13,6 @@ export const enum ToolName {
 	ReadFile = 'read_file',
 	GetErrors = 'get_errors',
 	GetScmChanges = 'get_changed_files',
-	UpdateUserPreferences = 'update_user_preferences',
 	ReadProjectStructure = 'read_project_structure',
 	TerminalSelection = 'get_terminal_selection',
 	TerminalLastCommand = 'get_terminal_last_command',
@@ -53,7 +52,6 @@ export const enum ToolName {
 export const enum ContributedToolName {
 	ApplyPatch = 'copilot_applyPatch',
 	Usages = 'copilot_listCodeUsages',
-	UpdateUserPreferences = 'copilot_updateUserPreferences',
 	TestFailure = 'copilot_testFailure',
 	/** @deprecated moving to core soon */
 	RunTests = 'copilot_runTests1',
@@ -98,7 +96,6 @@ const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.GetScmChanges, ToolName.GetScmChanges],
 	[ContributedToolName.ReadProjectStructure, ToolName.ReadProjectStructure],
 	[ContributedToolName.EditFile, ToolName.EditFile],
-	[ContributedToolName.UpdateUserPreferences, ToolName.UpdateUserPreferences],
 	[ContributedToolName.TerminalSelection, ToolName.TerminalSelection],
 	[ContributedToolName.TerminalLastCommand, ToolName.TerminalLastCommand],
 	[ContributedToolName.CreateNewWorkspace, ToolName.CreateNewWorkspace],

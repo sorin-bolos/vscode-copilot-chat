@@ -23,7 +23,6 @@ interface ToolCapabilities {
 	hasApplyPatchTool: boolean;
 	hasReadFileTool: boolean;
 	hasFindTextTool: boolean;
-	hasUpdateUserPreferencesTool: boolean;
 	hasSomeEditTool: boolean;
 	hasFetchTool: boolean;
 	hasTodoListTool: boolean;
@@ -39,7 +38,6 @@ function detectToolCapabilities(availableTools: readonly LanguageModelToolInform
 		hasApplyPatchTool: !!availableTools?.find(tool => tool.name === ToolName.ApplyPatch),
 		hasReadFileTool: !!availableTools?.find(tool => tool.name === ToolName.ReadFile),
 		hasFindTextTool: !!availableTools?.find(tool => tool.name === ToolName.FindTextInFiles),
-		hasUpdateUserPreferencesTool: !!availableTools?.find(tool => tool.name === ToolName.UpdateUserPreferences),
 		hasFetchTool: !!availableTools?.find(tool => tool.name === ToolName.FetchWebPage),
 		hasTodoListTool: !!availableTools?.find(tool => tool.name === ToolName.CoreManageTodoList),
 		hasGetErrorsTool: !!availableTools?.find(tool => tool.name === ToolName.GetErrors) || !!toolsService?.getTool(ToolName.GetErrors),
@@ -127,7 +125,6 @@ export class DefaultAgentPrompt extends PromptElement<DefaultAgentPromptProps> {
 				{tools.hasReadFileTool && <>When using the {ToolName.ReadFile} tool, prefer reading a large section over calling the {ToolName.ReadFile} tool many times in sequence. You can also think of all the pieces you may be interested in and read them in parallel. Read large enough context to ensure you get what you need.<br /></>}
 				{tools.hasFindTextTool && <>You can use the {ToolName.FindTextInFiles} to get an overview of a file by searching for a string within that one file, instead of using {ToolName.ReadFile} many times.<br /></>}
 				{tools.hasTerminalTool && <>Don't call the {ToolName.CoreRunInTerminal} tool multiple times in parallel. Instead, run one command and wait for the output before running the next command.<br /></>}
-				{tools.hasUpdateUserPreferencesTool && <>After you have performed the user's task, if the user corrected something you did, expressed a coding preference, or communicated a fact that you need to remember, use the {ToolName.UpdateUserPreferences} tool to save their preferences.<br /></>}
 				When invoking a tool that takes a file path, always use the absolute file path. If the file has a scheme like untitled: or vscode-userdata:, then use a URI with the scheme.<br />
 				{tools.hasTerminalTool && <>NEVER try to edit a file by running terminal commands unless the user specifically asks for it.<br /></>}
 				{!tools.hasSomeEditTool && <>You don't currently have any tools available for editing files. If the user asks you to edit a file, you can ask the user to enable editing tools or print a codeblock with the suggested changes.<br /></>}
@@ -290,7 +287,6 @@ export class AlternateGPTPrompt extends PromptElement<DefaultAgentPromptProps> {
 				{tools.hasReadFileTool && <>When using the {ToolName.ReadFile} tool, prefer reading a large section over calling the {ToolName.ReadFile} tool many times in sequence. You can also think of all the pieces you may be interested in and read them in parallel. Read large enough context to ensure you get what you need.<br /></>}
 				{tools.hasFindTextTool && <>You can use the {ToolName.FindTextInFiles} to get an overview of a file by searching for a string within that one file, instead of using {ToolName.ReadFile} many times.<br /></>}
 				{tools.hasTerminalTool && <>Don't call the {ToolName.CoreRunInTerminal} tool multiple times in parallel. Instead, run one command and wait for the output before running the next command.<br /></>}
-				{tools.hasUpdateUserPreferencesTool && <>After you have performed the user's task, if the user corrected something you did, expressed a coding preference, or communicated a fact that you need to remember, use the {ToolName.UpdateUserPreferences} tool to save their preferences.<br /></>}
 				When invoking a tool that takes a file path, always use the absolute file path. If the file has a scheme like untitled: or vscode-userdata:, then use a URI with the scheme.<br />
 				{tools.hasTerminalTool && <>NEVER try to edit a file by running terminal commands unless the user specifically asks for it.<br /></>}
 				{!tools.hasSomeEditTool && <>You don't currently have any tools available for editing files. If the user asks you to edit a file, you can ask the user to enable editing tools or print a codeblock with the suggested changes.<br /></>}
