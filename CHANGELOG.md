@@ -1293,8 +1293,6 @@ AI-powered semantic text search is now enabled by default in the Search view. Us
 
 <video src="https://code.visualstudio.com/assets/updates/1_99/semantic-search.mp4" title="Video that shows semantic search improvements in Visual Studio Code." autoplay loop controls muted></video>
 
-You can also reference the semantic search results in your chat prompt by using the `#searchResults` tool. This allows you to ask the LLM to summarize or explain the results, or even generate code based on them.
-
 <video src="https://code.visualstudio.com/assets/updates/1_99/semantic-search-results.mp4" title="Video that shows using search results in chat view." autoplay loop controls muted></video>
 
 ### Code Editing

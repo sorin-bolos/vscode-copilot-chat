@@ -7,7 +7,6 @@ import './applyPatchTool';
 import './editNotebookTool';
 import './findTextInFilesTool';
 import './getErrorsTool';
-import './getSearchViewResultsTool';
 import './insertEditTool';
 import './notebookSummaryTool';
 import './readFileTool';

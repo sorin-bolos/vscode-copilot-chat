@@ -227,8 +227,6 @@
 	"github.copilot.config.notebook.inlineEditAgent.enabled": "Enable agent-like behavior from the notebook inline chat widget.",
 	"github.copilot.config.summarizeAgentConversationHistory.enabled": "Whether to auto-summarize agent conversation history once the context window is filled.",
 	"github.copilot.tools.openEmptyFolder.name": "Open an empty folder as VS Code workspace",
-	"github.copilot.tools.searchResults.name": "Search View Results",
-	"github.copilot.tools.searchResults.description": "The results from the search view",
 	"github.copilot.config.autoFix": "Automatically fix diagnostics for edited files.",
 	"github.copilot.chat.virtualTools.enabled": "Automatically group large number of language model tools to improve tool calling and avoid model limitations.",
 	"copilot.tools.errors.description": "Check errors for a particular file",
