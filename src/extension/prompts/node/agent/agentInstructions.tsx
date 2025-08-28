@@ -25,7 +25,6 @@ interface ToolCapabilities {
 	hasSomeEditTool: boolean;
 	hasFetchTool: boolean;
 	hasTodoListTool: boolean;
-	hasGetErrorsTool: boolean;
 }
 
 // Utility function to detect available tools
@@ -38,7 +37,6 @@ function detectToolCapabilities(availableTools: readonly LanguageModelToolInform
 		hasReadFileTool: !!availableTools?.find(tool => tool.name === ToolName.ReadFile),
 		hasFetchTool: !!availableTools?.find(tool => tool.name === ToolName.FetchWebPage),
 		hasTodoListTool: !!availableTools?.find(tool => tool.name === ToolName.CoreManageTodoList),
-		hasGetErrorsTool: !!availableTools?.find(tool => tool.name === ToolName.GetErrors) || !!toolsService?.getTool(ToolName.GetErrors),
 		get hasSomeEditTool() { return this.hasInsertEditTool || this.hasReplaceStringTool || this.hasApplyPatchTool; }
 	};
 }
@@ -261,7 +259,6 @@ export class AlternateGPTPrompt extends PromptElement<DefaultAgentPromptProps> {
 				- Whenever you detect that a project requires an environment variable (such as an API key or secret), always check if a .env file exists in the project root. If it does not exist, automatically create a .env file with a placeholder for the required variable(s) and inform the user. Do this proactively, without waiting for the user to request it.<br />
 				<br />
 				## 5. Debugging<br />
-				{tools.hasGetErrorsTool && <>- Use the {ToolName.GetErrors} tool to check for any problems in the code<br /></>}
 				- Make code changes only if you have high confidence they can solve the problem<br />
 				- When debugging, try to determine the root cause rather than addressing symptoms<br />
 				- Debug for as long as needed to identify the root cause and identify a fix<br />
@@ -417,7 +414,6 @@ export class SweBenchAgentPrompt extends PromptElement<DefaultAgentPromptProps> 
 
 	async render(state: void, sizing: PromptSizing) {
 		const hasTerminalTool = this._toolsService.getTool(ToolName.CoreRunInTerminal) !== undefined;
-		const hasGetErrorsTool = this._toolsService.getTool(ToolName.GetErrors) !== undefined;
 		const hasReplaceStringTool = !!this.props.availableTools?.find(tool => tool.name === ToolName.ReplaceString);
 		const hasEditFileTool = !!this.props.availableTools?.find(tool => tool.name === ToolName.EditFile);
 		const hasApplyPatchTool = !!this.props.availableTools?.find(tool => tool.name === ToolName.ApplyPatch);
@@ -528,7 +524,6 @@ export class SweBenchAgentPrompt extends PromptElement<DefaultAgentPromptProps> 
 				NEVER print a codeblock that represents a change to a file, use {ToolName.EditFile}{hasReplaceStringTool && <> or {ToolName.ReplaceString}</>} instead.<br />
 				For each file, give a short description of what needs to be changed, then use the {ToolName.ReplaceString} or {ToolName.EditFile} tools. You can use any tool multiple times in a response, and you can keep writing text after using a tool.<br />
 				Follow best practices when editing files. If a popular external library exists to solve a problem, use it and properly install the package e.g. {hasTerminalTool && 'with "npm install" or '}creating a "requirements.txt".<br />
-				{hasGetErrorsTool && `After editing a file, any remaining errors in the file will be in the tool result. Fix the errors if they are relevant to your change or the prompt, and remember to validate that they were actually fixed.`}<br />
 				The {ToolName.EditFile} tool is very smart and can understand how to apply your edits to the user's files, you just need to provide minimal hints.<br />
 				// {EXISTING_CODE_MARKER}<br />
 				changed code<br />

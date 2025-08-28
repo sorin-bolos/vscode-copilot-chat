@@ -18,7 +18,7 @@ import { timeout } from '../../../util/vs/base/common/async';
 import { URI } from '../../../util/vs/base/common/uri';
 import { Diagnostic, DiagnosticSeverity } from '../../../vscodeTypes';
 import { ToolName } from '../common/toolNames';
-import { DiagnosticToolOutput } from './getErrorsTool';
+import { Diagnostics } from '../../prompts/node/inline/diagnosticsContext';
 
 export interface IEditedFile {
 	operation: 'add' | 'delete' | 'update';
@@ -74,13 +74,10 @@ export class EditFileResult extends PromptElement<IEditFileResultProps> {
 				const newSnapshot = await this.workspaceService.openTextDocumentAndSnapshot(file.uri);
 				editsWithDiagnostics.push({
 					file: this.promptPathRepresentationService.getFilePath(file.uri),
-					diagnostics: <DiagnosticToolOutput
-						diagnosticsGroups={[{
-							context: { document: newSnapshot, language: getLanguage(newSnapshot) },
-							diagnostics,
-							uri: file.uri,
-						}]}
-						maxDiagnostics={20}
+					diagnostics: <Diagnostics
+						documentContext={{ document: newSnapshot, language: getLanguage(newSnapshot) }}
+						diagnostics={diagnostics.slice(0, 20)}
+						includeRelatedInfos={false}
 					/>
 				});
 				continue;

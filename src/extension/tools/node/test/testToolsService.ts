@@ -5,7 +5,6 @@
 
 import type * as vscode from 'vscode';
 import { packageJson } from '../../../../platform/env/common/packagejson';
-import { ILanguageDiagnosticsService } from '../../../../platform/languages/common/languageDiagnosticsService';
 import { ILogService } from '../../../../platform/log/common/logService';
 import { CancellationToken } from '../../../../util/vs/base/common/cancellation';
 import { CancellationError } from '../../../../util/vs/base/common/errors';
@@ -63,15 +62,6 @@ export class TestToolsService extends BaseToolsService implements IToolsService 
 			const contributedTool = packageJson.contributes.languageModelTools.find(contributedTool => contributedTool.name === contributedName);
 			if (!contributedTool) {
 				throw new Error(`Tool ${contributedName} is not in package.json`);
-			}
-
-			if (tool.toolName === ToolName.GetErrors) {
-				// Some tests don't have ILanguageDiagnosticsService configured. Hacky, not sure how else to handle this
-				try {
-					instantiationService.invokeFunction(acc => acc.get(ILanguageDiagnosticsService));
-				} catch (e) {
-					continue;
-				}
 			}
 
 			const info: LanguageModelToolInformation = {

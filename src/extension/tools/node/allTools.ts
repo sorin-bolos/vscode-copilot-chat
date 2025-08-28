@@ -5,7 +5,6 @@
 
 import './applyPatchTool';
 import './editNotebookTool';
-import './getErrorsTool';
 import './insertEditTool';
 import './notebookSummaryTool';
 import './readFileTool';

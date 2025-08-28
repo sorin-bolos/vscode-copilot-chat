@@ -239,7 +239,6 @@
 	"copilot.tools.applyPatch.name": "Apply Patch",
 	"copilot.tools.readFile.name": "Read File",
 	"copilot.tools.getTaskOutput.name": "Get Task Output",
-	"copilot.tools.getErrors.name": "Get Problems",
 	"copilot.tools.getChangedFiles.name": "Git Changes",
 	"copilot.tools.insertEdit.name": "Edit File",
 	"copilot.tools.replaceString.name": "Replace String in File",
