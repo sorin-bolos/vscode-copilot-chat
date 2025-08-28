@@ -23,7 +23,6 @@ export const enum ToolName {
 	SearchViewResults = 'get_search_view_results',
 	GithubRepo = 'github_repo',
 	SimpleBrowser = 'open_simple_browser',
-	CreateDirectory = 'create_directory',
 	GetTaskOutput = 'get_task_output',
 	CoreManageTodoList = 'manage_todo_list',
 	CoreRunInTerminal = 'run_in_terminal',
@@ -56,7 +55,6 @@ export const enum ContributedToolName {
 	GithubRepo = 'copilot_githubRepo',
 	CreateAndRunTask = 'copilot_createAndRunTask',
 	SimpleBrowser = 'copilot_openSimpleBrowser',
-	CreateDirectory = 'copilot_createDirectory',
 }
 
 const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
@@ -76,7 +74,6 @@ const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.SearchViewResults, ToolName.SearchViewResults],
 	[ContributedToolName.GithubRepo, ToolName.GithubRepo],
 	[ContributedToolName.SimpleBrowser, ToolName.SimpleBrowser],
-	[ContributedToolName.CreateDirectory, ToolName.CreateDirectory],
 ]);
 
 const toolNameToContributedToolNames = new Map<ToolName, ContributedToolName>();

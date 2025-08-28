@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import './applyPatchTool';
-import './createDirectoryTool';
 import './editNotebookTool';
 import './findTextInFilesTool';
 import './getErrorsTool';

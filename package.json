@@ -362,25 +362,6 @@
 				}
 			},
 			{
-				"name": "copilot_createDirectory",
-				"toolReferenceName": "createDirectory",
-				"displayName": "%copilot.tools.createDirectory.name%",
-				"modelDescription": "Create a new directory structure in the workspace. Will recursively create all directories in the path, like mkdir -p. You do not need to use this tool before using create_file, that tool will automatically create the needed directories.",
-				"tags": [],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"dirPath": {
-							"type": "string",
-							"description": "The absolute path to the directory to create."
-						}
-					},
-					"required": [
-						"dirPath"
-					]
-				}
-			},
-			{
 				"name": "copilot_openSimpleBrowser",
 				"displayName": "%copilot.tools.openSimpleBrowser.name%",
 				"modelDescription": "Preview a website or open a URL in the editor's Simple Browser. Useful for quickly viewing locally hosted websites, demos, or resources without leaving the coding environment.",
@@ -618,7 +599,6 @@
 					"insertEdit",
 					"replaceString",
 					"applyPatch",
-					"createDirectory",
 					"editNotebook",
 					"newJupyterNotebook"
 				]
