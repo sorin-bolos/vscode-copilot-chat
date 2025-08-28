@@ -120,7 +120,6 @@ The extension provides a comprehensive set of tools for AI models:
 - **Search & Discovery**: `copilot_findTextInFiles`
 - **Code Analysis**: `copilot_listCodeUsages`, `copilot_getErrors`
 - **Development**: `copilot_runNotebookCell`, `copilot_getChangedFiles`, `copilot_createNewWorkspace`
-- **VS Code Integration**: `copilot_openSimpleBrowser`
 
 ### 5. Context & Intelligence (`src/extension/context/`, `src/extension/workspaceSemanticSearch/`)
 

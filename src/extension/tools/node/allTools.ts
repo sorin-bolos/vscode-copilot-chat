@@ -13,7 +13,6 @@ import './readFileTool';
 import './replaceStringTool';
 import './runNotebookCellTool';
 import './scmChangesTool';
-import './simpleBrowserTool';
 import './thinkTool';
 import './usagesTool';
 

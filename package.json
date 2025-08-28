@@ -362,27 +362,6 @@
 				}
 			},
 			{
-				"name": "copilot_openSimpleBrowser",
-				"displayName": "%copilot.tools.openSimpleBrowser.name%",
-				"modelDescription": "Preview a website or open a URL in the editor's Simple Browser. Useful for quickly viewing locally hosted websites, demos, or resources without leaving the coding environment.",
-				"userDescription": "%copilot.tools.openSimpleBrowser.description%",
-				"toolReferenceName": "openSimpleBrowser",
-				"canBeReferencedInPrompt": true,
-				"tags": [],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"url": {
-							"type": "string",
-							"description": "The website URL to preview or open in the Simple Browser inside the editor."
-						}
-					},
-					"required": [
-						"url"
-					]
-				}
-			},
-			{
 				"name": "copilot_replaceString",
 				"toolReferenceName": "replaceString",
 				"displayName": "%copilot.tools.replaceString.name%",
