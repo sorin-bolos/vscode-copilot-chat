@@ -30,7 +30,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 			[ToolName.FindTextInFiles]: true,
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
-			[ToolName.ListDirectory]: true,
 		},
 	}, {
 		allowParallelToolCalls: false,
@@ -66,7 +65,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 			[ToolName.FindTextInFiles]: true,
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
-			[ToolName.ListDirectory]: true,
 		},
 	}, {
 		allowParallelToolCalls: true,
@@ -139,7 +137,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 			[ToolName.FindTextInFiles]: true,
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
-			[ToolName.ListDirectory]: true,
 		},
 	}, {
 		allowParallelToolCalls: false,
@@ -181,7 +178,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 			[ToolName.FindTextInFiles]: true,
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
-			[ToolName.ListDirectory]: true,
 		},
 	}, {
 		allowParallelToolCalls: true,

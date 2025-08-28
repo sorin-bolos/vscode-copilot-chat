@@ -262,7 +262,6 @@
 	"copilot.tools.findTextInFiles.name": "Find Text In Files",
 	"copilot.tools.applyPatch.name": "Apply Patch",
 	"copilot.tools.readFile.name": "Read File",
-	"copilot.tools.listDirectory.name": "List Dir",
 	"copilot.tools.getTaskOutput.name": "Get Task Output",
 	"copilot.tools.getErrors.name": "Get Problems",
 	"copilot.tools.readProjectStructure.name": "Project Structure",

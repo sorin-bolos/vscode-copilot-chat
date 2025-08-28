@@ -16,7 +16,6 @@ import './getSearchViewResultsTool';
 import './githubRepoTool';
 import './insertEditTool';
 import './installExtensionTool';
-import './listDirTool';
 import './newNotebookTool';
 import './newWorkspace/newWorkspaceTool';
 import './newWorkspace/projectSetupInfoTool';

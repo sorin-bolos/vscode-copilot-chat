@@ -278,27 +278,6 @@
 				}
 			},
 			{
-				"name": "copilot_listDirectory",
-				"toolReferenceName": "listDirectory",
-				"displayName": "%copilot.tools.listDirectory.name%",
-				"modelDescription": "List the contents of a directory. Result will have the name of the child. If the name ends in /, it's a folder, otherwise a file",
-				"tags": [
-					"vscode_codesearch"
-				],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"path": {
-							"type": "string",
-							"description": "The absolute path to the directory to list."
-						}
-					},
-					"required": [
-						"path"
-					]
-				}
-			},
-			{
 				"name": "copilot_getErrors",
 				"displayName": "%copilot.tools.getErrors.name%",
 				"toolReferenceName": "problems",
@@ -370,7 +349,6 @@
 				"tags": [
 					"vscode_editing_with_tests",
 					"enable_other_tool_copilot_readFile",
-					"enable_other_tool_copilot_listDirectory",
 					"enable_other_tool_copilot_runTests"
 				],
 				"canBeReferencedInPrompt": true
@@ -950,7 +928,6 @@
 				"tools": [
 					"fileSearch",
 					"textSearch",
-					"listDirectory",
 					"readNotebookCellOutput",
 					"readFile"
 				]
