@@ -333,27 +333,6 @@
 				}
 			},
 			{
-				"name": "copilot_createNewJupyterNotebook",
-				"displayName": "Create New Jupyter Notebook",
-				"icon": "$(notebook)",
-				"toolReferenceName": "newJupyterNotebook",
-				"modelDescription": "Generates a new Jupyter Notebook (.ipynb) in VS Code. Jupyter Notebooks are interactive documents commonly used for data exploration, analysis, visualization, and combining code with narrative text. This tool should only be called when the user explicitly requests to create a new Jupyter Notebook.",
-				"userDescription": "%copilot.tools.newJupyterNotebook.description%",
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"query": {
-							"type": "string",
-							"description": "The query to use to generate the jupyter notebook. This should be a clear and concise description of the notebook the user wants to create."
-						}
-					},
-					"required": [
-						"query"
-					]
-				},
-				"tags": []
-			},
-			{
 				"name": "copilot_insertEdit",
 				"toolReferenceName": "insertEdit",
 				"displayName": "%copilot.tools.insertEdit.name%",

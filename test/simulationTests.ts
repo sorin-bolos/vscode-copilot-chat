@@ -9,7 +9,6 @@ import './e2e/fetchWebPageTool.stest';
 import './e2e/markdown.stest';
 import './e2e/newWorkspace.stest';
 import './e2e/notebook.stest';
-import './e2e/notebookTools.stest';
 import './e2e/pythonFix.stest';
 import './e2e/search.stest';
 import './e2e/semanticSearch.stest';

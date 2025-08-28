@@ -5,30 +5,12 @@
 import * as l10n from '@vscode/l10n';
 import { Raw } from '@vscode/prompt-tsx';
 import type { CancellationToken, ChatResponseFileTreePart, ChatResponseStream, NotebookDocument } from 'vscode';
-import { IChatMLFetcher, IResponsePart } from '../../../platform/chat/common/chatMLFetcher';
-import { ChatFetchResponseType, ChatLocation } from '../../../platform/chat/common/commonTypes';
-import { IConversationOptions } from '../../../platform/chat/common/conversationOptions';
 import { ILogService } from '../../../platform/log/common/logService';
-import { IResponseDelta } from '../../../platform/networking/common/fetch';
-import { IChatEndpoint } from '../../../platform/networking/common/networking';
-import { IAlternativeNotebookContentEditGenerator, NotebookEditGenerationTelemtryOptions, NotebookEditGenrationSource } from '../../../platform/notebook/common/alternativeContentEditGenerator';
-import { ITelemetryService } from '../../../platform/telemetry/common/telemetry';
-import { IWorkspaceService } from '../../../platform/workspace/common/workspaceService';
-import { extractCodeBlocks, filepathCodeBlockMarker } from '../../../util/common/markdown';
-import { extractNotebookOutline, INotebookSection } from '../../../util/common/notebooks';
-import { AsyncIterableObject, AsyncIterableSource, DeferredPromise } from '../../../util/vs/base/common/async';
-import { Lazy } from '../../../util/vs/base/common/lazy';
+import { extractNotebookOutline } from '../../../util/common/notebooks';
 import { IInstantiationService } from '../../../util/vs/platform/instantiation/common/instantiation';
-import { ChatResponseMarkdownPart, NotebookEdit, Uri, WorkspaceEdit } from '../../../vscodeTypes';
-import { ChatVariablesCollection } from '../../prompt/common/chatVariablesCollection';
 import { Turn } from '../../prompt/common/conversation';
 import { IBuildPromptContext } from '../../prompt/common/intents';
 import { IResponseProcessorContext } from '../../prompt/node/intents';
-import { LineFilters, LineOfText, streamLines } from '../../prompt/node/streamingEdits';
-import { renderPromptElement } from '../../prompts/node/base/promptRenderer';
-import { NewNotebookCodeGenerationPrompt, NewNotebookCodeImprovementPrompt } from '../../prompts/node/panel/newNotebook';
-import { sendEditNotebookTelemetry } from '../../tools/node/editNotebookTool';
-import { NewNotebookToolPrompt } from '../../tools/node/newNotebookTool';
 
 
 export class NewNotebookResponseProcessor {
@@ -147,62 +129,12 @@ export class NewNotebookResponseProcessor {
 		try {
 			const outline = extractNotebookOutline(this.messageText);
 			if (outline) {
-
-				const mockContext: IBuildPromptContext = this.context ?? {
-					query: '',
-					history: [],
-					chatVariables: new ChatVariablesCollection([]),
-				};
-
-				const { messages: generateMessages } = await renderPromptElement(
-					this.instantiationService,
-					this.endpoint,
-					NewNotebookToolPrompt,
-					{
-						outline: outline,
-						promptContext: mockContext,
-						originalCreateNotebookQuery: mockContext.query,
-						availableTools: this.context?.tools?.availableTools
-					}
-				);
-
-				const sourceStream = new AsyncIterableSource<string>();
-				const newNotebook = new Lazy(async () => {
-					const notebook = await this.workspaceService.openNotebookDocument('jupyter-notebook');
-					const updateMetadata = NotebookEdit.updateNotebookMetadata(Object.assign({ new_copilot_notebook: true }, notebook.metadata));
-					const workspaceEdit = new WorkspaceEdit();
-					workspaceEdit.set(notebook.uri, [updateMetadata]);
-					await this.workspaceService.applyEdit(workspaceEdit);
-					return notebook;
-				});
-				const sourceLines = filterFilePathFromCodeBlock2(streamLines(sourceStream.asyncIterable)
-					.filter(LineFilters.createCodeBlockFilter())
-					.map(line => {
-						newNotebook.value; // force the notebook to be created
-						return line;
-					}));
-				const created = this.createNewNotebook2(sourceLines, newNotebook.value, token);
-				async function finishedCb(text: string, index: number, delta: IResponseDelta): Promise<number | undefined> {
-					sourceStream.emitOne(delta.text);
-					return undefined;
-				}
-
-				const generateResponse = await this.endpoint.makeChatRequest(
-					'newNotebookCodeCell',
-					generateMessages,
-					finishedCb,
-					token,
-					ChatLocation.Panel
-				);
-				sourceStream.resolve();
-				if (generateResponse.type !== ChatFetchResponseType.Success) {
-					return [];
-				}
-				await created;
+				// Notebook outline detected, but tool functionality has been removed
+				outputStream.markdown('Notebook creation functionality is no longer available.');
 			} else {
 				this.logService.error('No Notebook outline found: ', this.messageText);
 			}
-		} catch (ex) {
+		} catch (ex: any) {
 			this.logService.error('Error creating new notebook: ', ex);
 		}
 
