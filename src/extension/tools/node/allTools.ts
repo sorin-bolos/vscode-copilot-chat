@@ -24,5 +24,4 @@ import './scmChangesTool';
 import './simpleBrowserTool';
 import './thinkTool';
 import './usagesTool';
-import './vscodeCmdTool';
 

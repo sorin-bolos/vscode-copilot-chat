@@ -333,38 +333,6 @@
 				}
 			},
 			{
-				"name": "copilot_runVscodeCommand",
-				"displayName": "Run VS Code Command",
-				"when": "config.github.copilot.chat.newWorkspaceCreation.enabled",
-				"toolReferenceName": "runVscodeCommand",
-				"modelDescription": "Run a command in VS Code. Use this tool to run a command in Visual Studio Code as part of a new workspace creation process only.",
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"commandId": {
-							"type": "string",
-							"description": "The ID of the command to execute. This should be in the format <command>."
-						},
-						"name": {
-							"type": "string",
-							"description": "The name of the command to execute. This should be a clear and concise description of the command."
-						},
-						"args": {
-							"type": "array",
-							"description": "The arguments to pass to the command. This should be an array of strings.",
-							"items": {
-								"type": "string"
-							}
-						}
-					},
-					"required": [
-						"commandId",
-						"name"
-					]
-				},
-				"tags": []
-			},
-			{
 				"name": "copilot_createNewJupyterNotebook",
 				"displayName": "Create New Jupyter Notebook",
 				"icon": "$(notebook)",
@@ -804,8 +772,7 @@
 				"description": "%copilot.toolSet.new.description%",
 				"icon": "$(new-folder)",
 				"tools": [
-					"newWorkspace",
-					"runVscodeCommand"
+					"newWorkspace"
 				]
 			}
 		],
