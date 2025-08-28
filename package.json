@@ -333,26 +333,6 @@
 				}
 			},
 			{
-				"name": "copilot_getProjectSetupInfo",
-				"displayName": "%github.copilot.tools.getProjectSetupInfo.name%",
-				"when": "config.github.copilot.chat.newWorkspaceCreation.enabled",
-				"toolReferenceName": "getProjectSetupInfo",
-				"modelDescription": "Do not call this tool without first calling the tool to create a workspace. This tool provides a project setup information for a Visual Studio Code workspace based on a project type and programming language.",
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"projectType": {
-							"type": "string",
-							"description": "The type of project to create. Supported values are: 'python-script', 'python-project', 'mcp-server', 'model-context-protocol-server', 'vscode-extension', 'next-js', 'vite' and 'other'"
-						}
-					},
-					"required": [
-						"projectType"
-					]
-				},
-				"tags": []
-			},
-			{
 				"name": "copilot_installExtension",
 				"displayName": "Install Extension in VS Code",
 				"when": "config.github.copilot.chat.newWorkspaceCreation.enabled",
@@ -851,7 +831,6 @@
 				"tools": [
 					"newWorkspace",
 					"runVscodeCommand",
-					"getProjectSetupInfo",
 					"installExtension"
 				]
 			}

@@ -17,7 +17,6 @@ import './githubRepoTool';
 import './insertEditTool';
 import './installExtensionTool';
 import './newNotebookTool';
-import './newWorkspace/projectSetupInfoTool';
 import './notebookSummaryTool';
 import './readFileTool';
 import './replaceStringTool';
