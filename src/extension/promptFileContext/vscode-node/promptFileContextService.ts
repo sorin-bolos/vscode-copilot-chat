@@ -112,7 +112,7 @@ export class PromptFileContextContribution extends Disposable {
 					},
 					{
 						name: '`tools` is optional and is an array that can consist of any number of the following values',
-						value: `'changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'new', 'problems', 'runCommands', 'runNotebooks', 'runTasks', 'runTests', 'search', 'usages'`
+						value: `'changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'new', 'problems', 'runCommands', 'runNotebooks', 'runTasks', 'runTests', 'search'`
 					},
 					{
 						name: 'Here is an example of a prompt file:',
@@ -121,7 +121,7 @@ export class PromptFileContextContribution extends Disposable {
 							`mode: 'agent'`,
 							`description: This prompt is used to generate a new issue template for GitHub repositories.`,
 							`model: ${this.models[0] || 'GPT-4.1'}`,
-							`tools: ['changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'new', 'problems', 'runCommands', 'runNotebooks', 'runTasks', 'runTests', 'search', 'usages']`,
+							`tools: ['changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'new', 'problems', 'runCommands', 'runNotebooks', 'runTasks', 'runTests', 'search']`,
 							`---`,
 							`Generate a new issue template for a GitHub repository.`,
 						].join('\n'),
@@ -160,7 +160,7 @@ export class PromptFileContextContribution extends Disposable {
 					},
 					{
 						name: '`tools` is optional and is an array that can consist of any number of the following values',
-						value: `'changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'new', 'problems', 'runCommands', 'runNotebooks', 'runTasks', 'runTests', 'search', 'usages'`
+						value: `'changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'new', 'problems', 'runCommands', 'runNotebooks', 'runTasks', 'runTests', 'search'`
 					},
 					{
 						name: 'Here is an example of a mode file:',
@@ -168,7 +168,7 @@ export class PromptFileContextContribution extends Disposable {
 							`---`,
 							`description: This mode is used to plan a new feature.`,
 							`model: GPT-4.1`,
-							`tools: ['changes', 'codebase','extensions', 'fetch', 'problems', 'search', 'usages']`,
+							`tools: ['changes', 'codebase','extensions', 'fetch', 'problems', 'search']`,
 							`---`,
 							`First come up with a plan for the new feature. Write a todo list of tasks to complete the feature.`,
 						].join('\n'),

@@ -12,7 +12,6 @@ export const enum ToolName {
 	ReadFile = 'read_file',
 	GetErrors = 'get_errors',
 	GetScmChanges = 'get_changed_files',
-	Usages = 'list_code_usages',
 	EditFile = 'insert_edit_into_file',
 	ReplaceString = 'replace_string_in_file',
 	EditNotebook = 'edit_notebook_file',
@@ -34,7 +33,6 @@ export const enum ToolName {
 // When updating this, also update contributedToolNameToToolNames
 export const enum ContributedToolName {
 	ApplyPatch = 'copilot_applyPatch',
-	Usages = 'copilot_listCodeUsages',
 	/** @deprecated moving to core soon */
 	RunTests = 'copilot_runTests1',
 	FindTextInFiles = 'copilot_findTextInFiles',
@@ -53,7 +51,6 @@ export const enum ContributedToolName {
 
 const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.ApplyPatch, ToolName.ApplyPatch],
-	[ContributedToolName.Usages, ToolName.Usages],
 	[ContributedToolName.FindTextInFiles, ToolName.FindTextInFiles],
 	[ContributedToolName.ReadFile, ToolName.ReadFile],
 	[ContributedToolName.GetErrors, ToolName.GetErrors],

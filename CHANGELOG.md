@@ -733,7 +733,7 @@ The following example shows a custom "Planning" chat mode:
 ```md
 ---
 description: Generate an implementation plan for new features or refactoring existing code.
-tools: ['codebase', 'fetch', 'search', 'usages']
+tools: ['codebase', 'fetch', 'search']
 ---
 # Planning mode instructions
 You are in planning mode. Your task is to generate an implementation plan for a new feature or for refactoring existing code.
@@ -1405,12 +1405,6 @@ Let us know how you use the `#fetch` tool, and what features you'd like to see f
 
 * Currently, JavaScript is disabled in this browser window. The tool will not be able to acquire much context if the website depends entirely on JavaScript to render content. This is a limitation we are considering changing and likely will change to allow JavaScript.
 * Due to the headless nature, we are unable to fetch pages that are behind authentication, as this headless browser exists in a different browser context than the browser you use. Instead, consider using [MCP](#model-context-protocol-server-support) to bring in an MCP server that is purpose-built for that target, or a generic browser MCP server such as the [Playwright MCP server](https://github.com/microsoft/playwright-mcp).
-
-##### Usages tool
-
-The `#usages` tool is a combination of "Find All References", "Find Implementation", and "Go to Definition". This tool can help chat to learn more about a function, class, or interface. For instance, chat can use this tool to look for sample implementations of an interface or to find all places that need to be changed when making a refactoring.
-
-In agent mode this tool will be picked up automatically but you can also reference it explicitly via `#usages`
 
 #### Create a new workspace with agent mode (Experimental)
 

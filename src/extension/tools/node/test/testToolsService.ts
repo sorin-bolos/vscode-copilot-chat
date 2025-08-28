@@ -21,8 +21,7 @@ export class TestToolsService extends BaseToolsService implements IToolsService 
 	_serviceBrand: undefined;
 
 	private static readonly ExcludedTools = [
-		ToolName.GetScmChanges,
-		ToolName.Usages
+		ToolName.GetScmChanges
 	];
 
 	private static readonly ContainerOnlyTools = [
