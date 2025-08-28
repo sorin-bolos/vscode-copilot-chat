@@ -168,28 +168,6 @@
 				}
 			},
 			{
-				"name": "copilot_getVSCodeAPI",
-				"toolReferenceName": "vscodeAPI",
-				"displayName": "%copilot.tools.getVSCodeAPI.name%",
-				"icon": "$(references)",
-				"userDescription": "%copilot.vscode.tool.description%",
-				"modelDescription": "Get relevant VS Code API references to answer questions about VS Code extension development. Use this tool when the user asks about VS Code APIs, capabilities, or best practices related to developing VS Code extensions. Use it in all VS Code extension development workspaces.",
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"query": {
-							"type": "string",
-							"description": "The query to search vscode documentation for. Should contain all relevant context."
-						}
-					},
-					"required": [
-						"query"
-					]
-				},
-				"tags": [],
-				"canBeReferencedInPrompt": true
-			},
-			{
 				"displayName": "%copilot.tools.think.name%",
 				"name": "copilot_think",
 				"tags": [],

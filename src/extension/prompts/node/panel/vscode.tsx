@@ -357,9 +357,6 @@ ms-python.python,ms-python.vscode-pylance
 						<TextChunk>{state.releaseNotes}</TextChunk>
 					</Tag>
 					</>}
-					<Tag name='vscodeAPIToolUseInstructions'>
-						Always call the tool {ToolName.VSCodeAPI} to get documented references and examples when before responding to questions about VS Code Extension Development.<br />
-					</Tag>
 					<Tag name='searchExtensionToolUseInstructions'>
 						Always call the tool 'vscode_searchExtensions_internal' to first search for extensions in the VS Code Marketplace before responding about extensions.<br />
 					</Tag>

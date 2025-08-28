@@ -33,6 +33,5 @@ import './testFailureTool';
 import './thinkTool';
 import './usagesTool';
 import './userPreferencesTool';
-import './vscodeAPITool';
 import './vscodeCmdTool';
 

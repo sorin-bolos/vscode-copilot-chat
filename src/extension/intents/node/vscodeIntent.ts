@@ -18,7 +18,6 @@ import { IBuildPromptContext } from '../../prompt/common/intents';
 import { IIntent, IIntentInvocation, IIntentInvocationContext, IIntentSlashCommandInfo, IntentLinkificationOptions, IResponseProcessorContext } from '../../prompt/node/intents';
 import { PromptRenderer, RendererIntentInvocation } from '../../prompts/node/base/promptRenderer';
 import { VscodePrompt } from '../../prompts/node/panel/vscode';
-import { ToolName } from '../../tools/common/toolNames';
 import { IToolsService } from '../../tools/common/toolsService';
 
 
@@ -52,8 +51,7 @@ class VSCodeIntentInvocation extends RendererIntentInvocation implements IIntent
 
 	getAvailableTools(): vscode.LanguageModelToolInformation[] | Promise<vscode.LanguageModelToolInformation[]> | undefined {
 		return this.toolsService.getEnabledTools(this.request, tool =>
-			tool.name === 'vscode_searchExtensions_internal' ||
-			tool.name === ToolName.VSCodeAPI
+			tool.name === 'vscode_searchExtensions_internal'
 		);
 	}
 }

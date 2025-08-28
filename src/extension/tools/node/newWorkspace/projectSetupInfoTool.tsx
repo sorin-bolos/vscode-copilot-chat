@@ -56,8 +56,7 @@ const setupInfo: ProjectSetupInfo[] = [
 		rules: [
 			'Follow these rules strictly and do not deviate from them.',
 			'1. Do not remove any arguments from the command. You can only add arguments if the user requests them.',
-			`2. Call the tool ${ToolName.VSCodeAPI} with the users query to get the relevant references. `,
-			`3. After the tool ${ToolName.VSCodeAPI} has completed, only then begin to modify the project.`,
+			'2. Begin to modify the project based on the user requirements.',
 		]
 	},
 	{

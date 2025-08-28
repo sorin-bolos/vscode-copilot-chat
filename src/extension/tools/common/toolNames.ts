@@ -7,7 +7,6 @@ import { cloneAndChange } from '../../../util/vs/base/common/objects';
 
 export const enum ToolName {
 	ApplyPatch = 'apply_patch',
-	VSCodeAPI = 'get_vscode_api',
 	TestFailure = 'test_failure',
 	RunTests = 'run_tests',
 	FindFiles = 'file_search',
@@ -57,7 +56,6 @@ export const enum ContributedToolName {
 	ApplyPatch = 'copilot_applyPatch',
 	Usages = 'copilot_listCodeUsages',
 	UpdateUserPreferences = 'copilot_updateUserPreferences',
-	VSCodeAPI = 'copilot_getVSCodeAPI',
 	TestFailure = 'copilot_testFailure',
 	/** @deprecated moving to core soon */
 	RunTests = 'copilot_runTests1',
@@ -96,7 +94,6 @@ export const enum ContributedToolName {
 const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.ApplyPatch, ToolName.ApplyPatch],
 	[ContributedToolName.Usages, ToolName.Usages],
-	[ContributedToolName.VSCodeAPI, ToolName.VSCodeAPI],
 	[ContributedToolName.TestFailure, ToolName.TestFailure],
 	[ContributedToolName.FindFiles, ToolName.FindFiles],
 	[ContributedToolName.FindTextInFiles, ToolName.FindTextInFiles],

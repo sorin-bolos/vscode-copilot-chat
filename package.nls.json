@@ -258,7 +258,6 @@
 	"copilot.tools.fetchWebPage.description": "Fetch the main content from a web page. You should include the URL of the page you want to fetch.",
 	"copilot.tools.searchCodebase.name": "Codebase",
 	"copilot.tools.listCodeUsages.name": "Find Usages",
-	"copilot.tools.getVSCodeAPI.name": "Get VS Code API References",
 	"copilot.tools.think.name": "Think",
 	"copilot.tools.findFiles.name": "Find Files",
 	"copilot.tools.findTextInFiles.name": "Find Text In Files",
