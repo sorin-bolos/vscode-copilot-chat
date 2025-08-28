@@ -21,7 +21,6 @@ export const enum ToolName {
 	Think = 'think',
 	FetchWebPage = 'fetch_webpage',
 	SearchViewResults = 'get_search_view_results',
-	GithubRepo = 'github_repo',
 	SimpleBrowser = 'open_simple_browser',
 	GetTaskOutput = 'get_task_output',
 	CoreManageTodoList = 'manage_todo_list',
@@ -52,7 +51,6 @@ export const enum ContributedToolName {
 	Think = 'copilot_think',
 	FetchWebPage = 'copilot_fetchWebPage',
 	SearchViewResults = 'copilot_getSearchResults',
-	GithubRepo = 'copilot_githubRepo',
 	CreateAndRunTask = 'copilot_createAndRunTask',
 	SimpleBrowser = 'copilot_openSimpleBrowser',
 }
@@ -72,7 +70,6 @@ const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.RunNotebookCell, ToolName.RunNotebookCell],
 	[ContributedToolName.GetNotebookSummary, ToolName.GetNotebookSummary],
 	[ContributedToolName.SearchViewResults, ToolName.SearchViewResults],
-	[ContributedToolName.GithubRepo, ToolName.GithubRepo],
 	[ContributedToolName.SimpleBrowser, ToolName.SimpleBrowser],
 ]);
 

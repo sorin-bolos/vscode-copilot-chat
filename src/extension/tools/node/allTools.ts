@@ -8,7 +8,6 @@ import './editNotebookTool';
 import './findTextInFilesTool';
 import './getErrorsTool';
 import './getSearchViewResultsTool';
-import './githubRepoTool';
 import './insertEditTool';
 import './notebookSummaryTool';
 import './readFileTool';
