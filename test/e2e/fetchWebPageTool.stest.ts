@@ -32,7 +32,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
 			[ToolName.ListDirectory]: true,
-			[ToolName.SearchWorkspaceSymbols]: true,
 		},
 	}, {
 		allowParallelToolCalls: false,
@@ -70,7 +69,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
 			[ToolName.ListDirectory]: true,
-			[ToolName.SearchWorkspaceSymbols]: true,
 		},
 	}, {
 		allowParallelToolCalls: true,
@@ -145,7 +143,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
 			[ToolName.ListDirectory]: true,
-			[ToolName.SearchWorkspaceSymbols]: true,
 		},
 	}, {
 		allowParallelToolCalls: false,
@@ -189,7 +186,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'fetchWebPageTool', subtitle: 'to
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
 			[ToolName.ListDirectory]: true,
-			[ToolName.SearchWorkspaceSymbols]: true,
 		},
 	}, {
 		allowParallelToolCalls: true,

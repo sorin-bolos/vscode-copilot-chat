@@ -137,29 +137,6 @@
 	"contributes": {
 		"languageModelTools": [
 			{
-				"name": "copilot_searchWorkspaceSymbols",
-				"toolReferenceName": "symbols",
-				"displayName": "%copilot.tools.searchWorkspaceSymbols.name%",
-				"icon": "$(symbol)",
-				"userDescription": "%copilot.workspaceSymbols.tool.description%",
-				"modelDescription": "Search the user's workspace for code symbols using language services. Use this tool when the user is looking for a specific symbol in their workspace.",
-				"tags": [
-					"vscode_codesearch"
-				],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"symbolName": {
-							"type": "string",
-							"description": "The symbol to search for, such as a function name, class name, or variable name."
-						}
-					},
-					"required": [
-						"symbolName"
-					]
-				}
-			},
-			{
 				"name": "copilot_listCodeUsages",
 				"toolReferenceName": "usages",
 				"displayName": "%copilot.tools.listCodeUsages.name%",

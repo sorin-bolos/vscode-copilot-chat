@@ -27,7 +27,6 @@ import './readProjectStructureTool';
 import './replaceStringTool';
 import './runNotebookCellTool';
 import './scmChangesTool';
-import './searchWorkspaceSymbolsTool';
 import './simpleBrowserTool';
 import './terminalStateTools';
 import './testFailureTool';

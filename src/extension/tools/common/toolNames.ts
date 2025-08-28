@@ -22,7 +22,6 @@ export const enum ToolName {
 	TerminalLastCommand = 'get_terminal_last_command',
 	CreateNewWorkspace = 'create_new_workspace',
 	CreateNewJupyterNotebook = 'create_new_jupyter_notebook',
-	SearchWorkspaceSymbols = 'search_workspace_symbols',
 	Usages = 'list_code_usages',
 	EditFile = 'insert_edit_into_file',
 	CreateFile = 'create_file',
@@ -56,7 +55,6 @@ export const enum ToolName {
 // When updating this, also update contributedToolNameToToolNames
 export const enum ContributedToolName {
 	ApplyPatch = 'copilot_applyPatch',
-	SearchWorkspaceSymbols = 'copilot_searchWorkspaceSymbols',
 	Usages = 'copilot_listCodeUsages',
 	UpdateUserPreferences = 'copilot_updateUserPreferences',
 	VSCodeAPI = 'copilot_getVSCodeAPI',
@@ -97,7 +95,6 @@ export const enum ContributedToolName {
 
 const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.ApplyPatch, ToolName.ApplyPatch],
-	[ContributedToolName.SearchWorkspaceSymbols, ToolName.SearchWorkspaceSymbols],
 	[ContributedToolName.Usages, ToolName.Usages],
 	[ContributedToolName.VSCodeAPI, ToolName.VSCodeAPI],
 	[ContributedToolName.TestFailure, ToolName.TestFailure],

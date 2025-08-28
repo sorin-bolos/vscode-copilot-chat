@@ -405,7 +405,6 @@ class CodesearchModeInstructions extends PromptElement<DefaultAgentPromptProps> 
 				These instructions only apply when the question is about the user's workspace.<br />
 				Unless it is clear that the user's question relates to the current workspace, you should avoid using the code search tools and instead prefer to answer the user's question directly.<br />
 				Remember that you can call multiple tools in one response.<br />
-				Prefer {ToolName.SearchWorkspaceSymbols} over {ToolName.FindTextInFiles} when you have precise code identifiers to search for.<br />
 				Use {ToolName.FindTextInFiles} when you have precise keywords to search for.<br />
 				The tools {ToolName.FindFiles}, {ToolName.FindTextInFiles}, and {ToolName.GetScmChanges} are deterministic and comprehensive, so do not repeatedly invoke them with the same arguments.<br />
 			</Tag>

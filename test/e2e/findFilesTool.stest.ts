@@ -27,7 +27,6 @@ ssuite.optional(shouldSkipAgentTests, { title: 'findFilesTool', subtitle: 'toolC
 			[ToolName.ReadFile]: true,
 			[ToolName.EditFile]: true,
 			[ToolName.ListDirectory]: true,
-			[ToolName.SearchWorkspaceSymbols]: true,
 		},
 	}, {
 		allowParallelToolCalls: true,
