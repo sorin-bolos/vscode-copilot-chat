@@ -21,7 +21,6 @@ import './newWorkspace/newWorkspaceTool';
 import './newWorkspace/projectSetupInfoTool';
 import './notebookSummaryTool';
 import './readFileTool';
-import './readProjectStructureTool';
 import './replaceStringTool';
 import './runNotebookCellTool';
 import './scmChangesTool';

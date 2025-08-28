@@ -300,12 +300,6 @@
 				}
 			},
 			{
-				"name": "copilot_readProjectStructure",
-				"displayName": "%copilot.tools.readProjectStructure.name%",
-				"modelDescription": "Get a file tree representation of the workspace.",
-				"tags": []
-			},
-			{
 				"name": "copilot_getChangedFiles",
 				"displayName": "%copilot.tools.getChangedFiles.name%",
 				"toolReferenceName": "changes",

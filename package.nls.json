@@ -264,7 +264,6 @@
 	"copilot.tools.readFile.name": "Read File",
 	"copilot.tools.getTaskOutput.name": "Get Task Output",
 	"copilot.tools.getErrors.name": "Get Problems",
-	"copilot.tools.readProjectStructure.name": "Project Structure",
 	"copilot.tools.getChangedFiles.name": "Git Changes",
 	"copilot.tools.testFailure.name": "Test Failure",
 	"copilot.tools.openSimpleBrowser.name": "Open Simple Browser",
