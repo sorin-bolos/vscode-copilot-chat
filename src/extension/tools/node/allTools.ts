@@ -10,7 +10,6 @@ import './editNotebookTool';
 import './findTestsFilesTool';
 import './findTextInFilesTool';
 import './getErrorsTool';
-import './getNotebookCellOutputTool';
 import './getSearchViewResultsTool';
 import './githubRepoTool';
 import './insertEditTool';

@@ -543,34 +543,6 @@
 				}
 			},
 			{
-				"name": "copilot_readNotebookCellOutput",
-				"displayName": "%copilot.tools.getNotebookCellOutput.name%",
-				"toolReferenceName": "readNotebookCellOutput",
-				"canBeReferencedInPrompt": true,
-				"icon": "$(notebook-render-output)",
-				"modelDescription": "This tool will retrieve the output for a notebook cell from its most recent execution or restored from disk. The cell may have output even when it has not been run in the current kernel session. This tool has a higher token limit for output length than the runNotebookCell tool.",
-				"userDescription": "%copilot.tools.getNotebookCellOutput.description%",
-				"when": "userHasOpenedNotebook",
-				"tags": [],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"filePath": {
-							"type": "string",
-							"description": "An absolute path to the notebook file with the cell to run, or the URI of a untitled, not yet named, file, such as `untitled:Untitled-1.ipynb"
-						},
-						"cellId": {
-							"type": "string",
-							"description": "The ID of the cell for which output should be retrieved."
-						}
-					},
-					"required": [
-						"filePath",
-						"cellId"
-					]
-				}
-			},
-			{
 				"name": "copilot_fetchWebPage",
 				"displayName": "%copilot.tools.fetchWebPage.name%",
 				"toolReferenceName": "fetch",
@@ -706,8 +678,7 @@
 				"icon": "$(notebook)",
 				"tools": [
 					"runCell",
-					"getNotebookSummary",
-					"readNotebookCellOutput"
+					"getNotebookSummary"
 				]
 			},
 			{
@@ -717,7 +688,6 @@
 				"tools": [
 					"fileSearch",
 					"textSearch",
-					"readNotebookCellOutput",
 					"readFile"
 				]
 			},

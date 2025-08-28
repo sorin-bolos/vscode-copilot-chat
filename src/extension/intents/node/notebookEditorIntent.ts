@@ -48,7 +48,6 @@ const getTools = (instaService: IInstantiationService, request: vscode.ChatReque
 		lookForTools.add(ToolName.EditNotebook);
 		lookForTools.add(ToolName.GetNotebookSummary);
 		lookForTools.add(ToolName.RunNotebookCell);
-		lookForTools.add(ToolName.ReadCellOutput);
 
 		return toolsService.getEnabledTools(request, tool => lookForTools.has(tool.name) || tool.tags.includes('notebooks'));
 	});
