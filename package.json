@@ -333,49 +333,6 @@
 				}
 			},
 			{
-				"name": "copilot_getTerminalSelection",
-				"toolReferenceName": "terminalSelection",
-				"displayName": "%github.copilot.tools.terminalSelection.name%",
-				"modelDescription": "Get the user's current selection in the active terminal.",
-				"userDescription": "%github.copilot.tools.terminalSelection.description%",
-				"canBeReferencedInPrompt": true,
-				"icon": "$(terminal)"
-			},
-			{
-				"name": "copilot_getTerminalLastCommand",
-				"toolReferenceName": "terminalLastCommand",
-				"displayName": "%github.copilot.tools.terminalLastCommand.name%",
-				"modelDescription": "Get the active terminal's last run command.",
-				"userDescription": "%github.copilot.tools.terminalLastCommand.description%",
-				"canBeReferencedInPrompt": true,
-				"icon": "$(terminal)"
-			},
-			{
-				"name": "copilot_createNewWorkspace",
-				"displayName": "%github.copilot.tools.createNewWorkspace.name%",
-				"toolReferenceName": "newWorkspace",
-				"icon": "$(new-folder)",
-				"userDescription": "%github.copilot.tools.createNewWorkspace.userDescription%",
-				"when": "config.github.copilot.chat.newWorkspaceCreation.enabled",
-				"modelDescription": "Get steps to help the user create any project in a VS Code workspace. Use this tool to help users set up new projects, including TypeScript-based projects, Model Context Protocol (MCP) servers, VS Code extensions, Next.js projects, Vite projects, or any other project.",
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"query": {
-							"type": "string",
-							"description": "The query to use to generate the new workspace. This should be a clear and concise description of the workspace the user wants to create."
-						}
-					},
-					"required": [
-						"query"
-					]
-				},
-				"tags": [
-					"enable_other_tool_install_extension",
-					"enable_other_tool_get_project_setup_info"
-				]
-			},
-			{
 				"name": "copilot_getProjectSetupInfo",
 				"displayName": "%github.copilot.tools.getProjectSetupInfo.name%",
 				"when": "config.github.copilot.chat.newWorkspaceCreation.enabled",
@@ -1669,26 +1626,6 @@
 				"category": "Developer"
 			},
 			{
-				"command": "github.copilot.terminal.explainTerminalSelection",
-				"title": "%github.copilot.command.explainTerminalSelection%",
-				"category": "GitHub Copilot"
-			},
-			{
-				"command": "github.copilot.terminal.explainTerminalSelectionContextMenu",
-				"title": "%github.copilot.command.explainTerminalSelectionContextMenu%",
-				"category": "GitHub Copilot"
-			},
-			{
-				"command": "github.copilot.terminal.explainTerminalLastCommand",
-				"title": "%github.copilot.command.explainTerminalLastCommand%",
-				"category": "GitHub Copilot"
-			},
-			{
-				"command": "github.copilot.terminal.attachTerminalSelection",
-				"title": "%github.copilot.command.attachTerminalSelection%",
-				"category": "GitHub Copilot"
-			},
-			{
 				"command": "github.copilot.git.generateCommitMessage",
 				"title": "%github.copilot.git.generateCommitMessage%",
 				"icon": "$(sparkle)",
@@ -2670,16 +2607,6 @@
 					"group": "copilotAction@5"
 				}
 			],
-			"terminal/context/chat": [
-				{
-					"command": "github.copilot.terminal.explainTerminalSelectionContextMenu",
-					"group": "copilotAction@1"
-				},
-				{
-					"command": "github.copilot.terminal.attachTerminalSelection",
-					"group": "zEditContext@1"
-				}
-			],
 			"commandPalette": [
 				{
 					"command": "github.copilot.interactiveSession.feedback",
@@ -2695,10 +2622,6 @@
 				},
 				{
 					"command": "github.copilot.chat.startCopilotDebugCommand",
-					"when": "false"
-				},
-				{
-					"command": "github.copilot.terminal.explainTerminalSelectionContextMenu",
 					"when": "false"
 				},
 				{
