@@ -15,7 +15,6 @@ import { ExplainIntent } from './explainIntent';
 import { FixIntent } from './fixIntent';
 import { GenerateCodeIntent } from './generateCodeIntent';
 import { NewWorkspaceIntent } from './newIntent';
-import { NotebookEditorIntent } from './notebookEditorIntent';
 import { ReviewIntent } from './reviewIntent';
 import { SearchIntent } from './searchIntent';
 import { SearchKeywordsIntent } from './searchKeywordsIntent';
@@ -48,6 +47,5 @@ IntentRegistry.setIntents([
 	new SyncDescriptor(SetupTestsIntent),
 	new SyncDescriptor(SearchPanelIntent),
 	new SyncDescriptor(SearchKeywordsIntent),
-	new SyncDescriptor(AskAgentIntent),
-	new SyncDescriptor(NotebookEditorIntent)
+	new SyncDescriptor(AskAgentIntent)
 ]);

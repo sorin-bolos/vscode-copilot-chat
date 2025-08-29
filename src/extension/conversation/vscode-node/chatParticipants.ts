@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 import * as vscode from 'vscode';
 import { IAuthenticationService } from '../../../platform/authentication/common/authentication';
-import { IChatAgentService, defaultAgentName, editingSessionAgent2Name, editingSessionAgentEditorName, editingSessionAgentName, editorAgentName, editsAgentName, getChatParticipantIdFromName, notebookEditorAgentName, terminalAgentName, vscodeAgentName } from '../../../platform/chat/common/chatAgents';
+import { IChatAgentService, defaultAgentName, editingSessionAgent2Name, editingSessionAgentEditorName, editingSessionAgentName, editorAgentName, editsAgentName, getChatParticipantIdFromName, terminalAgentName, vscodeAgentName } from '../../../platform/chat/common/chatAgents';
 import { IChatQuotaService } from '../../../platform/chat/common/chatQuotaService';
 import { IInteractionService } from '../../../platform/chat/common/interactionService';
 import { ConfigKey, IConfigurationService } from '../../../platform/configuration/common/configurationService';
@@ -81,8 +81,6 @@ class ChatAgents implements IDisposable {
 		this._disposables.add(this.registerEditingAgentEditor());
 		this._disposables.add(this.registerEditsAgent());
 		this._disposables.add(this.registerEditorDefaultAgent());
-		this._disposables.add(this.registerNotebookEditorDefaultAgent());
-		this._disposables.add(this.registerNotebookDefaultAgent());
 		this._disposables.add(this.registerVSCodeAgent());
 		this._disposables.add(this.registerTerminalAgent());
 	}
@@ -212,20 +210,6 @@ Learn more about [GitHub Copilot](https://docs.github.com/copilot/using-github-c
 
 	private registerEditorDefaultAgent(): IDisposable {
 		const defaultAgent = this.createAgent(editorAgentName, Intent.Editor);
-		defaultAgent.iconPath = new vscode.ThemeIcon('copilot');
-
-		return defaultAgent;
-	}
-
-	private registerNotebookEditorDefaultAgent(): IDisposable {
-		const defaultAgent = this.createAgent('notebook', Intent.Editor);
-		defaultAgent.iconPath = new vscode.ThemeIcon('copilot');
-
-		return defaultAgent;
-	}
-
-	private registerNotebookDefaultAgent(): IDisposable {
-		const defaultAgent = this.createAgent(notebookEditorAgentName, Intent.notebookEditor);
 		defaultAgent.iconPath = new vscode.ThemeIcon('copilot');
 
 		return defaultAgent;
