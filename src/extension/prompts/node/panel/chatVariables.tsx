@@ -32,7 +32,6 @@ import { IAlternativeNotebookContentService } from '../../../../platform/noteboo
 import { IPromptPathRepresentationService } from '../../../../platform/prompts/common/promptPathRepresentationService';
 import { ITelemetryService } from '../../../../platform/telemetry/common/telemetry';
 import { IWorkspaceService } from '../../../../platform/workspace/common/workspaceService';
-import { createFencedCodeBlock } from '../../../../util/common/markdown';
 import { getNotebookAndCellFromUri } from '../../../../util/common/notebooks';
 import { isLocation } from '../../../../util/common/types';
 import { CancellationToken } from '../../../../util/vs/base/common/cancellation';
@@ -72,14 +71,11 @@ import {
 	ToolResult,
 	ToolResultMetadata,
 } from './toolCalling';
-import {
-	IFileTreeData,
-	workspaceVisualFileTree,
-} from './workspace/visualFileTree';
+// Removed workspace imports - workspace participant removed
 
 export interface ChatVariablesProps
 	extends BasePromptElementProps,
-		EmbeddedInsideUserMessage {
+	EmbeddedInsideUserMessage {
 	readonly chatVariables: ChatVariablesCollection;
 	readonly includeFilepath?: boolean;
 	readonly omitReferences?: boolean;
@@ -154,7 +150,7 @@ export class UserQuery extends PromptElement<QueryProps, void> {
 
 export interface ChatVariablesAndQueryProps
 	extends BasePromptElementProps,
-		EmbeddedInsideUserMessage {
+	EmbeddedInsideUserMessage {
 	readonly query: string;
 	readonly chatVariables: ChatVariablesCollection;
 	/**
@@ -284,7 +280,7 @@ export async function renderChatVariables(
 			try {
 				const stat = await fileSystemService.stat(uri);
 				isDirectory = stat.type === FileType.Directory;
-			} catch {}
+			} catch { }
 
 			if (isDirectory) {
 				elements.push(
@@ -475,12 +471,10 @@ interface IFolderVariableProps extends BasePromptElementProps {
 
 class FolderVariable extends PromptElement<
 	IFolderVariableProps,
-	IFileTreeData | undefined
+	undefined
 > {
 	constructor(
 		props: PromptElementProps<IFolderVariableProps>,
-		@IInstantiationService
-		private readonly instantiationService: IInstantiationService,
 		@IPromptPathRepresentationService
 		private readonly promptPathRepresentationService: IPromptPathRepresentationService,
 	) {
@@ -489,23 +483,12 @@ class FolderVariable extends PromptElement<
 
 	override async prepare(
 		sizing: PromptSizing,
-	): Promise<IFileTreeData | undefined> {
-		try {
-			return this.instantiationService.invokeFunction((accessor) =>
-				workspaceVisualFileTree(
-					accessor,
-					this.props.folderUri,
-					{ maxLength: 2000, excludeDotFiles: false },
-					CancellationToken.None,
-				),
-			);
-		} catch {
-			// Directory doesn't exist or is not accessible
-			return undefined;
-		}
+	): Promise<undefined> {
+		// Folder visualization removed with workspace participant
+		return undefined;
 	}
 
-	render(state: IFileTreeData | undefined) {
+	render(state: undefined) {
 		const folderPath = this.promptPathRepresentationService.getFilePath(
 			this.props.folderUri,
 		);
@@ -532,10 +515,6 @@ class FolderVariable extends PromptElement<
 						? this.props.description + ':\n'
 						: ''}
 					The user attached the folder `{folderPath}`
-					{state
-						? ' which has the following structure: ' +
-							createFencedCodeBlock('', state.tree)
-						: ''}
 				</TextChunk>
 			</Tag>
 		);
@@ -544,7 +523,7 @@ class FolderVariable extends PromptElement<
 
 export interface ChatToolCallProps
 	extends GenericBasePromptElementProps,
-		EmbeddedInsideUserMessage {}
+	EmbeddedInsideUserMessage { }
 
 interface IToolCallResult {
 	readonly name: string | undefined;
@@ -599,9 +578,9 @@ export class ChatToolReferences extends PromptElement<ChatToolCallProps, void> {
 
 			const name = toolReference.range
 				? this.props.promptContext.query.slice(
-						toolReference.range[0],
-						toolReference.range[1],
-					)
+					toolReference.range[0],
+					toolReference.range[1],
+				)
 				: undefined;
 			try {
 				const result = await this.toolsService.invokeTool(

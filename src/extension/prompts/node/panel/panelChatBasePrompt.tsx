@@ -27,10 +27,10 @@ import { CodeBlockFormattingRules } from './codeBlockFormattingRules';
 import { HistoryWithInstructions } from './conversationHistory';
 import { CustomInstructions } from './customInstructions';
 import { ProjectLabels } from './projectLabels';
-import { WorkspaceFoldersHint } from './workspace/workspaceFoldersHint';
+// Removed workspace folders hint import - workspace participant removed
 
 export interface PanelChatBasePromptProps
-	extends GenericBasePromptElementProps {}
+	extends GenericBasePromptElementProps { }
 
 export class PanelChatBasePrompt extends PromptElement<PanelChatBasePromptProps> {
 	constructor(
@@ -61,7 +61,7 @@ export class PanelChatBasePrompt extends PromptElement<PanelChatBasePromptProps>
 					<CopilotIdentityRules />
 					<SafetyRules />
 					<Capabilities location={ChatLocation.Panel} />
-					<WorkspaceFoldersHint flexGrow={1} priority={800} />
+					{/* Removed WorkspaceFoldersHint - workspace participant removed */}
 					{/* Only include current date when not running simulations, since if we generate cache entries with the current date, the cache will be invalidated every day */}
 					{!this.envService.isSimulation() && (
 						<>

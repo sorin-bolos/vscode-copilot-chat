@@ -63,19 +63,6 @@ function detectedParticipantToIntentId(detected: ChatParticipantDetectionResult)
 			return 'unknown';
 		case 'github.copilot.terminalPanel':
 			return 'terminalExplain';
-		case 'github.copilot.workspace':
-			switch (detected.command) {
-				case 'new':
-					return 'new';
-				case 'newNotebook':
-					return 'newNotebook';
-				case 'tests':
-					return 'tests';
-				case 'setupTests':
-					return 'setupTests';
-				default:
-					return 'workspace';
-			}
 		case 'github.copilot.vscode':
 			return 'vscode';
 		case 'github.copilot-dynamic.platform':

@@ -79,7 +79,7 @@ import {
 } from '../panel/notebookEditCodePrompt';
 import { UserPreferences } from '../panel/preferences';
 import { ChatToolCalls } from '../panel/toolCalling';
-import { MultirootWorkspaceStructure } from '../panel/workspace/workspaceStructure';
+// Removed MultirootWorkspaceStructure import - workspace participant removed
 import { AgentConversationHistory } from './agentConversationHistory';
 import {
 	AlternateGPTPrompt,
@@ -331,10 +331,7 @@ class GlobalAgentContext extends PromptElement<GlobalAgentContextProps> {
 				<Tag name="workspace_info">
 					<AgentTasksInstructions />
 					<WorkspaceFoldersHint />
-					<MultirootWorkspaceStructure
-						maxSize={2000}
-						excludeDotFiles={true}
-					/>
+					{/* Removed MultirootWorkspaceStructure - workspace participant removed */}
 					<br />
 					This is the state of the context at this point in the
 					conversation. The view of the workspace structure may be

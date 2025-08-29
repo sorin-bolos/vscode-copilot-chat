@@ -35,8 +35,6 @@ To access GitHub Copilot, an active GitHub Copilot subscription is required. You
 
 **Ask Copilot for help with any task or question** in the [Chat view](https://aka.ms/vscode-chat), bringing in code from your current files. Rather than giving you a generic answer, it can give answers that are relevant for your codebase using information provided by [participants](https://aka.ms/vscode-chat-participants), [variables](https://aka.ms/vscode-chat-variables), and [slash commands](https://aka.ms/vscode-chat-commands).
 
-![Using the workspace chat participant](https://github.com/microsoft/vscode-copilot-release/blob/main/images/participants-workspace.gif?raw=true)
-
 **Apply Copilot's AI suggestions directly to your code** using [Inline chat](https://aka.ms/vscode-inline-chat), staying in the flow. Need help with refactoring a method, adding error handling, or explaining a complex algorithm - just launch Copilot in the editor!
 
 ![Inline chat in VS Code](https://code.visualstudio.com/assets/docs/copilot/copilot-chat/inline-chat-question-example.png)

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 import * as vscode from 'vscode';
 import { IAuthenticationService } from '../../../platform/authentication/common/authentication';
-import { IChatAgentService, defaultAgentName, editingSessionAgent2Name, editingSessionAgentEditorName, editingSessionAgentName, editorAgentName, editsAgentName, getChatParticipantIdFromName, notebookEditorAgentName, terminalAgentName, vscodeAgentName, workspaceAgentName } from '../../../platform/chat/common/chatAgents';
+import { IChatAgentService, defaultAgentName, editingSessionAgent2Name, editingSessionAgentEditorName, editingSessionAgentName, editorAgentName, editsAgentName, getChatParticipantIdFromName, notebookEditorAgentName, terminalAgentName, vscodeAgentName } from '../../../platform/chat/common/chatAgents';
 import { IChatQuotaService } from '../../../platform/chat/common/chatQuotaService';
 import { IInteractionService } from '../../../platform/chat/common/interactionService';
 import { ConfigKey, IConfigurationService } from '../../../platform/configuration/common/configurationService';
@@ -83,7 +83,6 @@ class ChatAgents implements IDisposable {
 		this._disposables.add(this.registerEditorDefaultAgent());
 		this._disposables.add(this.registerNotebookEditorDefaultAgent());
 		this._disposables.add(this.registerNotebookDefaultAgent());
-		this._disposables.add(this.registerWorkspaceAgent());
 		this._disposables.add(this.registerVSCodeAgent());
 		this._disposables.add(this.registerTerminalAgent());
 	}
@@ -106,14 +105,6 @@ class ChatAgents implements IDisposable {
 		}));
 
 		return agent;
-	}
-
-	private registerWorkspaceAgent(): IDisposable {
-		const workspaceAgent = this.createAgent(workspaceAgentName, Intent.Workspace);
-
-		workspaceAgent.iconPath = new vscode.ThemeIcon('code');
-
-		return workspaceAgent;
 	}
 
 	private registerVSCodeAgent(): IDisposable {

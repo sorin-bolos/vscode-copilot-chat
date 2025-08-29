@@ -61,9 +61,10 @@ import { ResponseTranslationRules } from '../../../prompts/node/base/responseTra
 import { SafetyRules } from '../../../prompts/node/base/safetyRules';
 import { ChatVariablesAndQuery } from '../../../prompts/node/panel/chatVariables';
 import { EditorIntegrationRules } from '../../../prompts/node/panel/editorIntegrationRules';
-import { WorkspaceStructure } from '../../../prompts/node/panel/workspace/workspaceStructure';
 import { SetupTestFileScheme } from '../../../testing/common/files';
 import { SetupTestsFrameworkQueryInvocationRaw } from './setupTestsFrameworkQueryInvocation';
+// Removed workspace imports - workspace participant removed
+const WorkspaceStructure = () => null;
 
 export class SetupTestsInvocation implements IIntentInvocation {
 	private delegatedSetup?: SetupConfirmationResult;
@@ -84,7 +85,7 @@ export class SetupTestsInvocation implements IIntentInvocation {
 		private readonly extensionsService: IExtensionsService,
 		@IRunCommandExecutionService
 		private readonly commandService: IRunCommandExecutionService,
-	) {}
+	) { }
 
 	async buildPrompt(
 		context: IBuildPromptContext,

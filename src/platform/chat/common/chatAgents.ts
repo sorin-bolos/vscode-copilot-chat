@@ -15,7 +15,6 @@ export interface IChatAgentService {
 
 export const defaultAgentName = 'default';
 export const editorAgentName = 'editor';
-export const workspaceAgentName = 'workspace';
 export const vscodeAgentName = 'vscode';
 export const terminalAgentName = 'terminal';
 export const editingSessionAgentName = 'editingSession';

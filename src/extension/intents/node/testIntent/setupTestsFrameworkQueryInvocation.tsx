@@ -40,8 +40,10 @@ import { ResponseTranslationRules } from '../../../prompts/node/base/responseTra
 import { SafetyRules } from '../../../prompts/node/base/safetyRules';
 import { ChatVariablesAndQuery } from '../../../prompts/node/panel/chatVariables';
 import { EditorIntegrationRules } from '../../../prompts/node/panel/editorIntegrationRules';
-import { WorkspacePromptProps } from '../../../prompts/node/panel/workspace/workspacePrompt';
-import { WorkspaceStructure } from '../../../prompts/node/panel/workspace/workspaceStructure';
+// Removed workspace imports - workspace participant removed
+// Placeholder types for removed workspace functionality
+type WorkspacePromptProps = any;
+const WorkspaceStructure = () => null;
 
 export class SetupTestsFrameworkQueryInvocationRaw {
 	constructor(
@@ -51,14 +53,14 @@ export class SetupTestsFrameworkQueryInvocationRaw {
 		private readonly instantiationService: IInstantiationService,
 		@IRunCommandExecutionService
 		private readonly commandService: IRunCommandExecutionService,
-	) {}
+	) { }
 	public async buildPrompt(
 		context: IBuildPromptContext,
 		progress:
 			| vscode.Progress<
-					| vscode.ChatResponseReferencePart
-					| vscode.ChatResponseProgressPart
-			  >
+				| vscode.ChatResponseReferencePart
+				| vscode.ChatResponseProgressPart
+			>
 			| undefined,
 		token: vscode.CancellationToken,
 	): Promise<RenderPromptResult> {
@@ -134,7 +136,7 @@ export class SetupTestsFrameworkQueryInvocationRaw {
 		}
 
 		await this.commandService.executeCommand('workbench.action.chat.open', {
-			query: `@${Intent.Workspace} /${Intent.SetupTests} `,
+			query: `/${Intent.SetupTests} `,
 			isPartialQuery: true,
 		});
 	}
@@ -145,8 +147,7 @@ export class SetupTestsFrameworkQueryInvocationRaw {
  */
 export class SetupTestsFrameworkQueryInvocation
 	extends SetupTestsFrameworkQueryInvocationRaw
-	implements IIntentInvocation
-{
+	implements IIntentInvocation {
 	constructor(
 		public readonly intent: IIntent,
 		endpoint: IChatEndpoint,

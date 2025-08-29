@@ -31,7 +31,7 @@ import { URI } from '../../../../util/vs/base/common/uri';
 import { IInstantiationService } from '../../../../util/vs/platform/instantiation/common/instantiation';
 import { ChatResponseProgressPart } from '../../../../vscodeTypes';
 import { getSchemasForTypeAsList } from '../../../onboardDebug/node/parseLaunchConfigFromResponse';
-import { Turn } from '../../../prompt/common/conversation';
+import { PromptMetadata, Turn } from '../../../prompt/common/conversation';
 import { CopilotIdentityRules } from '../base/copilotIdentity';
 import { InstructionMessage } from '../base/instructionMessage';
 import { PromptRenderer } from '../base/promptRenderer';
@@ -40,11 +40,24 @@ import { Tag } from '../base/tag';
 import { HistoryWithInstructions } from './conversationHistory';
 import { FileVariable } from './fileVariable';
 import { ProjectLabels } from './projectLabels';
-import { workspaceVisualFileTree } from './workspace/visualFileTree';
-import {
-	MultirootWorkspaceStructure,
-	WorkspaceStructureMetadata,
-} from './workspace/workspaceStructure';
+// Removed workspace visual file tree import - workspace participant removed
+// Removed workspace structure imports - workspace participant removed
+// Placeholder types for removed workspace functionality
+class WorkspaceStructureMetadata extends PromptMetadata {
+	constructor(public value: any[] = []) {
+		super();
+	}
+}
+class MultirootWorkspaceStructure {
+	constructor(props?: any) { }
+	static toURIs() { return []; }
+	render() { return null; }
+}
+
+// Placeholder function for removed workspace functionality
+function workspaceVisualFileTree(accessor?: any, workspace?: any, options?: any, token?: any) {
+	return Promise.resolve({ tree: { files: [] } });
+}
 
 export const enum StartDebuggingType {
 	UserQuery,
@@ -207,10 +220,7 @@ export class StartDebuggingPrompt extends PromptElement<
 		structureMetadata?: WorkspaceStructureMetadata,
 	): Promise<URI[] | undefined> {
 		const fileResults = new ResourceSet();
-		const returnedUris = MultirootWorkspaceStructure.toURIs(
-			this.workspace,
-			requestedFiles,
-		);
+		const returnedUris = MultirootWorkspaceStructure.toURIs();
 
 		const fileExists = (file: URI) =>
 			this.fileSystemService.stat(file).then(
@@ -244,12 +254,12 @@ export class StartDebuggingPrompt extends PromptElement<
 				// The model sometimes doesn't fully qualify the path to nested files.
 				// In these cases, try to guess what it means by looking at the what it does give us
 				const bestGuess = structureMetadata.value
-					.flatMap((root) =>
-						root.tree.files.filter((f) =>
+					.flatMap((root: any) =>
+						root.tree.files.filter((f: any) =>
 							f.path.endsWith(relativePath),
 						),
 					)
-					.sort((a, b) => a.path.length - b.path.length) // get the least-nested candidate
+					.sort((a: any, b: any) => a.path.length - b.path.length) // get the least-nested candidate
 					.at(0);
 				if (bestGuess) {
 					return tryAdd(bestGuess);
@@ -323,25 +333,25 @@ export class StartDebuggingPrompt extends PromptElement<
 		const promptRenderer =
 			this.props.input.type === StartDebuggingType.CommandLine
 				? PromptRenderer.create(
-						this.instantiationService,
-						endpoint,
-						ReferenceFilesFromCliPrompt,
-						{
-							debuggerType,
-							input: this.props.input,
-							os: this.envService.OS,
-						},
-					)
+					this.instantiationService,
+					endpoint,
+					ReferenceFilesFromCliPrompt,
+					{
+						debuggerType,
+						input: this.props.input,
+						os: this.envService.OS,
+					},
+				)
 				: PromptRenderer.create(
-						this.instantiationService,
-						endpoint,
-						ReferenceFilesFromQueryPrompt,
-						{
-							debuggerType,
-							input: this.props.input,
-							os: this.envService.OS,
-						},
-					);
+					this.instantiationService,
+					endpoint,
+					ReferenceFilesFromQueryPrompt,
+					{
+						debuggerType,
+						input: this.props.input,
+						os: this.envService.OS,
+					},
+				);
 
 		const prompt = await promptRenderer.render(undefined, token);
 		const structureMetadata = prompt.metadata.get(
@@ -649,8 +659,8 @@ export class StartDebuggingPrompt extends PromptElement<
 								this.workspace.getWorkspaceFolder(resource);
 							const name = containingFolder
 								? resource.path.substring(
-										containingFolder.path.length + 1,
-									)
+									containingFolder.path.length + 1,
+								)
 								: basename(resource.path);
 							return (
 								<FileVariable
@@ -919,8 +929,8 @@ class StructureOfWorkingDirectory extends PromptElement<
 		const maxSize = sizing.tokenBudget / 2; // note: size in the tree is in chars, /2 to be safe
 		const wf = this.props.input.relativeCwd
 			? this.workspaceService.getWorkspaceFolder(
-					URI.file(this.props.input.absoluteCwd),
-				)
+				URI.file(this.props.input.absoluteCwd),
+			)
 			: undefined;
 
 		if (wf) {
@@ -1202,14 +1212,14 @@ class DebugTypePrompt extends PromptElement<
 					<br />
 					{this.props.input.type ===
 						StartDebuggingType.CommandLine && (
-						<>
-							The command I give you is used to run code that I'm
-							working on. Although the command itself might not
-							directly be my program, you should suggest a tool to
-							debug the likely language I'm working in.
-							<br />
-						</>
-					)}
+							<>
+								The command I give you is used to run code that I'm
+								working on. Although the command itself might not
+								directly be my program, you should suggest a tool to
+								debug the likely language I'm working in.
+								<br />
+							</>
+						)}
 					The user will list the debug types they have installed, but
 					this is not a complete list of debug types available. You
 					may suggest a type outside of that list if it's a better

@@ -18,7 +18,7 @@ import { raceCancellation } from '../../../util/vs/base/common/async';
 import * as path from '../../../util/vs/base/common/path';
 import { Range } from '../../../vscodeTypes';
 import { Intent } from '../../common/constants';
-import { workspaceIntentId } from '../../intents/node/workspaceIntent';
+// Removed workspace intent import - workspace participant removed
 
 class AICodeAction extends vscode.CodeAction {
 	override readonly isAI = true;
@@ -129,7 +129,7 @@ export class QuickFixesProvider implements vscode.CodeActionProvider {
 
 		const explainAction = new AICodeAction(vscode.l10n.t('Explain'), QuickFixesProvider.explainKind);
 		explainAction.diagnostics = severeDiagnostics;
-		const query = `@${workspaceIntentId} /${Intent.Explain} ${diagnostics}`;
+		const query = `/${Intent.Explain} ${diagnostics}`;
 		explainAction.command = {
 			title: explainAction.title,
 			command: 'github.copilot.chat.explain',
