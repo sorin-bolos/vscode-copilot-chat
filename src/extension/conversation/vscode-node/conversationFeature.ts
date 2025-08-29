@@ -6,9 +6,8 @@
 
 import * as vscode from 'vscode';
 import { IAuthenticationService } from '../../../platform/authentication/common/authentication';
-import { IChatAgentService, terminalAgentName } from '../../../platform/chat/common/chatAgents';
+import { IChatAgentService } from '../../../platform/chat/common/chatAgents';
 import { IConversationOptions } from '../../../platform/chat/common/conversationOptions';
-import { ConfigKey, IConfigurationService } from '../../../platform/configuration/common/configurationService';
 import { DevContainerConfigGeneratorArguments, IDevContainerConfigurationService } from '../../../platform/devcontainer/common/devContainerConfigurationService';
 import { ICombinedEmbeddingIndex } from '../../../platform/embeddings/common/vscodeIndex';
 import { FEEDBACK_URL } from '../../../platform/endpoint/common/domainService';
@@ -19,7 +18,7 @@ import { ISettingsEditorSearchService } from '../../../platform/settingsEditor/c
 import { ITelemetryService } from '../../../platform/telemetry/common/telemetry';
 import { DeferredPromise } from '../../../util/vs/base/common/async';
 import { CancellationToken } from '../../../util/vs/base/common/cancellation';
-import { DisposableStore, IDisposable, combinedDisposable } from '../../../util/vs/base/common/lifecycle';
+import { DisposableStore, IDisposable } from '../../../util/vs/base/common/lifecycle';
 import { URI } from '../../../util/vs/base/common/uri';
 import { IInstantiationService } from '../../../util/vs/platform/instantiation/common/instantiation';
 import { ContributionCollection, IExtensionContribution } from '../../common/contributions';
@@ -27,7 +26,6 @@ import { vscodeNodeChatContributions } from '../../extension/vscode-node/contrib
 import { registerInlineChatCommands } from '../../inlineChat/vscode-node/inlineChatCommands';
 import { INewWorkspacePreviewContentManager } from '../../intents/node/newIntent';
 import { FindInFilesArgs } from '../../intents/node/searchIntent';
-import { TerminalExplainIntent } from '../../intents/node/terminalExplainIntent';
 import { ILinkifyService } from '../../linkify/common/linkifyService';
 import { registerLinkCommands } from '../../linkify/vscode-node/commands';
 import { InlineCodeSymbolLinkifier } from '../../linkify/vscode-node/inlineCodeSymbolLinkifier';
@@ -39,7 +37,6 @@ import { SemanticSearchTextSearchProvider } from '../../workspaceSemanticSearch/
 import { GitHubPullRequestProviders } from '../node/githubPullRequestProviders';
 import { startFeedbackCollection } from './feedbackCollection';
 import { registerNewWorkspaceIntentCommand } from './newWorkspaceFollowup';
-import { generateTerminalFixes, setLastCommandMatchResult } from './terminalFixGenerator';
 
 /**
  * Class that checks if users are allowed to use the conversation feature,
@@ -66,7 +63,6 @@ export class ConversationFeature implements IExtensionContribution {
 	constructor(
 		@IInstantiationService private instantiationService: IInstantiationService,
 		@ILogService private readonly logService: ILogService,
-		@IConfigurationService private configurationService: IConfigurationService,
 		@IConversationOptions private conversationOptions: IConversationOptions,
 		@IChatAgentService private chatAgentService: IChatAgentService,
 		@ITelemetryService private telemetryService: ITelemetryService,
@@ -210,11 +206,6 @@ export class ConversationFeature implements IExtensionContribution {
 			vscode.commands.registerCommand('github.copilot.interactiveSession.feedback', async () => {
 				return vscode.env.openExternal(vscode.Uri.parse(FEEDBACK_URL));
 			}),
-			vscode.commands.registerCommand('github.copilot.terminal.explainTerminalSelection', async () => this.triggerTerminalChat({ query: `/${TerminalExplainIntent.intentName} #terminalSelection` })),
-			// This command is an alias to use a different title in the context menu
-			vscode.commands.registerCommand('github.copilot.terminal.explainTerminalSelectionContextMenu', () => vscode.commands.executeCommand('github.copilot.terminal.explainTerminalSelection')),
-			vscode.commands.registerCommand('github.copilot.terminal.explainTerminalLastCommand', async () => this.triggerTerminalChat({ query: `/${TerminalExplainIntent.intentName} #terminalLastCommand` })),
-			vscode.commands.registerCommand('github.copilot.terminal.fixTerminalLastCommand', async () => generateTerminalFixes(this.instantiationService)),
 			vscode.commands.registerCommand('github.copilot.terminal.generateCommitMessage', async () => {
 				const workspaceFolders = vscode.workspace.workspaceFolders;
 
@@ -283,27 +274,6 @@ export class ConversationFeature implements IExtensionContribution {
 		return disposables;
 	}
 
-	private async triggerTerminalChat(options: { query: string; isPartialQuery?: boolean }) {
-		const chatLocation = this.configurationService.getConfig(ConfigKey.TerminalChatLocation);
-		let commandId: string;
-		switch (chatLocation) {
-			case 'quickChat':
-				commandId = 'workbench.action.quickchat.toggle';
-				options.query = `@${terminalAgentName} ` + options.query;
-				break;
-			case 'terminal':
-				commandId = 'workbench.action.terminal.chat.start';
-				// HACK: Currently @terminal is hardcoded in core
-				break;
-			case 'chatView':
-			default:
-				commandId = 'workbench.action.chat.open';
-				options.query = `@${terminalAgentName} ` + options.query;
-				break;
-		}
-		await vscode.commands.executeCommand(commandId, options);
-	}
-
 	private registerRelatedInformationProviders(): IDisposable {
 		const disposables = new DisposableStore();
 		[
@@ -328,35 +298,14 @@ export class ConversationFeature implements IExtensionContribution {
 	}
 
 	private registerTerminalQuickFixProviders() {
-		const isEnabled = () => this.enabled;
-		return combinedDisposable(
-			vscode.window.registerTerminalQuickFixProvider('copilot-chat.fixWithCopilot', {
-				provideTerminalQuickFixes(commandMatchResult, token) {
-					if (!isEnabled() || commandMatchResult.commandLine.endsWith('^C')) {
-						return [];
-					}
-					setLastCommandMatchResult(commandMatchResult);
-					return [
-						{
-							command: 'github.copilot.terminal.fixTerminalLastCommand',
-							title: vscode.l10n.t('Fix using Copilot')
-						},
-						{
-							command: 'github.copilot.terminal.explainTerminalLastCommand',
-							title: vscode.l10n.t('Explain using Copilot')
-						}
-					];
-				}
-			}),
-			vscode.window.registerTerminalQuickFixProvider('copilot-chat.generateCommitMessage', {
-				provideTerminalQuickFixes: (commandMatchResult, token) => {
-					return this.enabled ? [{
-						command: 'github.copilot.terminal.generateCommitMessage',
-						title: vscode.l10n.t('Generate Commit Message')
-					}] : [];
-				},
-			})
-		);
+		return vscode.window.registerTerminalQuickFixProvider('copilot-chat.generateCommitMessage', {
+			provideTerminalQuickFixes: (commandMatchResult, token) => {
+				return this.enabled ? [{
+					command: 'github.copilot.terminal.generateCommitMessage',
+					title: vscode.l10n.t('Generate Commit Message')
+				}] : [];
+			}
+		});
 	}
 }
 

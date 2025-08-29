@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 import * as vscode from 'vscode';
 import { IAuthenticationService } from '../../../platform/authentication/common/authentication';
-import { IChatAgentService, defaultAgentName, editingSessionAgent2Name, editingSessionAgentEditorName, editingSessionAgentName, editorAgentName, editsAgentName, getChatParticipantIdFromName, terminalAgentName, vscodeAgentName } from '../../../platform/chat/common/chatAgents';
+import { IChatAgentService, defaultAgentName, editingSessionAgent2Name, editingSessionAgentEditorName, editingSessionAgentName, editorAgentName, editsAgentName, getChatParticipantIdFromName, vscodeAgentName } from '../../../platform/chat/common/chatAgents';
 import { IChatQuotaService } from '../../../platform/chat/common/chatQuotaService';
 import { IInteractionService } from '../../../platform/chat/common/interactionService';
 import { ConfigKey, IConfigurationService } from '../../../platform/configuration/common/configurationService';
@@ -82,7 +82,6 @@ class ChatAgents implements IDisposable {
 		this._disposables.add(this.registerEditsAgent());
 		this._disposables.add(this.registerEditorDefaultAgent());
 		this._disposables.add(this.registerVSCodeAgent());
-		this._disposables.add(this.registerTerminalAgent());
 	}
 
 	private createAgent(name: string, defaultIntentIdOrGetter: IntentOrGetter, options?: { id?: string }): vscode.ChatParticipant {
@@ -110,13 +109,6 @@ class ChatAgents implements IDisposable {
 		const vscodeAgent = this.createAgent(vscodeAgentName, Intent.VSCode);
 		vscodeAgent.iconPath = useInsidersIcon ? new vscode.ThemeIcon('vscode-insiders') : new vscode.ThemeIcon('vscode');
 		return vscodeAgent;
-	}
-
-	private registerTerminalAgent(): IDisposable {
-		const terminalAgent = this.createAgent(terminalAgentName, Intent.Terminal);
-
-		terminalAgent.iconPath = new vscode.ThemeIcon('terminal');
-		return terminalAgent;
 	}
 
 	private async initDefaultAgentRequestorProps(defaultAgent: vscode.ChatParticipant) {

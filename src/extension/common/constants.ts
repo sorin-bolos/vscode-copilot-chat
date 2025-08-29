@@ -13,8 +13,6 @@ export const enum Intent {
 	New = 'new',
 	Search = 'search',
 	SemanticSearch = 'semanticSearch',
-	Terminal = 'terminal',
-	TerminalExplain = 'terminalExplain',
 	VSCode = 'vscode',
 	Unknown = 'unknown',
 	StartDebugging = 'startDebugging',
@@ -37,9 +35,6 @@ export const agentsToCommands: Partial<Record<Intent, Record<string, Intent>>> =
 	[Intent.VSCode]: {
 		'search': Intent.Search,
 		'startDebugging': Intent.StartDebugging,
-	},
-	[Intent.Terminal]: {
-		'explain': Intent.TerminalExplain
 	},
 	[Intent.Editor]: {
 		'doc': Intent.Doc,

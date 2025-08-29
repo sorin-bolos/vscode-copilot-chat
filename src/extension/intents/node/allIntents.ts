@@ -21,8 +21,6 @@ import { SearchKeywordsIntent } from './searchKeywordsIntent';
 import { SearchPanelIntent } from './searchPanelIntent';
 import { SetupTestsIntent } from './setupTests';
 import { StartDebuggingIntent } from './startDebugging';
-import { TerminalExplainIntent } from './terminalExplainIntent';
-import { TerminalIntent } from './terminalIntent';
 import { TestsIntent } from './testIntent/testIntent';
 import { UnknownIntent } from './unknownIntent';
 import { VscodeIntent } from './vscodeIntent';
@@ -37,8 +35,6 @@ IntentRegistry.setIntents([
 	new SyncDescriptor(FixIntent),
 	new SyncDescriptor(ExplainIntent),
 	new SyncDescriptor(ReviewIntent),
-	new SyncDescriptor(TerminalIntent),
-	new SyncDescriptor(TerminalExplainIntent),
 	new SyncDescriptor(UnknownIntent),
 	new SyncDescriptor(GenerateCodeIntent),
 	new SyncDescriptor(NewWorkspaceIntent),
