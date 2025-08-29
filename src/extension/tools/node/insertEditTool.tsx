@@ -5,12 +5,10 @@
 
 import type * as vscode from 'vscode';
 import { NotebookDocumentSnapshot } from '../../../platform/editing/common/notebookDocumentSnapshot';
-import { IEndpointProvider } from '../../../platform/endpoint/common/endpointProvider';
 import { ILanguageDiagnosticsService } from '../../../platform/languages/common/languageDiagnosticsService';
 import { IAlternativeNotebookContentService } from '../../../platform/notebook/common/alternativeContent';
 import { INotebookService } from '../../../platform/notebook/common/notebookService';
 import { IPromptPathRepresentationService } from '../../../platform/prompts/common/promptPathRepresentationService';
-import { ITelemetryService } from '../../../platform/telemetry/common/telemetry';
 import { IWorkspaceService } from '../../../platform/workspace/common/workspaceService';
 import { IInstantiationService } from '../../../util/vs/platform/instantiation/common/instantiation';
 import {
@@ -50,9 +48,7 @@ export class EditFileTool implements ICopilotTool<IEditFileParams> {
 		protected readonly languageDiagnosticsService: ILanguageDiagnosticsService,
 		@IAlternativeNotebookContentService
 		private readonly alternativeNotebookContentService: IAlternativeNotebookContentService,
-		@ITelemetryService private readonly telemetryService: ITelemetryService,
-		@IEndpointProvider private readonly endpointProvider: IEndpointProvider,
-	) {}
+	) { }
 
 	async invoke(
 		options: vscode.LanguageModelToolInvocationOptions<IEditFileParams>,
@@ -89,11 +85,11 @@ export class EditFileTool implements ICopilotTool<IEditFileParams> {
 		const isNotebook = this.notebookService.hasSupportedNotebooks(uri);
 		const document = isNotebook
 			? await this.workspaceService.openNotebookDocumentAndSnapshot(
-					uri,
-					this.alternativeNotebookContentService.getFormat(
-						this.promptContext?.request?.model,
-					),
-				)
+				uri,
+				this.alternativeNotebookContentService.getFormat(
+					this.promptContext?.request?.model,
+				),
+			)
 			: await this.workspaceService.openTextDocumentAndSnapshot(uri);
 
 		if (document instanceof NotebookDocumentSnapshot) {

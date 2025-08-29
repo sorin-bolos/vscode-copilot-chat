@@ -14,6 +14,9 @@ export const enum ToolName {
 	Think = 'think',
 	FetchWebPage = 'fetch_webpage',
 	GetTaskOutput = 'get_task_output',
+	TestFailure = 'test_failure',
+	GetProjectSetupInfo = 'get_project_setup_info',
+	FindTextInFiles = 'find_text_in_files',
 	CoreManageTodoList = 'manage_todo_list',
 	CoreRunInTerminal = 'run_in_terminal',
 	CoreGetTerminalOutput = 'get_terminal_output',
@@ -35,6 +38,10 @@ export const enum ContributedToolName {
 	Think = 'copilot_think',
 	FetchWebPage = 'copilot_fetchWebPage',
 	CreateAndRunTask = 'copilot_createAndRunTask',
+	GetErrors = 'copilot_getErrors',
+	TerminalSelection = 'copilot_terminalSelection',
+	FindTestFiles = 'copilot_findTestFiles',
+	FindTextInFiles = 'copilot_findTextInFiles',
 }
 
 const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([

@@ -77,7 +77,6 @@ import {
 	NotebookFormat,
 	NotebookReminderInstructions,
 } from '../panel/notebookEditCodePrompt';
-import { NotebookSummaryChange } from '../panel/notebookSummaryChangePrompt';
 import { UserPreferences } from '../panel/preferences';
 import { ChatToolCalls } from '../panel/toolCalling';
 import { MultirootWorkspaceStructure } from '../panel/workspace/workspaceStructure';
@@ -136,10 +135,10 @@ export class AgentPrompt extends PromptElement<AgentPromptProps> {
 				codesearchMode={undefined}
 			/>
 		) : this.props.endpoint.family.startsWith('gpt-') &&
-		  this.configurationService.getExperimentBasedConfig(
+			this.configurationService.getExperimentBasedConfig(
 				ConfigKey.EnableAlternateGptPrompt,
 				this.experimentationService,
-		  ) ? (
+			) ? (
 			<AlternateGPTPrompt
 				availableTools={this.props.promptContext.tools?.availableTools}
 				modelFamily={this.props.endpoint.family}
@@ -441,14 +440,8 @@ export class AgentUserMessage extends PromptElement<AgentUserMessageProps> {
 		const hasApplyPatchTool = !!this.props.availableTools?.find(
 			(tool) => tool.name === ToolName.ApplyPatch,
 		);
-		const hasCreateFileTool = !!this.props.availableTools?.find(
-			(tool) => tool.name === ToolName.CreateFile,
-		);
 		const hasEditFileTool = !!this.props.availableTools?.find(
 			(tool) => tool.name === ToolName.EditFile,
-		);
-		const hasEditNotebookTool = !!this.props.availableTools?.find(
-			(tool) => tool.name === ToolName.EditNotebook,
 		);
 		const hasTerminalTool = !!this.props.availableTools?.find(
 			(tool) => tool.name === ToolName.CoreRunInTerminal,
@@ -456,12 +449,10 @@ export class AgentUserMessage extends PromptElement<AgentUserMessageProps> {
 		const attachmentHint =
 			(this.props.endpoint.family === 'gpt-4.1' ||
 				this.props.endpoint.family === 'gpt-5') &&
-			this.props.chatVariables.hasVariables()
+				this.props.chatVariables.hasVariables()
 				? ' (See <attachments> above for file contents. You may not need to search or read the file again.)'
 				: '';
 		const hasToolsToEditNotebook =
-			hasCreateFileTool ||
-			hasEditNotebookTool ||
 			hasReplaceStringTool ||
 			hasApplyPatchTool ||
 			hasEditFileTool;
@@ -500,7 +491,6 @@ export class AgentUserMessage extends PromptElement<AgentUserMessageProps> {
 						<EditedFileEvents
 							editedFileEvents={this.props.editedFileEvents}
 						/>
-						<NotebookSummaryChange />
 						{hasTerminalTool && (
 							<TerminalAndTaskStatePromptElement
 								sessionId={this.props.sessionId}
@@ -1278,8 +1268,8 @@ function getExplanationReminder(
 
 export interface EditedFileEventsProps extends BasePromptElementProps {
 	readonly editedFileEvents:
-		| readonly ChatRequestEditedFileEvent[]
-		| undefined;
+	| readonly ChatRequestEditedFileEvent[]
+	| undefined;
 }
 
 /**

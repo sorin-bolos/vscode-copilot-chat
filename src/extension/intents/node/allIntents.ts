@@ -15,7 +15,6 @@ import { ExplainIntent } from './explainIntent';
 import { FixIntent } from './fixIntent';
 import { GenerateCodeIntent } from './generateCodeIntent';
 import { NewWorkspaceIntent } from './newIntent';
-import { NewNotebookIntent } from './newNotebookIntent.contribution';
 import { NotebookEditorIntent } from './notebookEditorIntent';
 import { ReviewIntent } from './reviewIntent';
 import { SearchIntent } from './searchIntent';
@@ -45,7 +44,6 @@ IntentRegistry.setIntents([
 	new SyncDescriptor(TerminalExplainIntent),
 	new SyncDescriptor(UnknownIntent),
 	new SyncDescriptor(GenerateCodeIntent),
-	new SyncDescriptor(NewNotebookIntent),
 	new SyncDescriptor(NewWorkspaceIntent),
 	new SyncDescriptor(VscodeIntent),
 	new SyncDescriptor(StartDebuggingIntent),

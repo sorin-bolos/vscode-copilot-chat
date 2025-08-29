@@ -38,7 +38,6 @@ import './intent/panelChatIntent.stest';
 import './prompts/customInstructions.stest';
 import './prompts/devContainerConfigGenerator.stest';
 import './prompts/gitCommitMessageGenerator.stest';
-import './prompts/newNotebookCell.stest';
 import './prompts/newWorkspace.stest';
 import './prompts/settingsEditorSearchResultsSelector.stest';
 import './simulation/debugCommandToConfig.stest';

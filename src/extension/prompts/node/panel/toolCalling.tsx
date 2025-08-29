@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+*  Copyright (c) Microsoft Corporation. All rights reserved.
+*  Licensed under the MIT License. See License.txt in the project root for license information.
+*--------------------------------------------------------------------------------------------*/
 
 import {
 	AssistantMessage,
@@ -61,8 +61,8 @@ export interface ChatToolCallsProps extends BasePromptElementProps {
 	readonly promptContext: IBuildPromptContext;
 	readonly toolCallRounds: readonly IToolCallRound[] | undefined;
 	readonly toolCallResults:
-		| Record<string, LanguageModelToolResult2>
-		| undefined;
+	| Record<string, LanguageModelToolResult2>
+	| undefined;
 	readonly isHistorical?: boolean;
 	readonly toolCallMode?: CopilotToolMode;
 	readonly enableCacheBreakpoints?: boolean;
@@ -419,16 +419,6 @@ class ToolResultElement extends PromptElement<ToolResultElementProps, void> {
 			toolName,
 			model,
 		});
-
-		if (toolName === ToolName.EditNotebook) {
-			sendNotebookEditToolValidationTelemetry(
-				invokeOutcome,
-				validateOutcome,
-				this.props.toolCall.arguments,
-				this.telemetryService,
-				model,
-			);
-		}
 	}
 }
 
@@ -679,122 +669,4 @@ export class ToolCallResultWrapper extends PromptElement<IToolCallResultWrapperP
 			</>
 		);
 	}
-}
-
-function sendNotebookEditToolValidationTelemetry(
-	invokeOutcome: ToolInvocationOutcome,
-	validationResult: ToolValidationOutcome,
-	toolArgs: string,
-	telemetryService: ITelemetryService,
-	model?: string,
-): void {
-	let editType: 'insert' | 'delete' | 'edit' | 'unknown' = 'unknown';
-	let explanation: 'provided' | 'empty' | 'unknown' = 'unknown';
-	let newCodeType:
-		| 'string'
-		| 'string[]'
-		| 'object'
-		| 'object[]'
-		| 'unknown'
-		| '' = 'unknown';
-	let cellId: 'TOP' | 'BOTTOM' | 'cellid' | 'unknown' | 'empty' = 'unknown';
-	let inputParsed = 0;
-	const knownProps = [
-		'editType',
-		'explanation',
-		'newCode',
-		'cellId',
-		'filePath',
-		'language',
-	];
-	let missingProps: string[] = [];
-	let unknownProps: string[] = [];
-	try {
-		const args = JSON.parse(toolArgs);
-		if (
-			args &&
-			typeof args === 'object' &&
-			!Array.isArray(args) &&
-			Object.keys(args).length > 0
-		) {
-			const props = Object.keys(args);
-			unknownProps = props.filter((key) => !knownProps.includes(key));
-			unknownProps.sort();
-			missingProps = knownProps.filter((key) => !props.includes(key));
-			missingProps.sort();
-		}
-		inputParsed = 1;
-		if (args.editType) {
-			editType = args.editType;
-		}
-		if (args.explanation) {
-			explanation = 'provided';
-		} else {
-			explanation = 'empty';
-		}
-		if (args.newCode || typeof args.newCode === 'string') {
-			if (typeof args.newCode === 'string') {
-				newCodeType = 'string';
-			} else if (
-				Array.isArray(args.newCode) &&
-				(args.newCode as any[]).every(
-					(item) => typeof item === 'string',
-				)
-			) {
-				newCodeType = 'string[]';
-			} else if (Array.isArray(args.newCode)) {
-				newCodeType = 'object[]';
-			} else if (typeof args.newCode === 'object') {
-				newCodeType = 'object';
-			}
-		}
-		if (editType === 'delete') {
-			newCodeType = '';
-		}
-		const cellIdValue = args.cellId;
-		if (typeof cellIdValue === 'string') {
-			if (cellIdValue === 'TOP' || cellIdValue === 'BOTTOM') {
-				cellId = cellIdValue;
-			} else {
-				cellId = cellIdValue.trim().length === 0 ? 'cellid' : 'empty';
-			}
-		}
-	} catch {
-		//
-	}
-
-	/* __GDPR__
-		"editNotebook.validation" : {
-			"owner": "donjayamanne",
-			"comment": "Validation failure for a Edit Notebook tool invocation",
-			"validationResult": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "comment": "The result of the tool input validation. valid, invalid and unknown" },
-			"invokeOutcome": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "comment": "The result of the tool Invocation. invalidInput, disabledByUser, success, error, cancelled" },
-			"editType": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "comment": "The type of edit that was attempted. insert, delete, edit or unknown" },
-			"unknownProps": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "comment": "List of unknown properties in the input" },
-			"missingProps": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "comment": "List of missing properties in the input" },
-			"newCodeType": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "comment": "The type of code, whether its string, string[], object, object[] or unknown" },
-			"cellId": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "comment": "The id of the cell, TOP, BOTTOM, cellid, empty or unknown" },
-			"explanation": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "comment": "The explanation for the edit. provided, empty and unknown" },
-			"inputParsed": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "isMeasurement": true, "comment": "Whether the input was parsed as JSON" },
-			"model": { "classification": "SystemMetaData", "purpose": "FeatureInsight", "comment": "The model that invoked the tool" }
-		}
-	*/
-
-	telemetryService.sendMSFTTelemetryEvent(
-		'editNotebook.validation',
-		{
-			validationResult,
-			invokeOutcome,
-			editType,
-			newCodeType,
-			cellId,
-			explanation,
-			model,
-			unknownProps: unknownProps.join(','),
-			missingProps: missingProps.join(','),
-		},
-		{
-			inputParsed,
-		},
-	);
 }

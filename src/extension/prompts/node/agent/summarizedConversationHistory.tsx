@@ -36,10 +36,8 @@ import { IEndpointProvider } from '../../../../platform/endpoint/common/endpoint
 import { ILogService } from '../../../../platform/log/common/logService';
 import { IChatEndpoint } from '../../../../platform/networking/common/networking';
 import { APIUsage } from '../../../../platform/networking/common/openai';
-import { IPromptPathRepresentationService } from '../../../../platform/prompts/common/promptPathRepresentationService';
 import { IExperimentationService } from '../../../../platform/telemetry/common/nullExperimentationService';
 import { ITelemetryService } from '../../../../platform/telemetry/common/telemetry';
-import { IWorkspaceService } from '../../../../platform/workspace/common/workspaceService';
 import { CancellationToken } from '../../../../util/vs/base/common/cancellation';
 import {
 	CancellationError,
@@ -486,9 +484,9 @@ class ConversationHistory extends PromptElement<SummarizedAgentHistoryProps> {
 				const round = turn.rounds[i];
 				summaryForTurn = round.summary
 					? new SummarizedConversationHistoryMetadata(
-							round.id,
-							round.summary,
-						)
+						round.id,
+						round.summary,
+					)
 					: undefined;
 				if (summaryForTurn) {
 					break;
@@ -675,7 +673,7 @@ class ConversationHistorySummarizer {
 		@IExperimentationService
 		private readonly experimentationService: IExperimentationService,
 		@IEndpointProvider private readonly endpointProvider: IEndpointProvider,
-	) {}
+	) { }
 
 	async summarizeHistory(): Promise<{
 		summary: string;
@@ -693,7 +691,7 @@ class ConversationHistorySummarizer {
 				async () => {
 					try {
 						await summaryPromise;
-					} catch {}
+					} catch { }
 					return l10n.t('Summarized conversation history');
 				},
 			),
@@ -813,28 +811,28 @@ class ConversationHistorySummarizer {
 			const toolOpts =
 				mode === SummaryMode.Full
 					? {
-							tool_choice: 'none' as const,
-							tools: normalizeToolSchema(
-								endpoint.family,
-								this.props.tools?.map((tool) => ({
-									function: {
-										name: tool.name,
-										description: tool.description,
-										parameters:
-											tool.inputSchema &&
+						tool_choice: 'none' as const,
+						tools: normalizeToolSchema(
+							endpoint.family,
+							this.props.tools?.map((tool) => ({
+								function: {
+									name: tool.name,
+									description: tool.description,
+									parameters:
+										tool.inputSchema &&
 											Object.keys(tool.inputSchema).length
-												? tool.inputSchema
-												: undefined,
-									},
-									type: 'function',
-								})),
-								(tool, rule) => {
-									this.logService.warn(
-										`Tool ${tool} failed validation: ${rule}`,
-									);
+											? tool.inputSchema
+											: undefined,
 								},
-							),
-						}
+								type: 'function',
+							})),
+							(tool, rule) => {
+								this.logService.warn(
+									`Tool ${tool} failed validation: ${rule}`,
+								);
+							},
+						),
+					}
 					: undefined;
 
 			if (promptCacheMode) {
@@ -1081,12 +1079,7 @@ export interface ISummarizedConversationHistoryInfo {
  * Exported for test
  */
 export class SummarizedConversationHistoryPropsBuilder {
-	constructor(
-		@IPromptPathRepresentationService
-		private readonly _promptPathRepresentationService: IPromptPathRepresentationService,
-		@IWorkspaceService
-		private readonly _workspaceService: IWorkspaceService,
-	) {}
+	constructor() { }
 
 	getProps(
 		props: SummarizedAgentHistoryProps,

@@ -11,7 +11,6 @@ import { IEnvService } from '../../../platform/env/common/envService';
 import { ILogService } from '../../../platform/log/common/logService';
 import { IEditLogService } from '../../../platform/multiFileEdit/common/editLogService';
 import { IChatEndpoint } from '../../../platform/networking/common/networking';
-import { requestHasNotebookRefs } from '../../../platform/notebook/common/helpers';
 import { INotebookService } from '../../../platform/notebook/common/notebookService';
 import { IPromptPathRepresentationService } from '../../../platform/prompts/common/promptPathRepresentationService';
 import { IExperimentationService } from '../../../platform/telemetry/common/nullExperimentationService';
@@ -35,20 +34,12 @@ const getTools = (instaService: IInstantiationService, request: vscode.ChatReque
 	instaService.invokeFunction(async accessor => {
 		const toolsService = accessor.get<IToolsService>(IToolsService);
 		const endpointProvider = accessor.get<IEndpointProvider>(IEndpointProvider);
-		const notebookService = accessor.get<INotebookService>(INotebookService);
 		const model = await endpointProvider.getChatEndpoint(request);
 		const lookForTools = new Set<string>([ToolName.EditFile]);
 
 		if (model.family.startsWith('claude')) {
 			lookForTools.add(ToolName.ReplaceString);
-		}
-		lookForTools.add(ToolName.EditNotebook);
-		if (requestHasNotebookRefs(request, notebookService, { checkPromptAsWell: true })) {
-			lookForTools.add(ToolName.GetNotebookSummary);
-			lookForTools.add(ToolName.RunNotebookCell);
-		}
-
-		return toolsService.getEnabledTools(request, tool => lookForTools.has(tool.name));
+		} return toolsService.getEnabledTools(request, tool => lookForTools.has(tool.name));
 	});
 
 export class EditCode2Intent extends EditCodeIntent {
