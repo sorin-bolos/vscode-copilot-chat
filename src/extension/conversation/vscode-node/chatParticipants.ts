@@ -86,7 +86,6 @@ class ChatAgents implements IDisposable {
 		this._disposables.add(this.registerWorkspaceAgent());
 		this._disposables.add(this.registerVSCodeAgent());
 		this._disposables.add(this.registerTerminalAgent());
-		this._disposables.add(this.registerTerminalPanelAgent());
 	}
 
 	private createAgent(name: string, defaultIntentIdOrGetter: IntentOrGetter, options?: { id?: string }): vscode.ChatParticipant {
@@ -129,14 +128,6 @@ class ChatAgents implements IDisposable {
 
 		terminalAgent.iconPath = new vscode.ThemeIcon('terminal');
 		return terminalAgent;
-	}
-
-	private registerTerminalPanelAgent(): IDisposable {
-		const terminalPanelAgent = this.createAgent(terminalAgentName, Intent.Terminal, { id: 'github.copilot.terminalPanel' });
-
-		terminalPanelAgent.iconPath = new vscode.ThemeIcon('terminal');
-
-		return terminalPanelAgent;
 	}
 
 	private async initDefaultAgentRequestorProps(defaultAgent: vscode.ChatParticipant) {

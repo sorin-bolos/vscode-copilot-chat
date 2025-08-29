@@ -165,7 +165,6 @@
 	"copilot.vscode.setupTests.description": "Set up tests in your project (Experimental)",
 	"copilot.vscode.setupTests.sampleRequest": "add playwright tests to my project",
 	"copilot.terminal.description": "Ask about commands",
-	"copilot.terminalPanel.description": "Ask how to do something in the terminal",
 	"copilot.terminal.sampleRequest": "How do I view all files within a directory including sub-directories?",
 	"copilot.terminal.explain.description": "Explain something in the terminal",
 	"copilot.terminal.explain.sampleRequest": "Explain the last command",

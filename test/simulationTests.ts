@@ -15,7 +15,6 @@ import './e2e/semanticSearch.stest';
 import './e2e/semanticSearchView.stest';
 import './e2e/startDebugging.stest';
 import './e2e/system.stest';
-import './e2e/terminal.stest';
 import './e2e/tools.stest';
 import './e2e/typescriptFix.stest';
 import './e2e/variables.stest';

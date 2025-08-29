@@ -3,13 +3,21 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { BasePromptElementProps, PromptElement, PromptSizing } from '@vscode/prompt-tsx';
+import {
+	BasePromptElementProps,
+	PromptElement,
+	PromptSizing,
+} from '@vscode/prompt-tsx';
 import { Diagnostic } from '../../../../vscodeTypes';
 import { ChunksToolProps } from '../../../common/constants';
 import { IDocumentContext } from '../../../prompt/node/documentContext';
 
 // Simple stub for WorkspaceChunks since the codebase tool was removed
-const WorkspaceChunks = ({ query, maxChunks, tokenBudget }: ChunksToolProps) => {
+const WorkspaceChunks = ({
+	query,
+	maxChunks,
+	tokenBudget,
+}: ChunksToolProps) => {
 	// Return empty since workspace search functionality was removed
 	return null;
 };
@@ -22,24 +30,38 @@ interface InlineChatWorkspaceSearchProps extends BasePromptElementProps {
 }
 
 export class InlineChatWorkspaceSearch extends PromptElement<InlineChatWorkspaceSearchProps> {
-
 	render(state: void, sizing: PromptSizing) {
-		const { useWorkspaceChunksFromSelection, useWorkspaceChunksFromDiagnostics } = this.props;
+		const {
+			useWorkspaceChunksFromSelection,
+			useWorkspaceChunksFromDiagnostics,
+		} = this.props;
 
-		if (!useWorkspaceChunksFromSelection && !useWorkspaceChunksFromDiagnostics) {
+		if (
+			!useWorkspaceChunksFromSelection &&
+			!useWorkspaceChunksFromDiagnostics
+		) {
 			return null;
 		}
 
 		let tokenBudget = sizing.tokenBudget;
-		if (useWorkspaceChunksFromSelection && useWorkspaceChunksFromDiagnostics) {
+		if (
+			useWorkspaceChunksFromSelection &&
+			useWorkspaceChunksFromDiagnostics
+		) {
 			tokenBudget = tokenBudget / 2;
 		}
 		return (
 			<>
-				{useWorkspaceChunksFromSelection &&
-					<WorkspaceChunks {...this.getChunkSearchPropsForSelection()} />}
-				{useWorkspaceChunksFromDiagnostics &&
-					<WorkspaceChunks {...this.getChunkSearchPropsForDiagnostics(tokenBudget)} />}
+				{useWorkspaceChunksFromSelection && (
+					<WorkspaceChunks
+						{...this.getChunkSearchPropsForSelection()}
+					/>
+				)}
+				{useWorkspaceChunksFromDiagnostics && (
+					<WorkspaceChunks
+						{...this.getChunkSearchPropsForDiagnostics(tokenBudget)}
+					/>
+				)}
 			</>
 		);
 	}
@@ -47,7 +69,7 @@ export class InlineChatWorkspaceSearch extends PromptElement<InlineChatWorkspace
 	private getChunkSearchPropsForSelection(): ChunksToolProps {
 		const { document, wholeRange } = this.props.documentContext;
 		let range = document.validateRange(wholeRange);
-		this.props.diagnostics.forEach(d => {
+		this.props.diagnostics.forEach((d) => {
 			range = range.union(d.range);
 		});
 		const selectedText = document.getText(range);
@@ -58,8 +80,10 @@ export class InlineChatWorkspaceSearch extends PromptElement<InlineChatWorkspace
 		};
 	}
 
-	private getChunkSearchPropsForDiagnostics(tokenBudget: number): ChunksToolProps {
-		const messages = this.props.diagnostics.map(d => d.message).join(' ');
+	private getChunkSearchPropsForDiagnostics(
+		tokenBudget: number,
+	): ChunksToolProps {
+		const messages = this.props.diagnostics.map((d) => d.message).join(' ');
 		const query = `Please find code that can help me fix the following problems: ${messages}`;
 		return {
 			query,

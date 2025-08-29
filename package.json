@@ -308,8 +308,7 @@
 				"tools": [
 					"insertEdit",
 					"replaceString",
-					"applyPatch",
-					"newJupyterNotebook"
+					"applyPatch"
 				]
 			},
 			{
@@ -317,17 +316,8 @@
 				"description": "%copilot.toolSet.search.description%",
 				"icon": "$(search)",
 				"tools": [
-					"fileSearch",
 					"textSearch",
 					"readFile"
-				]
-			},
-			{
-				"name": "new",
-				"description": "%copilot.toolSet.new.description%",
-				"icon": "$(new-folder)",
-				"tools": [
-					"newWorkspace"
 				]
 			}
 		],
@@ -582,7 +572,7 @@
 					}
 				]
 			},
-{
+			{
 				"id": "github.copilot.notebook",
 				"name": "GitHubCopilot",
 				"fullName": "GitHub Copilot",
@@ -795,32 +785,6 @@
 						"name": "explain",
 						"description": "%copilot.terminal.explain.description%",
 						"sampleRequest": "%copilot.terminal.explain.sampleRequest%"
-					}
-				]
-			},
-			{
-				"id": "github.copilot.terminalPanel",
-				"name": "terminal",
-				"fullName": "Terminal",
-				"description": "%copilot.terminalPanel.description%",
-				"sampleRequest": "%copilot.terminal.sampleRequest%",
-				"locations": [
-					"panel"
-				],
-				"commands": [
-					{
-						"name": "explain",
-						"description": "%copilot.terminal.explain.description%",
-						"sampleRequest": "%copilot.terminal.explain.sampleRequest%",
-						"disambiguation": [
-							{
-								"category": "terminal_state_questions",
-								"description": "The user wants to learn about specific state such as the selection, command, or failed command in the integrated terminal in Visual Studio Code.",
-								"examples": [
-									"Why did the latest terminal command fail?"
-								]
-							}
-						]
 					}
 				]
 			}
