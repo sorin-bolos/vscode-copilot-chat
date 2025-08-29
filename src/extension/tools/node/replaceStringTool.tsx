@@ -34,7 +34,6 @@ import { ActionType } from './applyPatch/parser';
 import { CorrectedEditResult, healReplaceStringParams } from './editFileHealing';
 import { EditFileResult } from './editFileToolResult';
 import { EditError, NoChangeError, NoMatchError, applyEdit } from './editFileToolUtils';
-import { sendEditNotebookTelemetry } from './editNotebookTool';
 import { assertFileOkForTool, resolveToolInputPath } from './toolUtils';
 
 export interface IReplaceStringToolParams {
@@ -118,7 +117,6 @@ export class ReplaceStringTool implements ICopilotTool<IReplaceStringToolParams>
 					this._promptContext.stream.notebookEdit(document.uri, []);
 					await processFullRewriteNotebook(document.document, updatedFile, this._promptContext.stream, this.alternativeNotebookEditGenerator, telemetryOptions, token);
 					this._promptContext.stream.notebookEdit(document.uri, true);
-					sendEditNotebookTelemetry(this.telemetryService, this.endpointProvider, 'stringReplace', document.uri, this._promptContext.requestId, options.model ?? this._promptContext.request?.model);
 				} else {
 					for (const [uri, edit] of workspaceEdit.entries()) {
 						responseStream.textEdit(uri, edit);

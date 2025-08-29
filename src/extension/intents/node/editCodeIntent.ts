@@ -53,7 +53,6 @@ import { EXISTING_CODE_MARKER } from '../../prompts/node/panel/codeBlockFormatti
 import { EditCodePrompt } from '../../prompts/node/panel/editCodePrompt';
 import { getToolName, ToolName } from '../../tools/common/toolNames';
 import { IToolsService } from '../../tools/common/toolsService';
-import { sendEditNotebookTelemetry } from '../../tools/node/editNotebookTool';
 import { EditCodeStep, EditCodeStepTurnMetaData, PreviousEditCodeStep } from './editCodeStep';
 
 
@@ -535,7 +534,6 @@ export class EditCodeIntentInvocation implements IIntentInvocation {
 							// signal being done with this uri
 							if (isNotebookDocument) {
 								outputStream.notebookEdit(codeBlock.resource, true);
-								sendEditNotebookTelemetry(this.telemetryService, undefined, 'editCodeIntent', codeBlock.resource, this.request.id, undefined, this.endpoint);
 							} else {
 								outputStream.textEdit(codeBlock.resource, true);
 							}

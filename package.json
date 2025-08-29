@@ -269,118 +269,6 @@
 				}
 			},
 			{
-				"name": "copilot_editNotebook",
-				"toolReferenceName": "editNotebook",
-				"displayName": "%copilot.tools.editNotebook.name%",
-				"modelDescription": "This is a tool for editing an existing Notebook file in the workspace. Generate the \"explanation\" property first.\nThe system is very smart and can understand how to apply your edits to the notebooks.\nWhen updating the content of an existing cell, ensure newCode includes at least 3-5 lines of context both before and after the new changes, preserving whitespace and indentation exactly.",
-				"tags": [],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"filePath": {
-							"type": "string",
-							"description": "An absolute path to the notebook file to edit, or the URI of a untitled, not yet named, file, such as `untitled:Untitled-1."
-						},
-						"explanation": {
-							"type": "string",
-							"description": "A one-sentence description of edit operation. This will be shown to the user before the tool is run."
-						},
-						"cellId": {
-							"type": "string",
-							"description": "Id of the cell that needs to be deleted or edited. Use the value `TOP`, `BOTTOM` when inserting a cell at the top or bottom of the notebook, else provide the id of the cell after which a new cell is to be inserted. Remember, if a cellId is provided and editType=insert, then a cell will be inserted after the cell with the provided cellId."
-						},
-						"newCode": {
-							"anyOf": [
-								{
-									"type": "string",
-									"description": "The code for the new or existing cell to be edited. Code should not be wrapped within <VSCode.Cell> tags"
-								},
-								{
-									"type": "array",
-									"items": {
-										"type": "string",
-										"description": "The code for the new or existing cell to be edited. Code should not be wrapped within <VSCode.Cell> tags"
-									}
-								}
-							]
-						},
-						"language": {
-							"type": "string",
-							"description": "The language of the cell. `markdown`, `python`, `javascript`, `julia`, etc."
-						},
-						"editType": {
-							"type": "string",
-							"enum": [
-								"insert",
-								"delete",
-								"edit"
-							],
-							"description": "The operation peformed on the cell, whether `insert`, `delete` or `edit`.\nUse the `editType` field to specify the operation: `insert` to add a new cell, `edit` to modify an existing cell's content, and `delete` to remove a cell."
-						}
-					},
-					"required": [
-						"filePath",
-						"explanation",
-						"editType"
-					]
-				}
-			},
-			{
-				"name": "copilot_runNotebookCell",
-				"displayName": "%copilot.tools.runNotebookCell.name%",
-				"toolReferenceName": "runCell",
-				"icon": "$(play)",
-				"modelDescription": "This is a tool for running a code cell in a notebook file directly in the notebook editor. The output from the execution will be returned. Code cells should be run as they are added or edited when working through a problem to bring the kernel state up to date and ensure the code executes successfully. Code cells are ready to run and don't require any pre-processing. If asked to run the first cell in a notebook, you should run the first code cell since markdown cells cannot be executed. NOTE: Avoid executing Markdown cells or providing Markdown cell IDs, as Markdown cells cannot be  executed.",
-				"userDescription": "%copilot.tools.runNotebookCell.description%",
-				"tags": [
-					"enable_other_tool_copilot_getNotebookSummary"
-				],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"filePath": {
-							"type": "string",
-							"description": "An absolute path to the notebook file with the cell to run, or the URI of a untitled, not yet named, file, such as `untitled:Untitled-1.ipynb"
-						},
-						"reason": {
-							"type": "string",
-							"description": "An optional explanation of why the cell is being run. This will be shown to the user before the tool is run and is not necessary if it's self-explanatory."
-						},
-						"cellId": {
-							"type": "string",
-							"description": "The ID for the code cell to execute. Avoid providing markdown cell IDs as nothing will be executed."
-						},
-						"continueOnError": {
-							"type": "boolean",
-							"description": "Whether or not execution should continue for remaining cells if an error is encountered. Default to false unless instructed otherwise."
-						}
-					},
-					"required": [
-						"filePath",
-						"cellId"
-					]
-				}
-			},
-			{
-				"name": "copilot_getNotebookSummary",
-				"toolReferenceName": "getNotebookSummary",
-				"displayName": "Get the structure of a notebook",
-				"modelDescription": "This is a tool returns the list of the Notebook cells along with the id, cell types, language, execution information and output mime types for each cell. This is useful to get Cell Ids when executing a notebook or determine what cells have been executed and what order, or what cells have outputs. Requery this tool if the contents of the notebook change.",
-				"tags": [],
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"filePath": {
-							"type": "string",
-							"description": "An absolute path to the notebook file with the cell to run, or the URI of a untitled, not yet named, file, such as `untitled:Untitled-1.ipynb"
-						}
-					},
-					"required": [
-						"filePath"
-					]
-				}
-			},
-			{
 				"name": "copilot_fetchWebPage",
 				"displayName": "%copilot.tools.fetchWebPage.name%",
 				"toolReferenceName": "fetch",
@@ -421,17 +309,7 @@
 					"insertEdit",
 					"replaceString",
 					"applyPatch",
-					"editNotebook",
 					"newJupyterNotebook"
-				]
-			},
-			{
-				"name": "runNotebooks",
-				"description": "%copilot.toolSet.runNotebook.description%",
-				"icon": "$(notebook)",
-				"tools": [
-					"runCell",
-					"getNotebookSummary"
 				]
 			},
 			{

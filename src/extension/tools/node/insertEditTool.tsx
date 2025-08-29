@@ -5,6 +5,7 @@
 
 import type * as vscode from 'vscode';
 import { NotebookDocumentSnapshot } from '../../../platform/editing/common/notebookDocumentSnapshot';
+import { IEndpointProvider } from '../../../platform/endpoint/common/endpointProvider';
 import { ILanguageDiagnosticsService } from '../../../platform/languages/common/languageDiagnosticsService';
 import { IAlternativeNotebookContentService } from '../../../platform/notebook/common/alternativeContent';
 import { INotebookService } from '../../../platform/notebook/common/notebookService';
@@ -20,9 +21,7 @@ import { ICopilotTool, ToolRegistry } from '../common/toolsRegistry';
 import { IToolsService } from '../common/toolsService';
 import { ActionType } from './applyPatch/parser';
 import { EditFileResult } from './editFileToolResult';
-import { sendEditNotebookTelemetry } from './editNotebookTool';
 import { assertFileOkForTool } from './toolUtils';
-import { IEndpointProvider } from '../../../platform/endpoint/common/endpointProvider';
 
 export interface IEditFileParams {
 	explanation: string;
@@ -73,7 +72,7 @@ export class EditFileTool implements ICopilotTool<IEditFileParams> {
 			await this.workspaceService.openTextDocumentAndSnapshot(uri);
 
 		if (document instanceof NotebookDocumentSnapshot) {
-			sendEditNotebookTelemetry(this.telemetryService, this.endpointProvider, 'insertEdit', uri, this.promptContext?.requestId, options.model ?? this.promptContext?.request?.model);
+			// Notebook edit detected but telemetry removed
 		}
 		// Then fill in the tool result
 		return new LanguageModelToolResult([

@@ -29,9 +29,7 @@ import { addCacheBreakpoints } from '../../../intents/node/cacheBreakpoints';
 import { ToolCallingLoop } from '../../../intents/node/toolCallingLoop';
 import { IResultMetadata } from '../../../prompt/common/conversation';
 import { IBuildPromptContext, IToolCallRound } from '../../../prompt/common/intents';
-import { ToolName } from '../../../tools/common/toolNames';
 import { normalizeToolSchema } from '../../../tools/common/toolSchemaNormalizer';
-import { NotebookSummary } from '../../../tools/node/notebookSummaryTool';
 import { renderPromptElement } from '../base/promptRenderer';
 import { Tag } from '../base/tag';
 import { ChatToolCalls } from '../panel/toolCalling';
@@ -180,8 +178,7 @@ class WorkingNotebookSummary extends PromptElement<NotebookSummaryProps> {
 	override async render(state: void, sizing: PromptSizing) {
 		return (
 			<UserMessage>
-				This is the current state of the notebook that you have been working on:<br />
-				<NotebookSummary notebook={this.props.notebook} />
+				This is the current state of the notebook that you have been working on.<br />
 			</UserMessage>
 		);
 	}
@@ -685,23 +682,7 @@ export class SummarizedConversationHistoryPropsBuilder {
 	}
 
 	private getWorkingNotebook(props: SummarizedAgentHistoryProps): NotebookDocument | undefined {
-		const toolCallRound = props.promptContext.toolCallRounds && [...props.promptContext.toolCallRounds].reverse().find(round => round.toolCalls.some(call => call.name === ToolName.RunNotebookCell));
-		const toolCall = toolCallRound?.toolCalls.find(call => call.name === ToolName.RunNotebookCell);
-		if (toolCall && toolCall.arguments) {
-			try {
-				const args = JSON.parse(toolCall.arguments);
-				if (typeof args.filePath === 'string') {
-					const uri = this._promptPathRepresentationService.resolveFilePath(args.filePath);
-					if (!uri) {
-						return undefined;
-					}
-					return this._workspaceService.notebookDocuments.find(doc => doc.uri.toString() === uri.toString());
-				}
-			} catch (e) {
-				// Ignore parsing errors
-			}
-		}
-
+		// RunNotebookCell tool has been removed, so no working notebook can be determined
 		return undefined;
 	}
 }

@@ -2,7 +2,6 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-
 import { BasePromptElementProps, PromptElement, PromptSizing } from '@vscode/prompt-tsx';
 import type { LanguageModelToolInformation } from 'vscode';
 import { LanguageModelToolMCPSource } from '../../../../vscodeTypes';
@@ -14,7 +13,6 @@ import { Tag } from '../base/tag';
 import { CodeBlockFormattingRules, EXISTING_CODE_MARKER } from '../panel/codeBlockFormattingRules';
 import { MathIntegrationRules } from '../panel/editorIntegrationRules';
 import { KeepGoingReminder } from './agentPrompt';
-
 // Types and interfaces for reusable components
 interface ToolCapabilities {
 	hasTerminalTool: boolean;
@@ -26,7 +24,6 @@ interface ToolCapabilities {
 	hasFetchTool: boolean;
 	hasTodoListTool: boolean;
 }
-
 // Utility function to detect available tools
 function detectToolCapabilities(availableTools: readonly LanguageModelToolInformation[] | undefined, toolsService?: IToolsService): ToolCapabilities {
 	return {
@@ -40,13 +37,11 @@ function detectToolCapabilities(availableTools: readonly LanguageModelToolInform
 		get hasSomeEditTool() { return this.hasInsertEditTool || this.hasReplaceStringTool || this.hasApplyPatchTool; }
 	};
 }
-
 interface DefaultAgentPromptProps extends BasePromptElementProps {
 	readonly availableTools: readonly LanguageModelToolInformation[] | undefined;
 	readonly modelFamily: string | undefined;
 	readonly codesearchMode: boolean | undefined;
 }
-
 /**
  * Base system prompt for agent mode
  */
@@ -54,7 +49,6 @@ export class DefaultAgentPrompt extends PromptElement<DefaultAgentPromptProps> {
 	async render(state: void, sizing: PromptSizing) {
 		const tools = detectToolCapabilities(this.props.availableTools);
 		const isGpt5 = this.props.modelFamily === 'gpt-5';
-
 		return <InstructionMessage>
 			<Tag name='instructions'>
 				You are a highly sophisticated automated coding agent with expert-level knowledge across many different programming languages and frameworks.<br />
@@ -170,7 +164,6 @@ export class DefaultAgentPrompt extends PromptElement<DefaultAgentPromptProps> {
 			{tools.hasApplyPatchTool && <ApplyPatchInstructions {...this.props} />}
 			{this.props.availableTools && <McpToolInstructions tools={this.props.availableTools} />}
 			{isGpt5 && tools.hasTodoListTool && <TodoListToolInstructions {...this.props} />}
-			<NotebookInstructions {...this.props} />
 			<Tag name='outputFormatting'>
 				Use proper Markdown formatting in your answers. When referring to a filename or symbol in the user's workspace, wrap it in backticks.<br />
 				{isGpt5 && <>
@@ -193,7 +186,6 @@ export class DefaultAgentPrompt extends PromptElement<DefaultAgentPromptProps> {
 		</InstructionMessage>;
 	}
 }
-
 /**
  * GPT-specific agent prompt that incorporates structured workflow and autonomous behavior patterns
  * for improved multi-step task execution and more systematic problem-solving approach.
@@ -202,7 +194,6 @@ export class AlternateGPTPrompt extends PromptElement<DefaultAgentPromptProps> {
 	async render(state: void, sizing: PromptSizing) {
 		const tools = detectToolCapabilities(this.props.availableTools);
 		const isGpt5 = this.props.modelFamily === 'gpt-5';
-
 		return <InstructionMessage>
 			<Tag name='gpt41AgentInstructions'>
 				You are a highly sophisticated coding agent with expert-level knowledge across programming languages and frameworks.<br />
@@ -330,7 +321,6 @@ export class AlternateGPTPrompt extends PromptElement<DefaultAgentPromptProps> {
 			{tools.hasApplyPatchTool && <ApplyPatchInstructions {...this.props} />}
 			{this.props.availableTools && <McpToolInstructions tools={this.props.availableTools} />}
 			{isGpt5 && tools.hasTodoListTool && <TodoListToolInstructions {...this.props} />}
-			<NotebookInstructions {...this.props} />
 			<Tag name='outputFormatting'>
 				Use proper Markdown formatting in your answers. When referring to a filename or symbol in the user's workspace, wrap it in backticks.<br />
 				{isGpt5 && <>
@@ -353,7 +343,6 @@ export class AlternateGPTPrompt extends PromptElement<DefaultAgentPromptProps> {
 		</InstructionMessage>;
 	}
 }
-
 class McpToolInstructions extends PromptElement<{ tools: readonly LanguageModelToolInformation[] } & BasePromptElementProps> {
 	render() {
 		const instructions = new Map<string, string>();
@@ -364,13 +353,11 @@ class McpToolInstructions extends PromptElement<{ tools: readonly LanguageModelT
 				instructions.set(`mcp_${serverLabel}`, tool.source.instructions);
 			}
 		}
-
 		return <>{[...instructions].map(([prefix, instruction]) => (
 			<Tag name='instruction' attrs={{ forToolsWithPrefix: prefix }}>{instruction}</Tag>
 		))}</>;
 	}
 }
-
 /**
  * Instructions specific to code-search mode AKA AskAgent
  */
@@ -399,7 +386,6 @@ class CodesearchModeInstructions extends PromptElement<DefaultAgentPromptProps> 
 		</>;
 	}
 }
-
 /**
  * A system prompt only used for some evals with swebench
  */
@@ -410,13 +396,11 @@ export class SweBenchAgentPrompt extends PromptElement<DefaultAgentPromptProps> 
 	) {
 		super(props);
 	}
-
 	async render(state: void, sizing: PromptSizing) {
 		const hasTerminalTool = this._toolsService.getTool(ToolName.CoreRunInTerminal) !== undefined;
 		const hasReplaceStringTool = !!this.props.availableTools?.find(tool => tool.name === ToolName.ReplaceString);
 		const hasEditFileTool = !!this.props.availableTools?.find(tool => tool.name === ToolName.EditFile);
 		const hasApplyPatchTool = !!this.props.availableTools?.find(tool => tool.name === ToolName.ApplyPatch);
-
 		return <InstructionMessage>
 			<Tag name="mostImportantInstructions">
 				<KeepGoingReminder modelFamily={this.props.modelFamily} />
@@ -435,10 +419,8 @@ export class SweBenchAgentPrompt extends PromptElement<DefaultAgentPromptProps> 
 				You are biased for action to fix all the issues user mentioned by using edit tool rather than just answering the user's question.<br />
 				Once you need to use bash tool, you can use {ToolName.CoreRunInTerminal} to run bash commands and see the output directly.<br />
 				As a first step, you should create a temp folder before creating any temporary files.<br />
-
 				Run your reproducing scripts and test scripts directly in the terminal to see the output immediately. Use commands like:<br />
 				- `python temp/test_script.py` to see the output directly in the terminal<br />
-
 				Follow these steps when handling fixing the issue from user query:<br />
 				1. Begin by initializing Git with `git init`, then exploring the repository to familiarize yourself with its structure. Use {ToolName.CoreRunInTerminal} to explore the directory structure.<br />
 				2. Create a well-documented Python script in temp/ to reproduce the issue described in the pr_description.<br />
@@ -464,21 +446,17 @@ export class SweBenchAgentPrompt extends PromptElement<DefaultAgentPromptProps> 
 				22. FINAL VALIDATION WITH GIT DIFF: Before considering the task complete, you must use `git diff` in {ToolName.CoreRunInTerminal} to review all files you have edited outside of temp to verify that the final successful fix validated by reproducing script has been correctly applied to all the corresponding files.<br />
 				23. SUMMARIZE THE CHANGE: Provide a detailed summary of all changes made to the codebase, explaining how they address the issue described in pr_description and handle edge cases. Include relevant `git diff` outputs to clearly document the changes.<br />
 				24. DOCUMENT TESTING: Include details about how your fix was validated, including the test cases that now pass which previously failed.<br />
-
 				Don't make assumptions about the situation - gather context first, then perform the task or answer the question.<br />
 				Think completely and explore the whole workspace before you make any plan or decision.<br />
 				You must clean up all the temporary files you created in the temp folder after confirming user's issue is fixed and validated.<br />
 			</Tag>
 			<Tag name="searchInstructions">
 				When searching for information in the codebase, follow these guidelines:<br />
-
 				1. For locating specific code elements:<br />
 				- Best for finding class names, function names, or specific code patterns<br />
-
 				2. Fallback search strategy:<br />
 				- If these searches fail to find what you need, use bash commands via {ToolName.CoreRunInTerminal}<br />
 				- Example: `find . -name "*.py" | xargs grep -l "function_name"` or `grep -r "search_term" .`<br />
-
 				Choose the appropriate search tool based on how specific your target is - from general context to exact matches.<br />
 			</Tag>
 			{hasReplaceStringTool && <Tag name='ReplaceStringToolInstructions'>
@@ -553,7 +531,6 @@ export class SweBenchAgentPrompt extends PromptElement<DefaultAgentPromptProps> 
 		</InstructionMessage>;
 	}
 }
-
 export class ApplyPatchFormatInstructions extends PromptElement {
 	render() {
 		return <>
@@ -585,7 +562,6 @@ export class ApplyPatchFormatInstructions extends PromptElement {
 		</>;
 	}
 }
-
 class ApplyPatchInstructions extends PromptElement<DefaultAgentPromptProps> {
 	async render(state: void, sizing: PromptSizing) {
 		const isGpt5 = this.props.modelFamily === 'gpt-5';
@@ -599,7 +575,6 @@ class ApplyPatchInstructions extends PromptElement<DefaultAgentPromptProps> {
 		</Tag>;
 	}
 }
-
 class GenericEditingTips extends PromptElement<DefaultAgentPromptProps> {
 	override render() {
 		const hasTerminalTool = !!this.props.availableTools?.find(tool => tool.name === ToolName.CoreRunInTerminal);
@@ -610,31 +585,6 @@ class GenericEditingTips extends PromptElement<DefaultAgentPromptProps> {
 		</>;
 	}
 }
-
-class NotebookInstructions extends PromptElement<DefaultAgentPromptProps> {
-	constructor(
-		props: DefaultAgentPromptProps,
-	) {
-		super(props);
-	}
-
-	async render(state: void, sizing: PromptSizing) {
-		const hasEditFileTool = !!this.props.availableTools?.find(tool => tool.name === ToolName.EditFile);
-		const hasEditNotebookTool = !!this.props.availableTools?.find(tool => tool.name === ToolName.EditNotebook);
-		if (!hasEditNotebookTool) {
-			return;
-		}
-		return <Tag name='notebookInstructions'>
-			To edit notebook files in the workspace, you can use the {ToolName.EditNotebook} tool.<br />
-			{hasEditFileTool && <><br />Never use the {ToolName.EditFile} tool and never execute Jupyter related commands in the Terminal to edit notebook files, such as `jupyter notebook`, `jupyter lab`, `install jupyter` or the like. Use the {ToolName.EditNotebook} tool instead.<br /></>}
-			Use the {ToolName.RunNotebookCell} tool instead of executing Jupyter related commands in the Terminal, such as `jupyter notebook`, `jupyter lab`, `install jupyter` or the like.<br />
-			Use the {ToolName.GetNotebookSummary} tool to get the summary of the notebook (this includes the list or all cells along with the Cell Id, Cell type and Cell Language, execution details and mime types of the outputs, if any).<br />
-			Important Reminder: Avoid referencing Notebook Cell Ids in user messages. Use cell number instead.<br />
-			Important Reminder: Markdown cells cannot be executed
-		</Tag>;
-	}
-}
-
 class TodoListToolInstructions extends PromptElement<DefaultAgentPromptProps> {
 	render() {
 		return <Tag name='todoListToolInstructions'>

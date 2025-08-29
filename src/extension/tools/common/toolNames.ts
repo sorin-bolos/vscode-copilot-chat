@@ -11,9 +11,6 @@ export const enum ToolName {
 	ReadFile = 'read_file',
 	EditFile = 'insert_edit_into_file',
 	ReplaceString = 'replace_string_in_file',
-	EditNotebook = 'edit_notebook_file',
-	RunNotebookCell = 'run_notebook_cell',
-	GetNotebookSummary = 'copilot_getNotebookSummary',
 	Think = 'think',
 	FetchWebPage = 'fetch_webpage',
 	GetTaskOutput = 'get_task_output',
@@ -35,9 +32,6 @@ export const enum ContributedToolName {
 	ReadFile = 'copilot_readFile',
 	EditFile = 'copilot_insertEdit',
 	ReplaceString = 'copilot_replaceString',
-	EditNotebook = 'copilot_editNotebook',
-	RunNotebookCell = 'copilot_runNotebookCell',
-	GetNotebookSummary = 'copilot_getNotebookSummary',
 	Think = 'copilot_think',
 	FetchWebPage = 'copilot_fetchWebPage',
 	CreateAndRunTask = 'copilot_createAndRunTask',
@@ -50,9 +44,6 @@ const contributedToolNameToToolNames = new Map<ContributedToolName, ToolName>([
 	[ContributedToolName.Think, ToolName.Think],
 	[ContributedToolName.FetchWebPage, ToolName.FetchWebPage],
 	[ContributedToolName.ReplaceString, ToolName.ReplaceString],
-	[ContributedToolName.EditNotebook, ToolName.EditNotebook],
-	[ContributedToolName.RunNotebookCell, ToolName.RunNotebookCell],
-	[ContributedToolName.GetNotebookSummary, ToolName.GetNotebookSummary],
 ]);
 
 const toolNameToContributedToolNames = new Map<ToolName, ContributedToolName>();

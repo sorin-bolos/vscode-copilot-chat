@@ -45,7 +45,6 @@ import { IToolsService } from '../common/toolsService';
 import { PATCH_PREFIX, PATCH_SUFFIX } from './applyPatch/parseApplyPatch';
 import { ActionType, Commit, DiffError, FileChange, InvalidContextError, InvalidPatchFormatError, processPatch } from './applyPatch/parser';
 import { EditFileResult, IEditedFile } from './editFileToolResult';
-import { sendEditNotebookTelemetry } from './editNotebookTool';
 import { assertFileOkForTool, resolveToolInputPath } from './toolUtils';
 
 export const applyPatchWithNotebookSupportDescription: vscode.LanguageModelToolInformation = {
@@ -239,7 +238,7 @@ export class ApplyPatchTool implements ICopilotTool<IApplyPatchToolParams> {
 				// Possible there are other issues with other formats as well.
 				return new LanguageModelToolResult([
 					new LanguageModelTextPart('Applying patch failed with error: ' + error.message),
-					new LanguageModelTextPart(`Use the ${ToolName.EditNotebook} tool to edit notebook files such as ${notebookUri}.`),
+					new LanguageModelTextPart('Note: This tool cannot be used to edit notebook files.'),
 				]);
 
 			} else {
@@ -299,7 +298,7 @@ export class ApplyPatchTool implements ICopilotTool<IApplyPatchToolParams> {
 								this.sendApplyPatchTelemetry('invalidNotebookEdit', options, altDoc.getText(), !!healed, true, error);
 								return new LanguageModelToolResult([
 									new LanguageModelTextPart('Applying patch failed with error: ' + error.message),
-									new LanguageModelTextPart(`Use the ${ToolName.EditNotebook} tool to edit notebook files such as ${file}.`),
+									new LanguageModelTextPart('Note: This tool cannot be used to edit notebook files.'),
 								]);
 							}
 						}
@@ -353,7 +352,6 @@ export class ApplyPatchTool implements ICopilotTool<IApplyPatchToolParams> {
 						}
 					}
 					responseStream.notebookEdit(notebookUri, true);
-					sendEditNotebookTelemetry(this.telemetryService, this.endpointProvider, 'applyPatch', notebookUri, this._promptContext.requestId, options.model ?? this._promptContext.request?.model);
 				} else {
 					this._promptContext.stream.markdown('\n```\n');
 					this._promptContext.stream.codeblockUri(notebookUri || uri, true);

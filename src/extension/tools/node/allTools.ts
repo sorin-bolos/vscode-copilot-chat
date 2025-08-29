@@ -4,11 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import './applyPatchTool';
-import './editNotebookTool';
 import './insertEditTool';
-import './notebookSummaryTool';
 import './readFileTool';
 import './replaceStringTool';
-import './runNotebookCellTool';
 import './thinkTool';
 
